@@ -69,7 +69,7 @@ fpe = FPSim2Engine('molecules_library.h5')
 
 # Load the source CSV metadata file
 # Preserving the natural integer row index matching the database matrix
-df_metadata = pd.read_csv(r'D:\ChemSmileAI\chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
+df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
 print("Search engine is hot and ready.")
 
