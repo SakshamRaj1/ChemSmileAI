@@ -1,0 +1,2263 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    /* GLOBAL  */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    body {
+        width: 100%;
+        max-width: 100%;
+        color: white;
+    }
+
+    img,
+    svg {
+        max-width: 100%;
+    }
+
+    /* TYPOGRAPHY */
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 2%;
+        letter-spacing: -1px;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .para-describe {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #ffffff;
+        text-align: left;
+        width: 80%;
+        max-width: 100%;
+    }
+
+    .para-describe p {
+        margin-bottom: 0;
+        overflow-wrap: break-word;
+    }
+
+    /* SEARCH / INPUT AREA */
+
+    .search-container-bar {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .search-container-bar form {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .search-input-field {
+        background: linear-gradient(90deg,#b30c1b21 0%,#6e050e 40%,#150204 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 20px 25px;
+        width: 100%;
+        min-width: 0;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        /* margin-right: 10px; */
+    }
+
+    .search-input-field:focus {
+        background-image: linear-gradient(
+            135deg,
+            #a80a18 0%,
+            #09111c 100%
+        ) !important;
+        background-color: transparent !important;
+        color: #ffffff !important;
+        outline: none;
+    }
+
+    .search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.863);
+    }
+
+    /* Delete / clear buttons */
+    .search-container-bar form > button[type="button"] {
+        flex: 0 0 auto;
+        padding: 0 5px;
+    }
+
+    .search-container-bar form > button[type="button"] svg {
+        width: 32px;
+        height: 32px;
+        display: block;
+    }
+
+    .submit-action-btn {
+        background: linear-gradient(
+            135deg,
+            #a80a18 0%,
+            #09111c 100%
+        );
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 20px 25px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        flex: 0 0 auto;
+        cursor: pointer;
+    }
+
+    .submit-action-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    }
+
+    .range-action-btn input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 200px;
+        max-width: 100%;
+        height: 6px;
+        background: #ffffff;
+        border-radius: 3px;
+        outline: none;
+        transition: background 0.2s ease;
+    } 
+
+    .if-error {
+        background: rgba(16, 34, 54, 0.486);
+        border-radius: 50px;
+        padding: 14px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        max-width: 100%;
+        color: #ffffff;
+        margin-left: 40px;
+        margin-top: 15px;
+    }
+
+    .results-panel {
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 30px;
+        margin-top: 50px;
+        margin-left: 3rem;
+        margin-right: 6rem;
+        backdrop-filter: blur(10px);
+        max-width: calc(100% - 9rem);
+    }
+
+    .card {
+        border-radius: 24px;
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        margin-right: 2rem;
+    }
+
+    .text-break {
+        color: rgba(255, 255, 255, 0.7);
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .body {
+        color: white;
+    }
+
+    /* MAIN SIMILARITY LAYOUT */
+
+    .similarity-results {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 10px;
+        margin-top: 2rem;
+        margin-top: 2rem;
+    }
+
+    .left-sidebar {
+        background-color: rgba(13, 22, 34, 0.8);
+        padding: 1rem;
+        max-width: 25%;
+        width: 25%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        margin-bottom: 24px;
+        flex: 0 0 25%;
+        box-sizing: border-box;
+        position: sticky;
+        top: 4rem;
+        min-width: 0;
+    }
+
+    .right-sidebar {
+        max-width: 73.5%;
+        width: 73.5%;
+        min-width: 0;
+        background-color: rgba(13, 22, 34, 0.8);
+        border-radius: 24px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 24px;
+        flex: 0 0 73.5%;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .query-summary {
+        margin: 1rem;
+        min-width: 0;
+    }
+
+    .data-grid-table th {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .table-dark th {
+        color: #ffffff;
+        text-align: center;
+        font-size: 1.1rem;
+        background-color: #6e050e;
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    .data-grid-table td {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .right-sidebar .table {
+        width: 100%;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .right-sidebar .table td,
+    .right-sidebar .table th {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .right-sidebar svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .right-sidebar img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* ERROR RESULT COLUMN */
+
+    .col-md-7 {
+        padding: 3.5rem;
+        margin: auto;
+        place-items: center;
+        border-radius: 24px;
+        background-color: rgba(13, 22, 34, 0.8);
+        max-width: 90%;
+        margin-bottom: 2rem;
+        margin-top: 2rem;
+    }
+
+    /* RE-COMPARE BUTTON */
+
+    .re-compare-button {
+        background: linear-gradient(
+            135deg,
+            #a80a18 0%,
+            #09111c 100%
+        );
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        align-self: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .re-compare-button:hover {
+        color: #ffffff;
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    }
+
+    /* CODE / SMILES TEXT  */
+
+    code {
+        font-size: .875em;
+        color: #ffc107;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        font-weight: 500;
+    }
+
+    /* AUTOFILL */
+
+    .search-input-field:-webkit-autofill,
+    .search-input-field:-webkit-autofill:hover,
+    .search-input-field:-webkit-autofill:focus,
+    .search-input-field:-webkit-autofill:active {
+        -webkit-text-fill-color: #ffffff !important;
+        color: #ffffff !important;
+
+        -webkit-box-shadow: 0 0 0 1000px #3f0308 inset !important;
+
+        background-image: linear-gradient(
+            135deg,
+            #a80a18 0%,
+            #09111c 100%
+        ) !important;
+
+        background-color: transparent !important;
+
+        transition: background-color 50000s ease-in-out 0s !important;
+
+        caret-color: #ffffff;
+    }
+
+
+    /* LARGE TABLETS / SMALL LAPTOPS <= 1200px */
+
+    @media (max-width: 1200px) {
+
+        .hero-title {
+            font-size: 3.5rem;
+        }
+
+        .para-describe {
+            width: 90%;
+        }
+
+        .search-container-bar {
+            max-width: 90%;
+        }
+
+        .similarity-results {
+            gap: 15px;
+        }
+
+        .left-sidebar {
+            max-width: 30%;
+            width: 30%;
+            flex-basis: 30%;
+        }
+
+        .right-sidebar {
+            max-width: calc(70% - 15px);
+            width: calc(70% - 15px);
+            flex-basis: calc(70% - 15px);
+        }
+
+        .col-md-7 {
+            max-width: 95%;
+            padding: 2.5rem;
+        }
+    }
+
+
+    /* TABLETS <= 992px */
+
+    @media (max-width: 992px) {
+
+        .hero-title {
+            font-size: 3rem;
+            margin-top: 1.5rem;
+        }
+
+        .para-describe {
+            width: 95%;
+            font-size: 1.05rem;
+        }
+
+        .search-container-bar {
+            max-width: 95%;
+            margin-top: 30px;
+        }
+
+        .search-container-bar form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        .search-container-bar form .search-input-field {
+            width: 100%;
+            min-width: 0;
+            margin-right: 0;
+            border-radius: 50px;
+        }
+
+        .search-container-bar form > button[type="button"] {
+            width: auto;
+            padding: 0 6px;
+        }
+
+        .search-container-bar form .submit-action-btn {
+            grid-column: 1 / -1;
+            width: 100%;
+            margin-top: 5px;
+            padding: 16px 20px;
+        }
+
+        .similarity-results {
+            flex-direction: column;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            width: 100%;
+            max-width: 100%;
+            flex: 0 0 100%;
+            position: relative;
+            top: auto;
+        }
+
+        .left-sidebar {
+            order: 1;
+        }
+
+        .right-sidebar {
+            order: 2;
+        }
+
+        .query-summary {
+            margin: 0;
+        }
+
+        .results-panel {
+            margin-left: 1.5rem;
+            margin-right: 1.5rem;
+            max-width: calc(100% - 3rem);
+        }
+
+        .col-md-7 {
+            max-width: 95%;
+            width: 95%;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+    }
+
+
+    /* MOBILE <= 768px */
+
+    @media (max-width: 768px) {
+
+        .hero-title {
+            font-size: 2.4rem;
+            line-height: 1.15;
+            letter-spacing: -0.5px;
+            margin-top: 1rem;
+        }
+
+        .para-describe {
+            width: 100%;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .para-describe br {
+            display: none;
+        }
+
+        .search-container-bar {
+            width: 100%;
+            max-width: 100%;
+            padding: 8px;
+            border-radius: 16px;
+            margin-top: 25px;
+        }
+
+        .search-container-bar form {
+            width: 100%;
+        }
+
+        .search-input-field {
+            font-size: 0.95rem;
+            padding: 16px 18px;
+        }
+
+        .search-container-bar form > button[type="button"] svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .submit-action-btn {
+            font-size: 0.95rem;
+            padding: 15px 18px !important;
+        }
+
+        .similarity-results {
+            padding: 5px 0;
+            gap: 15px;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 15px;
+        }
+
+        .right-sidebar {
+            overflow-x: auto;
+            /* -webkit-overflow-scrolling: touch; */
+        }
+
+        .right-sidebar .table {
+            min-width: 700px;
+        }
+
+        .left-sidebar .table {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .query-summary {
+            margin: 0;
+            width: 100%;
+        }
+
+        .query-summary .table {
+            font-size: 0.85rem;
+        }
+
+        .query-summary td,
+        .query-summary th {
+            padding: 0.65rem 0.5rem;
+        }
+
+        .right-sidebar h2 {
+            font-size: 1.6rem;
+        }
+
+        .right-sidebar h5 {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .card-body-results {
+            padding: 0 !important;
+        }
+
+        .table-dark th {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+
+        .right-sidebar .table td {
+            font-size: 0.85rem;
+            padding: 0.7rem;
+        }
+
+        .re-compare-button {
+            margin-right: 0;
+            padding: 11px 20px;
+            font-size: 0.9rem;
+            white-space: normal;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .results-panel {
+            margin: 30px 10px 0;
+            max-width: calc(100% - 20px);
+            padding: 15px;
+            border-radius: 18px;
+        }
+
+        .col-md-7 {
+            width: 100%;
+            max-width: 100%;
+            padding: 1rem;
+            border-radius: 18px;
+            margin-bottom: 2rem;
+        }
+
+        .col-md-7 .table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            /* -webkit-overflow-scrolling: touch; */
+        }
+
+        .col-md-7 .table th,
+        .col-md-7 .table td {
+            min-width: 110px;
+            font-size: 0.85rem;
+            padding: 0.65rem;
+        }
+
+        .if-error {
+            margin-left: 10px;
+            margin-right: 10px;
+            width: calc(100% - 20px);
+            max-width: calc(100% - 20px);
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+    }
+
+
+    /* SMALL PHONES <= 576px */
+    @media (max-width: 576px) {
+
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.15;
+            margin-top: 0.75rem;
+        }
+
+        .para-describe {
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        .search-container-bar {
+            margin-top: 20px;
+            padding: 7px;
+            border-radius: 16px;
+        }
+
+        /* On very small screens each molecule input gets its own full row. */
+        .search-container-bar form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .search-container-bar form .search-input-field {
+            width: 100%;
+            flex: none;
+            margin: 0;
+            border-radius: 16px !important;
+            padding: 15px 16px;
+            font-size: 0.88rem;
+        }
+
+        .search-container-bar form .submit-action-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px 15px !important;
+            font-size: 0.9rem;
+        }
+
+        .similarity-results {
+            gap: 10px;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            border-radius: 16px;
+            padding: 10px;
+        }
+
+        .right-sidebar .table {
+            min-width: 650px;
+        }
+
+        .right-sidebar h2 {
+            font-size: 1.35rem;
+        }
+
+        .right-sidebar h5 {
+            font-size: 0.85rem;
+        }
+
+        .query-summary .table {
+            font-size: 0.78rem;
+        }
+
+        .query-summary td,
+        .query-summary th {
+            padding: 0.55rem 0.4rem;
+        }
+
+        .table-dark th {
+            font-size: 0.82rem;
+            padding: 0.6rem;
+        }
+
+        .right-sidebar .table td {
+            font-size: 0.8rem;
+            padding: 0.6rem;
+        }
+
+        .re-compare-button {
+            width: 100%;
+            display: block;
+            margin: 0;
+            padding: 11px 15px;
+            font-size: 0.85rem;
+        }
+
+        .col-md-7 {
+            padding: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .col-md-7 h2 {
+            font-size: 1.4rem;
+        }
+
+        .col-md-7 h3 {
+            font-size: 1.1rem;
+        }
+
+        .col-md-7 .table th,
+        .col-md-7 .table td {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+        }
+
+        code {
+            font-size: 0.75rem;
+        }
+
+    }
+        
+
+    /* EXTRA SMALL PHONES <= 400px */
+
+    @media (max-width: 400px) {
+
+        .hero-title {
+            font-size: 1.75rem;
+        }
+
+        .para-describe {
+            font-size: 0.85rem;
+        }
+
+        .search-input-field {
+            font-size: 0.82rem !important;
+            padding: 14px 14px !important;
+        }
+
+        .submit-action-btn {
+            font-size: 0.82rem !important;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            padding: 8px;
+        }
+
+        .right-sidebar .table {
+            min-width: 600px;
+        }
+
+        .query-summary td,
+        .query-summary th {
+            font-size: 0.72rem;
+        }
+
+        .re-compare-button {
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 576.99px) {
+
+        .search-container-bar {
+            position: relative;
+            overflow: visible;
+        }
+
+        .search-container-bar form {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .search-container-bar form .search-input-field {
+            width: 100%;
+            margin: 0;
+            padding-right: 50px !important;
+            border-radius: 16px !important;
+        }
+
+        .search-container-bar form > button[type="button"]:nth-of-type(1) {
+            position: absolute;
+            top: 7px;
+            right: 5px;
+            width: 42px;
+            height: 42px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .search-container-bar form > button[type="button"]:nth-of-type(2) {
+            position: absolute;
+            top: 57px;
+            right: 5px;
+            width: 42px;
+            height: 42px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .search-container-bar form > button[type="button"] svg {
+            width: 28px;
+            height: 28px;
+            max-width: 28px;
+            max-height: 28px;
+        }
+
+        .search-container-bar form .submit-action-btn {
+            width: 100%;
+            margin-top: 5px;
+        }
+    }
+
+    @media (max-width: 576.99px) {
+
+        .search-container-bar form {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-container-bar form .search-input-field {
+            height: 50px;
+            padding: 0 50px 0 16px !important;
+            margin: 0;
+            border-radius: 16px !important;
+        }
+
+        .search-container-bar form > button[type="button"] {
+            position: absolute;
+            right: 5px;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        /* Input 1 */
+        .search-container-bar form > button[type="button"]:nth-of-type(1) {
+            top: 4px;
+        }
+
+        /* Input 2 = 50px input + 8px gap */
+        .search-container-bar form > button[type="button"]:nth-of-type(2) {
+            top: 62px;
+        }
+    }
+
+    /* ==========================Informaive Details ======================= */
+
+       .compare-explorer {
+            margin: 52px auto 90px;
+            /* padding: 2.5rem; */
+            margin-top: 2rem;
+        }
+
+        .compare-explorer-title span, .compare-info-title span {
+            color: #b30c1b;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1.6px;
+        }
+
+        .compare-explorer-title h2 {
+            margin: 6px 0 5px;
+            color: #f2f3f5;
+            font-size: 23px;
+        }
+
+        .compare-explorer-title p {
+            margin: 0 0 18px;
+            color: #78838e;
+            font-size: 11px;
+        }
+
+
+        /* Example rows */
+
+        .compare-try-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .compare-try {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 70px;
+            padding: 10px 14px;
+            text-align: left;
+            color: #fff;
+            background: #565d65;
+            border: 0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .compare-try:hover {
+            background: #626a73;
+            transform: translateY(-2px);
+        }
+
+        .try-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            margin-right: 14px;
+            color: #d83f52;
+            background: rgba(184,14,32,.16);
+            border-radius: 10px;
+            font-size: 19px;
+        }
+
+        .try-text {
+            flex: 1;
+        }
+
+        .try-text strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #f0f1f2;
+            font-size: 13px;
+        }
+
+        .try-text i {
+            margin: 0 5px;
+            color: #b30c1b;
+            font-style: normal;
+        }
+
+        .try-text span {
+            color: #78838e;
+            font-size: 10px;
+        }
+
+        .try-arrow {
+            color: #c5c9cd;
+            font-size: 18px;
+            transition: .2s;
+        }
+
+        .compare-try:hover .try-arrow {
+            color: #e04a5b;
+            transform: translateX(3px);
+        }
+
+
+        /* Analysis container */
+
+        .compare-info {
+            margin-top: 22px;
+            padding: 18px;
+            background: #000000b0;
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 15px;
+            /* zoom: 1.5; */
+            margin-top: 34px;
+            padding: 22px 24px;
+        }
+
+        .compare-info-title {
+            margin-bottom: 14px;
+        }
+
+        .compare-info-title strong {
+            display: block;
+            margin-top: 5px;
+            color: #dfe2e5;
+            font-size: 1rem;
+        }
+
+        .info-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            zoom: 1.3;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #99999912;
+            transition: .2s;
+        }
+
+        .info-item:hover {
+            background: rgba(184,14,32,.08);
+        }
+
+        .info-icon {
+            width: 31px;
+            height: 31px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            color: #b30c1b;
+            background: rgba(184,14,32,.10);
+            border-radius: 8px;
+        }
+
+        .info-item strong {
+            display: block;
+            color: #d7dade;
+            font-size: 10px;
+
+        }.info-item span {
+            color: #c5c5c5;
+            font-size: 9px;
+        }
+
+        @media (max-width: 650px) {
+
+            .compare-explorer {
+                padding: 0 15px;
+            }
+
+        }
+        /* ================================
+        COMPARE EXPLORER
+        ================================ */
+
+        .compare-explorer {
+            margin: 52px auto 90px;
+        }
+
+        .compare-heading {
+            margin-bottom: 24px;
+            padding: 1rem 2rem;
+            background: #09101a91;
+            border-radius: 24px;
+            border: 2px solid #ffffff17;
+            box-shadow: 0px 28px 52px #444444ab;
+        }
+
+        .compare-label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            color: #b30c1b;
+            font-size: 1.5rem;
+            text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff;
+        }
+
+        .compare-heading h2 {
+            margin: 7px 0 0;
+            color: #f4f5f7;
+            font-size: 25px;
+            text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff;
+        }
+
+        .compare-heading p {
+            margin: 8px 0 0;
+            /* max-width: 650px; */
+            color: #ff9400;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+
+        /* Example cards */
+
+        .compare-example-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            border-radius: 16px;
+            background: #ffffff0a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #ffffff15;
+            margin-bottom: 1.5rem;
+        }
+
+        .compare-example {
+            padding: 20px;
+            border: 1px solid rgba(145,160,175,.15);
+            border-radius: 17px;
+            background: linear-gradient(145deg,#111a23,#0c1219);
+            color: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: .25s ease;
+        }
+
+        .compare-example:hover,
+        .compare-example.selected {
+            transform: translateY(-5px);
+            border-color: rgba(210,35,53,.55);
+            box-shadow: 0 18px 40px rgba(0,0,0,.35);
+        }
+
+
+        /* Pair header */
+
+        .compare-pair {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 17px;
+        }
+
+        .molecule-pill {
+            flex: 1;
+            padding: 11px 10px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,.035);
+        }
+
+        .molecule-pill small {
+            display: block;
+            margin-bottom: 4px;
+            color: #9d9d9d;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            }
+
+        .molecule-pill strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        .compare-symbol {
+            color: #b30c1b;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+
+        /* Molecule information */
+
+        .compare-info {
+            min-height: 70px;
+        }
+
+        .compare-info h3 {
+            margin: 0 0 6px;
+            font-size: 17px;
+        }
+
+        .compare-info p {
+            margin: 0;
+            color: #ffffffc9;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .compare-tag {
+            display: inline-block;
+            margin-top: 13px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            color: #d75a67;
+            background: rgba(184,14,32,.09);
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        /* Footer */
+
+        .compare-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+            padding-top: 13px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            zoom: 1.4;
+        }
+
+        .compare-use:hover {
+            color: #ffffff !important;
+            font-weight: 700;
+            background: #b30c1b;
+            border-radius: 50px;
+            padding: 0.25rem;
+        }
+
+        .compare-card-footer span {
+            color: #66727e;
+            font-size: 9px;
+        }
+
+        .compare-use {
+            color: #b30c1b !important;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 0.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.226);
+        }
+
+
+        /* Small instruction panel */
+
+        .compare-hint {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-top: 24px;
+            padding: 17px 20px;
+            border: 1px solid rgba(145,160,175,.12);
+            border-radius: 14px;
+            background: rgba(13,20,28,.7);
+            zoom: 1.25;
+        }
+
+        .compare-hint-icon {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 9px;
+            color: #dc4355;
+            background: rgba(184,14,32,.1);
+            font-size: 17px;
+        }
+
+        .compare-hint strong {
+            display: block;
+            margin-bottom: 3px;
+            color: #dfe3e7;
+            font-size: 12px;
+        }
+
+        .compare-hint span {
+            color: #c5c5c5;
+            font-size: 10px;
+        }
+
+
+        /* Input feedback */
+
+        .compare-input-active {
+            box-shadow: 0 0 0 2px rgba(213,58,74,.2) !important;
+        }
+
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+            .compare-example-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .compare-explorer {
+                padding: 0 15px;
+            }
+
+            .compare-example-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* RESPONSIVE GRIDS */
+        .info-grid,
+        .compare-example-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .compare-example-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+
+        /* 1400px and below */
+
+        @media (max-width: 1400px) {
+
+            .info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .compare-example-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+        /* 1100px and below */
+
+        @media (max-width: 1100px) {
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .compare-example-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 991px) and (min-width: 651px){
+            .info-list {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+        }
+
+        /* 700px and below */
+
+        @media (max-width: 650px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .compare-example-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 18px;
+            }
+
+            .info-list {
+                grid-template-columns: repeat(2, 1fr);
+
+            }
+        }
+    
+        /* Small phones */
+
+        @media (max-width: 450px) {
+
+            .info-grid,
+            .compare-example-grid {
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .compare-example {
+                padding: 15px;
+            }
+
+            .info-list {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+        }
+
+        @media (max-width: 300px) {
+            .compare-example-grid {
+                gap: 10px;
+                padding: 12px;
+                zoom: 0.7;
+            }
+        }
+
+        @media (max-width: 300px) {
+            .compare-example-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 18px;
+                zoom: 0.7;
+            }
+        }
+
+        
+</style>
+
+<h1 class="hero-title">Comparison Playground</h1>
+    <div class="para-describe">
+        <p>Compare and analyze the 2 chemical molecules with their Canonical SMILES Strings and get details about the molecular properties, <br> similarities and differences.</p>
+    </div>
+    <div class="search-container-bar">
+        <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+        <form action="/comparison" method="POST">
+            <input type="text" 
+                    name="chembl_id1" 
+                    value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}"
+                    placeholder="Enter a valid Canonical SMILES of Molecule 1"
+                    id="chembl_id1"
+                    class="search-input-field" required
+                    style="border-top-left-radius: 50px; border-bottom-left-radius: 50px;">
+            <button type="button" onclick="document.getElementById('chembl_id1').value = ''" style="background: transparent; border: none;" >
+                <!-- Delete input button 1 -->
+                <span class="btn-text">
+                    <i class="fas fa-search btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0,0,256,256" style="/* background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); */ color: #ffffff; /*border: 1px solid rgba(255, 255, 255, 0.3)*/; border-radius: 6px; font-weight: 600; white-space: nowrap; transition: all 0.3s ease; flex-shrink: 0;">
+                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                        </svg>
+                    </i>
+                </span>
+            </button>
+            <input type="text" 
+                    name="chembl_id2" 
+                    value="{{ request.form.get('chembl_id2') if request.method == 'POST' else request.args.get('chembl_id2', '') }}"
+                    placeholder="Enter a valid Canonical SMILES of Molecule 2"
+                    id="chembl_id2"
+                    class="search-input-field" required
+                    style="border-top-right-radius: 50px; border-bottom-right-radius: 50px; background: linear-gradient(90deg, #150204 0%, #6e050e 40%, #b30c1b21 100%);">
+            <button type="button" onclick="document.getElementById('chembl_id2').value = ''" style="background: transparent; border: none;" >
+                <!-- Delete input button 1 -->
+                <span class="btn-text">
+                    <i class="fas fa-search btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0,0,256,256" style="/* background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); */ color: #ffffff; /*border: 1px solid rgba(255, 255, 255, 0.3)*/; border-radius: 6px; font-weight: 600; white-space: nowrap; transition: all 0.3s ease; flex-shrink: 0;">
+                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                        </svg>
+                    </i>
+                </span>
+            </button>
+            <button type="submit" class="submit-action-btn" id="compare-button">
+                Compare Molecules
+            </button>
+            <!-- value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}" -->
+        </form>
+
+    </div>
+
+<!-- In case of errors, the exact error along with the input strings are displayed -->
+
+{% if error%}
+
+    <div class="col-md-7 align-middle" style="padding:2rem;">
+        <h2 class="mb-2 text-center" style="color: #ffffff;">Comparison Results</h2>
+        <h3 class="cmb-2 text-center" style="color: #ffc107;">Input Error</h3><br>
+            <div class="align-items-center align-middle" style="width: stretch;">
+            
+            <table class="table table-dark align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th colspan="3" style="border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 1rem;">
+                            <h5 class="text-white text-center mb-2" style="font-size: 1.3rem;"><strong>Error Summary</strong></h5>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td class="text-break"><strong>Target Molecule</strong></td>
+                        <td class="text-break">Molecule 1</td>
+                        <td class="text-break">Molecule 2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target SMILES:</strong></td>
+                        <td class="text-break" style="width: 40%;"><code>{{ data.smiles1 }}</code></td>
+                        <td class="text-break" style="width: 40%;"><code>{{ data.smiles2 }}</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem;">
+                            <strong>Error:</strong>
+                        </td>
+                        <td colspan="2" style="padding-top: 1rem; padding-bottom: 1rem; width: 80%;" class="text-break">
+                            <span class="badge bg-danger px-2 py-1" style="white-space: normal;">
+                                <h6>{{ error }}</h6>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><br>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="/compare" class="re-compare-button">Perform Another Compare</a>
+        </div>
+    {% endif %}
+
+    {% if data %}
+    {% set result_block = data %}
+
+
+<!-- If both of the comparison molecules exist then only show the comparison table for both molecules -->
+{% if data.data1 and data.data2 %}
+    <div class="similarity-results">
+        
+        <!-- Similarity Data table on Right -->
+        <div class="right-sidebar">
+            <h2 class="mb-2 text-center" style="color: #ffffff">Comparison Results</h2>
+            <h5 class="cmb-2 text-center" style="color: #ffc107;">Showing Results for Molecule 1 and Molecule 2</h5>
+
+
+            {% if data %}
+
+            {% if data.data1 and data.data2 %}
+            <div class="card-body-results p-3">
+                <table class="table table-dark align-middle mb-0"
+                    style="margin-bottom: 2rem; margin: 1rem;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="border-top-left-radius: 24px;">
+                                S.No.
+                            </th>
+                            <th>
+                                Property
+                            </th>
+                            <th style="width:35%;">
+                                Molecule 1
+                            </th>
+                            <th style="border-top-right-radius: 24px; width:35%;">
+                                Molecule 2
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td ><strong>SMILES</strong></td>
+                            <td style="word-break: break-all;">{{ data.data1.smiles1 }}</td>
+                            <td style="word-break: break-all;">{{ data.data2.smiles2 }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">2</td>
+                            <td><strong>2D SVG</strong></td>
+                            <td>{{ data.data1.svg1 | safe }}</td>
+                            <td>{{ data.data2.svg2 | safe }}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <strong>Molecular Identification</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">3</td>
+                            <td><strong>Compound Name</strong></td>
+                            <td style="word-break: break-all;">{{ data.data1.molecular_property1.compound_name }}</td>
+                            <td style="word-break: break-all;">{{ data.data2.molecular_property2.compound_name }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">4</td>
+                            <td><strong>Common Name</strong></td>
+                            <td style="word-break: break-all;">
+                                {% if data.data1.molecular_property1.common_names %}
+                                    {% for name in data.data1.molecular_property1.common_names[:15] %}
+                                        {{ name }} {% if not loop.last %}, {% endif %}
+                                    {% endfor %} 
+                                {% endif %}
+                            </td>
+                            <td style="word-break: break-all;">
+                                {% if data.data2.molecular_property2.common_names %}
+                                    {% for name in data.data2.molecular_property2.common_names[:15] %}
+                                        {{ name }} {% if not loop.last %}, {% endif %}
+                                    {% endfor %} 
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">5</td>
+                            <td><strong>Predicted IUPAC Name</strong></td>
+                            <td style="word-break: break-all;">{% if data.data1.molecular_property1.predicted_iupac_name %}
+                                    {{ data.data1.molecular_property1.predicted_iupac_name }}
+                                {% else %}
+                                    Not available
+                                {% endif %}</td>
+                            <td>{% if data.data2.molecular_property2.predicted_iupac_name %}
+                                    {{ data.data2.molecular_property2.predicted_iupac_name }}
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">6</td>
+                            <td><strong>CHEMBL ID</strong></td>
+                            <td>{{ data.data1.molecular_property1.predicted_chembl_id }}</td>
+                            <td>{{ data.data2.molecular_property2.predicted_chembl_id }}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <strong>Molecular Descriptors</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">7</td>
+                            <td><strong>Elemental Formula</strong></td>
+                            <td style="word-break: break-all;">{{ data.data1.molecular_property1.elemental_formula }}</td>
+                            <td style="word-break: break-all;">{{ data.data2.molecular_property2.elemental_formula }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">8</td>
+                            <td><strong>Molecular Weight</strong></td>
+                            <td>{{ data.data1.molecular_property1.mw }}</td>
+                            <td>{{ data.data2.molecular_property2.mw }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">9</td>
+                            <td><strong>LogP</strong></td>
+                            <td>{{ data.data1.molecular_property1.logp }}</td>
+                            <td>{{ data.data2.molecular_property2.logp }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">10</td>
+                            <td><strong>TPSA</strong></td>
+                            <td>{{ data.data1.molecular_property1.tpsa }}</td>
+                            <td>{{ data.data2.molecular_property2.tpsa }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">11</td>
+                            <td><strong>Rotatable Free Bonds</strong></td>
+                            <td>{{ data.data1.molecular_property1.rotatable_bonds }}</td>
+                            <td>{{ data.data2.molecular_property2.rotatable_bonds }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">12</td>
+                            <td><strong>Formal Charge</strong></td>
+                            <td>{{ data.data1.molecular_property1.formal_charge }}</td>
+                            <td>{{ data.data2.molecular_property2.formal_charge }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">13</td>
+                            <td><strong>Heavy Atom Count</strong></td>
+                            <td>{{ data.data1.molecular_property1.HeavyAtomCount }}</td>
+                            <td>{{ data.data2.molecular_property2.HeavyAtomCount }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">14</td>
+                            <td><strong>H Bond Donors</strong></td>
+                            <td>{{ data.data1.molecular_property1.HBondDonors }}</td>
+                            <td>{{ data.data2.molecular_property2.HBondDonors }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">15</td>
+                            <td><strong>H Bond Acceptors</strong></td>
+                            <td>{{ data.data1.molecular_property1.HBondAcceptors }}</td>
+                            <td>{{ data.data2.molecular_property2.HBondAcceptors }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">16</td>
+                            <td><strong>Lipinski Rule of Five</strong></td>
+                            <td>{{ data.data1.molecular_property1.lipinski }}</td>
+                            <td>{{ data.data2.molecular_property2.lipinski }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">17</td>
+                            <td><strong>Ring Count</strong></td>
+                            <td>{{ data.data1.molecular_property1.ring_count }}</td>
+                            <td>{{ data.data2.molecular_property2.ring_count }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">18</td>
+                            <td><strong>Aromatic Rings</strong></td>
+                            <td>{{ data.data1.aromatic_ring1 }}</td>
+                            <td>{{ data.data2.aromatic_ring2 }}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <strong>Molecular Fingerprints</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">19</td>
+                            <td><strong>Length of Fingerprint</strong></td>
+                            <td>{{ data.data1.morgan_fp1.lenmf }}</td>
+                            <td>{{ data.data2.morgan_fp2.lenmf }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">20</td>
+                            <td><strong>Number of On Bits</strong></td>
+                            <td>{{ data.data1.morgan_fp1.onbits }}</td>
+                            <td>{{ data.data2.morgan_fp2.onbits }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">21</td>
+                            <td><strong>Indices of On Bits</strong></td>
+                            <td style="word-break: break-all;">{{ data.data1.morgan_fp1.idxonbits }}</td>
+                            <td style="word-break: break-all;">{{ data.data2.morgan_fp2.idxonbits }}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <strong>Molecular Similarity</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">22</td>
+                            <td><strong>Tanimoto Similarity</strong></td>
+                            <td colspan="2" style="width: 40%; text-align: center;">
+                                {{ data.data1.tanimoto_similarity }}
+
+                                    {% if data.data1.tanimoto_similarity >= 0.95 %}
+                                        <span class="badge bg-success" style="margin-left: 10%; color:white !important; background-color: #186901 !important;">Nearly Identical</span>
+
+                                    {% elif data.data1.tanimoto_similarity >= 0.85 %}
+                                        <span class="badge bg-success" style="margin-left: 10%; color:rgba(255, 255, 255, 0.651) !important; ">Highly Similar</span>
+
+                                    {% elif data.data1.tanimoto_similarity >= 0.70 %}
+                                        <span class="badge bg-primary" style="margin-left: 10%; color:white !important; background-color: #675E24 !important;">Structurally Similar</span>
+
+                                    {% elif data.data1.tanimoto_similarity >= 0.50 %}
+                                        <span class="badge bg-warning text-dark" style="margin-left: 10%; color:white !important; background-color: #8D472B !important;">Moderately Similar</span>
+                                    
+                                    {% elif data.data1.tanimoto_similarity >= 0.10 %}
+                                        <span class="badge bg-warning text-dark" style="margin-left: 10%; color:white !important; background-color: #B13433 !important;">Low Similarity</span>
+
+                                    {% else %}
+                                        <span class="badge bg-danger" style="margin-left: 10%;">Not Similar</span>
+                                    {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">23</td>
+                            <td><strong>Dice Similarity</strong></td>
+                            <td colspan="2" style="width: 40%; text-align: center;">
+                                {{ data.data1.cosine_similarity }}
+
+                                {% if data.data1.cosine_similarity >= 0.95 %}
+                                    <span class="badge bg-success" style="margin-left: 10%; color:white !important; background-color: #186901 !important;">Nearly Identical</span>
+
+                                {% elif data.data1.cosine_similarity >= 0.85 %}
+                                    <span class="badge bg-success" style="margin-left: 10%;color:rgba(255, 255, 255, 0.651) !important; ">Highly Similar</span>
+
+                                {% elif data.data1.cosine_similarity >= 0.70 %}
+                                    <span class="badge bg-primary" style="margin-left: 10%;color:white !important; background-color: #675E24 !important;">Structurally Similar</span>
+
+                                {% elif data.data1.cosine_similarity >= 0.50 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #8D472B !important;">Moderately Similar</span>
+                                
+                                {% elif data.data1.cosine_similarity >= 0.10 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #B13433 !important;">Low Similarity</span>
+
+                                {% else %}
+                                    <span class="badge bg-danger" style="margin-left: 10%;">Not Similar</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">24</td>
+                            <td><strong>Cosine Similarity</strong></td>
+                            <td colspan="2" style="width: 40%; text-align: center;">
+                                {{ data.data1.dice_similarity }}
+
+                                {% if data.data1.dice_similarity >= 0.95 %}
+                                    <span class="badge bg-success" style="margin-left: 10%; color:white !important; background-color: #186901 !important;">Nearly Identical</span>
+
+                                {% elif data.data1.dice_similarity >= 0.85 %}
+                                    <span class="badge bg-success" style="margin-left: 10%;color:rgba(255, 255, 255, 0.651) !important; ">Highly Similar</span>
+
+                                {% elif data.data1.dice_similarity >= 0.70 %}
+                                    <span class="badge bg-primary" style="margin-left: 10%;color:white !important; background-color: #675E24 !important;">Structurally Similar</span>
+
+                                {% elif data.data1.dice_similarity >= 0.50 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #8D472B !important;">Moderately Similar</span>
+                                
+                                {% elif data.data1.dice_similarity >= 0.10 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #B13433 !important;">Low Similarity</span>
+
+                                {% else %}
+                                    <span class="badge bg-danger" style="margin-left: 10%;">Not Similar</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">25</td>
+                            <td><strong>Average Similarity Status</strong></td>
+                            <td colspan="2" style="width: 40%; text-align: center;">
+                                {{ data.data1.average_similarity }}
+
+                                {% if data.data1.average_similarity >= 0.95 %}
+                                    <span class="badge bg-success" style="margin-left: 10%; color:white !important; background-color: #186901 !important;">Nearly Identical</span>
+
+                                {% elif data.data1.average_similarity >= 0.85 %}
+                                    <span class="badge bg-success" style="margin-left: 10%;color:rgba(255, 255, 255, 0.651) !important; ">Highly Similar</span>
+
+                                {% elif data.data1.average_similarity >= 0.70 %}
+                                    <span class="badge bg-primary" style="margin-left: 10%;color:white !important; background-color: #675E24 !important;">Structurally Similar</span>
+
+                                {% elif data.data1.average_similarity >= 0.50 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #8D472B !important;">Moderately Similar</span>
+                                
+                                {% elif data.data1.average_similarity >= 0.10 %}
+                                    <span class="badge bg-warning text-dark" style="margin-left: 10%;color:white !important; background-color: #B13433 !important;">Low Similarity</span>
+
+                                {% else %}
+                                    <span class="badge bg-danger" style="margin-left: 10%;">Not Similar</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                            <th colspan="4">
+                                <strong>Molecular Complexity</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">26</td>
+                            <td><strong>BertzCT</strong></td>
+                            <td>{{ data.data1.molecular_complexity1.BertzCT }}</td>
+                            <td>{{ data.data2.molecular_complexity2.BertzCT }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">27</td>
+                            <td><strong>BalabanJ</strong></td>
+                            <td>{{ data.data1.molecular_complexity1.BalabanJ }}</td>
+                            <td>{{ data.data2.molecular_complexity2.BalabanJ }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">28</td>
+                            <td><strong>AvgIpc</strong></td>
+                            <td>{{ data.data1.molecular_complexity1.AvgIpc }}</td>
+                            <td>{{ data.data2.molecular_complexity2.AvgIpc }}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <strong>Substructure Search Results</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">29</td>
+                            <td><strong>Substructure Matches</strong></td>
+                            <td>{{ data.data1.substructure1.present }}</td>
+                            <td>{{ data.data2.substructure2.present }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">30</td>
+                            <td><strong>Number of Substructure Matches</strong></td>
+                            <td>{{ data.data1.substructure1.count_matches }}</td>
+                            <td>{{ data.data2.substructure2.count_matches }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">31</td>
+                            <td style="word-break: break-all;">
+                                <strong>Indices of Substructure Matches</strong>
+                            </td>
+                            <td>{{ data.data1.substructure1.indices }}</td>
+                            <td>{{ data.data2.substructure2.indices }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            <div class="mt-4 text-center">
+                <a href="/compare" class="re-compare-button">Perform Another Compare</a><br><br>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="left-sidebar">
+
+            <!-- Query Summary Table (Right top) -->
+            <div class="query-summary">
+                <table class="table table-dark align-middle mb-0"
+                    style="vertical-align: middle;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="2" style="border-top-left-radius: 20px;border-top-right-radius: 20px;">
+                                <h5 style="color: #ffc107; text-align: center; font-size: 1.3rem;" class="mb-2">
+                                    <strong>Query Summary</strong></h5>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr>
+                            <td><strong>Target SMILES 1</strong></td>
+                            <td style="word-break: break-all; overflow-wrap: break-word;"> 
+                                Valid SMILES
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Target SMILES 2</strong></td>
+                            <td style="word-break: break-all; overflow-wrap: break-word;"> 
+                                Valid SMILES
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tanimoto Similarity</strong></td>
+                            <td style="word-break: break-all; overflow-wrap: break-word;"> 
+                                {{ data.data1.tanimoto_similarity }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Comparison Summary:</strong></td>
+                            <td style="word-break: break-all; overflow-wrap: break-word;">
+                                {% if data.data1.tanimoto_similarity >= 0.95 %}
+                                    <span class="badge bg-success" style="color:white !important; background-color: #186901 !important;">Nearly Identical</span>
+
+                                {% elif data.data1.tanimoto_similarity >= 0.85 %}
+                                    <span class="badge bg-success" style="color:rgba(255, 255, 255, 0.651) !important; ">Highly Similar</span>
+
+                                {% elif data.data1.tanimoto_similarity >= 0.70 %}
+                                    <span class="badge bg-primary" style="color:white !important; background-color: #675E24 !important;">Structurally Similar</span>
+
+                                {% elif data.data1.tanimoto_similarity >= 0.50 %}
+                                    <span class="badge bg-warning text-dark" style="color:white !important; background-color: #8D472B !important;">Moderately Similar</span>
+                                
+                                {% elif data.data1.tanimoto_similarity >= 0.10 %}
+                                    <span class="badge bg-warning text-dark" style="color:white !important; background-color: #B13433 !important;">Low Similarity</span>
+
+                                {% else %}
+                                    <span class="badge bg-danger">Not Similar</span>
+                                {% endif %}
+                            </td>
+                        </tr>        
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Download Button -->
+            <!-- <div class="svg-canvas-box shadow-lg text-center p-3 mb-3">
+                {{ data.svg | safe }}
+            </div> -->
+
+        </div>
+
+    </div>
+    {% endif %}
+    {% endif %}
+
+<!-- ==================================== Use 2 Molecule Examples with Smiles====================================================== -->
+{% if not data %}
+
+ <div class="compare-info">
+
+        <div class="compare-info-title">
+            <span>ANALYSIS</span>
+            <strong>What you can explore</strong>
+        </div>
+
+        <div class="info-list">
+
+            <div class="info-item">
+                <div class="info-icon">⌬</div>
+                <div>
+                    <strong>Molecular SVG</strong>
+                    <span>Visual structure</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">◈</div>
+                <div>
+                    <strong>Molecular Identification</strong>
+                    <span>Compound identity</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">◫</div>
+                <div>
+                    <strong>Molecular Descriptors</strong>
+                    <span>Key molecular properties</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">✦</div>
+                <div>
+                    <strong>Molecular Fingerprints</strong>
+                    <span>Structural fingerprints</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">≈</div>
+                <div>
+                    <strong>Molecular Similarity</strong>
+                    <span>Structural resemblance</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">◇</div>
+                <div>
+                    <strong>Molecular Complexity</strong>
+                    <span>Structural complexity</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">⌗</div>
+                <div>
+                    <strong>Substructure Search Results</strong>
+                    <span>Shared structural patterns</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    
+<section class="compare-explorer">
+    <div class="compare-heading">
+        <span class="compare-label">QUICK COMPARE</span>
+        <h2>Start with Molecule pairs</h2>
+        <p>
+            Start with a known pair or enter two Canonical SMILES
+            above to compare their molecular properties and structure.
+        </p>
+    </div>
+
+    <div class="compare-example-grid">
+
+        <!-- PARACETAMOL -->
+
+        <button
+            type="button"
+            class="compare-example"
+
+            data-name1="Paracetamol"
+            data-smiles1="CC(=O)Nc1ccc(O)cc1"
+
+            data-name2="Phenacetin"
+            data-smiles2="CCOc1ccc(NC(C)=O)cc1"
+        >
+            <div class="compare-pair">
+
+                <div class="molecule-pill">
+                    <small>Molecule 1</small>
+                    <strong>Paracetamol</strong>
+                </div>
+
+                <span class="compare-symbol">↔</span>
+
+                <div class="molecule-pill">
+                    <small>Molecule 2</small>
+                    <strong>Phenacetin</strong>
+                </div>
+
+            </div>
+
+
+            <div class="compare-info">
+                <h3>Acetanilide analgesics</h3>
+                <p>
+                    Compare two structurally related aromatic
+                    amide compounds.
+                </p>
+                <span class="compare-tag">
+                    STRUCTURAL RELATIONSHIP
+                </span>
+            </div>
+
+            <div class="compare-card-footer">
+                <span class="compare-use">
+                    Load pair →
+                </span>
+            </div>
+
+        </button>
+
+        <!-- METFORMIN -->
+
+        <button
+            type="button"
+            class="compare-example"
+
+            data-name1="Metformin"
+            data-smiles1="CN(C)C(=N)NC(=N)N"
+
+            data-name2="Phenformin"
+            data-smiles2="N=C(N)NC(=N)NCCc1ccccc1"
+        >
+
+            <div class="compare-pair">
+
+                <div class="molecule-pill">
+                    <small>Molecule 1</small>
+                    <strong>Metformin</strong>
+                </div>
+
+                <span class="compare-symbol">↔</span>
+
+                <div class="molecule-pill">
+                    <small>Molecule 2</small>
+                    <strong>Phenformin</strong>
+                </div>
+
+            </div>
+
+
+            <div class="compare-info">
+
+                <h3>Biguanide comparison</h3>
+
+                <p>
+                    See how adding a phenethyl group changes
+                    the molecular structure.
+                </p>
+
+                <span class="compare-tag">
+                    BIGUANIDES
+                </span>
+
+            </div>
+
+            <div class="compare-card-footer">
+
+                <span class="compare-use">
+                    Load pair →
+                </span>
+
+            </div>
+
+        </button>
+
+        <!-- CETIRIZINE -->
+
+        <button
+            type="button"
+            class="compare-example"
+
+            data-name1="Cetirizine"
+            data-smiles1="O=C(O)COCCN1CCN(C(c2ccccc2)c2ccc(Cl)cc2)CC1"
+
+            data-name2="Levocetirizine"
+            data-smiles2="O=C(O)COCCN1CCN([C@H](c2ccccc2)c2ccc(Cl)cc2)CC1"
+        >
+
+            <div class="compare-pair">
+                <div class="molecule-pill">
+                    <small>Molecule 1</small>
+                    <strong>Cetirizine</strong>
+                </div>
+                <span class="compare-symbol">↔</span>
+                <div class="molecule-pill">
+                    <small>Molecule 2</small>
+                    <strong>Levocetirizine</strong>
+                </div>
+            </div>
+
+            <div class="compare-info">
+                <h3>Same formula, different stereochemistry</h3>
+                <p>
+                    Explore a particularly interesting comparison
+                    between cetirizine and its R-enantiomer.
+                </p>
+                <span class="compare-tag">
+                    STEREOISOMERS
+                </span>
+            </div>
+            <div class="compare-card-footer">
+
+                <span class="compare-use">
+                    Load pair →
+                </span>
+            </div>
+        </button>
+    </div>
+
+    <div class="compare-hint">
+
+        <div class="compare-hint-icon">⌬</div>
+
+        <div>
+
+            <strong>Try a comparison</strong>
+
+            <span>
+                Click any pair to load both SMILES into the comparison fields.
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+{% endif %}
+
+<script>
+document.querySelectorAll(".compare-example").forEach(card => {
+
+    card.onclick = () => {
+
+        const input1 = document.getElementById("chembl_id1");
+        const input2 = document.getElementById("chembl_id2");
+
+        if (!input1 || !input2) return;
+
+        input1.value = card.dataset.smiles1;
+        input2.value = card.dataset.smiles2;
+
+        document.querySelectorAll(".compare-example")
+            .forEach(c => c.classList.remove("selected"));
+
+        card.classList.add("selected");
+
+        input1.classList.add("compare-input-active");
+        input2.classList.add("compare-input-active");
+
+        setTimeout(() => {
+            input1.classList.remove("compare-input-active");
+            input2.classList.remove("compare-input-active");
+        }, 400);
+
+        document.getElementById("compare-button")?.click();
+    };
+
+});
+</script>
+
+{% endblock %}
+

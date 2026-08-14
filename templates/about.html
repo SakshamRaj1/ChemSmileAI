@@ -1,0 +1,2022 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    /* GLOBAL */
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        color: #edf0f3;
+        font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        overflow-x: hidden;
+    }
+
+    button {
+        font: inherit;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+
+    /* VARIABLES */
+
+    :root {
+        --red: #b30c1b;
+        --red-bright: #e94b5e;
+        --red-soft: rgba(212,58,76,.12);
+
+        --bg: #080d12;
+        --panel: #10171f;
+        --panel-2: #0d141b;
+
+        --border: rgba(255,255,255,.08);
+
+        --text: #f1f3f5;
+        --muted: #7e8a96;
+        --muted-2: #596570;
+    }
+
+
+    /* PAGE CONTAINER */
+
+    .about-page {
+        width: min(1400px, 92%);
+        margin: auto;
+    }
+
+
+    /* HERO */
+
+    .about-hero {
+        position: relative;
+        min-height: 620px;
+        display: flex;
+        align-items: center;
+        padding: 90px 0 80px;
+        overflow: hidden;
+        background: transparent;
+        border: 1px solid #60606033;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 0 50px #4d00097d;
+        margin-top: 6%;
+    }
+
+
+    /* Background glow */
+
+    .about-hero::before {
+        content: "";
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        right: -180px;
+        top: -120px;
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(212,58,76,.13),
+                transparent 68%
+            );
+        pointer-events: none;
+    }
+
+
+    /* Grid */
+
+    .about-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        /* background-image:
+            linear-gradient(
+                rgba(255,255,255,.025) 1px,
+                transparent 1px
+            ),
+            linear-gradient(
+                90deg,
+                rgba(255,255,255,.025) 1px,
+                transparent 1px
+            );
+        background-size: 55px 55px;
+        mask-image:
+            linear-gradient(
+                to right,
+                black,
+                transparent 85%
+            ); */
+
+        pointer-events: none;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 720px;
+    }
+
+
+    .hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        color: var(--red);
+        font-size: 100%;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
+
+    .hero-label::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow:
+            0 0 12px
+            rgba(212,58,76,.8);
+    }
+
+    .hero-title {
+        margin: 0;
+        font-size:
+            clamp(38px, 5vw, 72px);
+        line-height: 1.02;
+        letter-spacing: -2.5px;
+        text-shadow: -2px -1px 0 #020202, 2px -1px 0 #ffffff, -2px 1px 0 #cdb6b6, 2px 1px 0 #ffffff;
+    }
+
+    .hero-title span {
+        color: var(--red);
+        letter-spacing: 0.75px;
+    }
+
+
+    .hero-description {
+        max-width: 650px;
+        margin: 32px 0 42px;
+        color: #ffffff;
+        font-size: clamp(14px, 1.2vw, 17px);
+        line-height: 1.75;
+        background: #00000014;
+        border: 1px solid rgba(255, 255, 255, .07);
+        border-radius: 15px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 19px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: .25s ease;
+    }
+
+    .hero-btn.primary {
+        background: var(--red);
+        color: white;
+
+        box-shadow:
+            0 10px 30px
+            rgba(212,58,76,.18);
+    }
+
+    .hero-btn.primary:hover {
+        background: var(--red-bright);
+        transform: translateY(-2px);
+    }
+
+
+    .hero-btn.secondary {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,.025);
+        color: #c8cdd2;
+    }
+
+
+    .hero-btn.secondary:hover {
+        border-color: rgba(212,58,76,.4);
+        color: white;
+    }
+
+
+    /* MOLECULAR VISUAL */
+
+    .hero-visual {
+        position: absolute;
+        right: 2%;
+        top: 50%;
+        width: 430px;
+        height: 430px;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .orbit {
+        position: absolute;
+        inset: 10%;
+        border:
+            1px solid
+            rgba(212,58,76,.16);
+        border-radius: 50%;
+        animation: rotate 18s linear infinite;
+    }
+
+    .orbit:nth-child(2) {
+        inset: 20%;
+        transform: rotate(65deg);
+        animation-duration: 25s;
+    }
+
+    .orbit:nth-child(3) {
+        inset: 30%;
+        animation-duration: 32s;
+    }
+
+    .molecule-core {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 80px;
+        height: 80px;
+        display: grid;
+        place-items: center;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        color: #ffffff;
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%, #150204 100%);
+        box-shadow: 0 0 50px #1f000080;
+    }
+
+    .molecule-core::after {
+        content: "⌬";
+        font-size: 34px;
+    }
+
+    .atom-dot {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #cbd1d6;
+        box-shadow:
+            0 0 15px
+            rgba(255,255,255,.25);
+    }
+
+    .atom-dot.red {
+        background: var(--red);
+        box-shadow:
+            0 0 18px
+            rgba(212,58,76,.6);
+    }
+
+    .atom-1 {
+        top: 15%;
+        left: 48%;
+    }
+
+    .atom-2 {
+        right: 12%;
+        top: 48%;
+    }
+
+    .atom-3 {
+        bottom: 16%;
+        left: 45%;
+    }
+
+    .atom-4 {
+        left: 12%;
+        top: 47%;
+    }
+
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    /* SECTION */
+
+    .about-section {
+        padding: 40px 0;
+    }
+
+
+    .section-heading {
+        margin-bottom: 1rem;
+        padding: 1rem 2rem;
+        background: #09101a91;
+        border-radius: 24px;
+        border: 2px solid #ffffff17;
+        box-shadow: 0px 28px 52px #444444ab;
+        margin-top: 2rem;
+    }
+
+    .section-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--red);
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        color: var(--text);
+        font-size: clamp(20px, 3vw, 38px);
+        letter-spacing: -1px;
+    }
+
+    .section-heading p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+
+    /* FEATURE CARDS */
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(3, 1fr);
+        gap: 16px;
+    }
+
+
+    .feature-card {
+        position: relative;
+        padding: 25px;
+        min-height: 220px;
+        border:
+            1px solid var(--border);
+        border-radius: 17px;
+        background:
+            linear-gradient(
+                145deg,
+                #111a23,
+                #0c1218
+            );
+        overflow: hidden;
+        transition:
+            transform .25s ease,
+            border-color .25s ease,
+            box-shadow .25s ease;
+    }
+
+
+    .feature-card:hover {
+        transform: translateY(-6px);
+        border-color:
+            rgba(212,58,76,.45);
+        box-shadow:
+            0 22px 50px
+            rgba(0,0,0,.3);
+    }
+
+
+    .feature-icon {
+        width: 43px;
+        height: 43px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 22px;
+        border-radius: 11px;
+        color: var(--red-bright);
+        background: var(--red-soft);
+        border:
+            1px solid
+            rgba(212,58,76,.15);
+        font-size: 20px;
+    }
+
+    .feature-card h3 {
+        margin: 0 0 9px;
+        font-size: 17px;
+    }
+
+    .feature-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+        margin-bottom: 1rem;
+    }
+
+
+
+    .feature-number {
+        position: absolute;
+        right: 20px;
+        bottom: 12px;
+        color:
+            rgba(255,255,255,.035);
+        font-size: 65px;
+        font-weight: 900;
+    }
+
+
+    /* STATS */
+
+    .stats-panel {
+        display: grid;
+        grid-template-columns:
+            repeat(4, 1fr);
+        border:
+            1px solid var(--border);
+        border-radius: 17px;
+        background: rgb(0 0 0 / 29%);
+        overflow: hidden;
+    }
+
+
+    .stat {
+        position: relative;
+        padding: 30px 25px;
+        border-right:
+            1px solid var(--border);
+    }
+
+    .stat:last-child {
+        border-right: 0;
+    }
+
+    .stat-value {
+        color: white;
+        font-size:
+            clamp(25px, 3vw, 38px);
+        font-weight: 800;
+    }
+
+    .stat-value span {
+        color: var(--red);
+    }
+
+    .stat-label {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 10px;
+    }
+
+
+    /* WORKFLOW */
+
+    .workflow {
+        display: grid;
+        grid-template-columns:
+            repeat(5, 1fr);
+        gap: 14px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+
+    .workflow-step {
+        position: relative;
+        padding: 22px;
+        border:
+            1px solid var(--border);
+        border-radius: 15px;
+        background: var(--panel-2);
+    }
+
+
+    .workflow-step:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -12px;
+        top: 50%;
+        color: var(--red);
+        transform: translateY(-50%);
+        z-index: 2;
+        font-weight: 900;
+        text-shadow: 0.5px 0 0 var(--red), -0.5px 0 0 var(--red);
+        zoom: 2.5;
+    }
+
+
+    .step-icon {
+        margin-bottom: 17px;
+        color: #efeeee;
+        font-size: 24px;
+        border: 1px solid var(--red);
+        padding: 0px 10px;
+        width: fit-content;
+        border-radius: 12px;
+        background: var(--red);
+    }
+
+
+    .workflow-step h3 {
+        margin: 0 0 7px;
+        font-size: 14px;
+    }
+
+
+    .workflow-step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+
+    /* DATA PANEL */
+
+    .data-panel {
+        display: grid;
+        grid-template-columns:
+            1fr 1fr;
+        gap: 25px;
+        padding: 30px;
+        border:
+            1px solid var(--border);
+        border-radius: 18px;
+        background:
+            linear-gradient(
+                135deg,
+                #111a22,
+                #0b1117
+            );
+    }
+
+    .data-content h2 {
+        margin: 0 0 12px;
+        font-size: 25px;
+    }
+
+
+    .data-content p {
+        max-width: 550px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .data-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .data-tag {
+        padding: 7px 10px;
+        border:
+            1px solid
+            rgba(212,58,76,.16);
+        border-radius: 7px;
+        color: #c4cbd1;
+        background: rgba(212,58,76,.06);
+        font-size: 9px;
+    }
+
+    .data-visual {
+        min-height: 230px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background:
+            radial-gradient(
+                circle,
+                rgba(212,58,76,.12),
+                transparent 65%
+            );
+    }
+
+    .data-code {
+        width: 85%;
+        padding: 20px;
+        border:
+            1px solid
+            rgba(255,255,255,.07);
+        border-radius: 12px;
+        background: #080d12;
+        color: #75818c;
+        font-family:
+            "SFMono-Regular",
+            Consolas,
+            monospace;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+
+    .data-code .key {
+        color: #d95a68;
+    }
+
+    .data-code .value {
+        color: #b7c1c9;
+    }
+
+
+    /* =========================================================
+    FAQ
+    ========================================================= */
+
+    .faq {
+        display: grid;
+
+        gap: 9px;
+    }
+
+
+    .faq-item {
+        border:
+            1px solid var(--border);
+        border-radius: 12px;
+        background: var(--panel-2);
+        overflow: hidden;
+    }
+
+
+    .faq-question {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 17px 18px;
+        border: 0;
+        background: transparent;
+        color: #e5e8ea;
+        text-align: left;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+
+    .faq-question span {
+        color: var(--red);
+        font-size: 17px;
+        transition: transform .25s ease;
+    }
+
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition:
+            max-height .3s ease;
+    }
+
+    .faq-answer p {
+        margin: 0;
+        padding: 0 18px 17px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+
+    .faq-item.active .faq-question span {
+        transform: rotate(45deg);
+    }
+
+
+    /* CTA */
+
+    .about-cta {
+        position: relative;
+        margin-bottom: 80px;
+        padding: 55px 30px;
+        text-align: center;
+        border:
+            1px solid
+            rgba(212,58,76,.2);
+        border-radius: 20px;
+        background:
+            radial-gradient(
+                circle at center,
+                rgba(212,58,76,.10),
+                transparent 65%
+            ),
+            #0d141b;
+        overflow: hidden;
+    }
+
+
+    .about-cta h2 {
+        margin: 0 0 10px;
+        font-size:
+            clamp(25px, 3vw, 36px);
+    }
+
+
+    .about-cta p {
+        max-width: 580px;
+        margin: 0 auto 22px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+
+    /* RESPONSIVE */
+
+    @media (max-width: 1100px) {
+
+        .hero-visual {
+            right: -100px;
+            opacity: .55;
+        }
+
+        .feature-grid {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+        .workflow {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+        .workflow-step:not(:last-child)::after {
+            display: none;
+        }
+
+    }
+
+
+    @media (max-width: 800px) {
+
+        .about-hero {
+            min-height: auto;
+            padding: 80px 0;
+            background: transparent;
+            border: 1px solid #60606033;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 0 50px #4d00097d;
+        }
+
+        .hero-visual {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            right: -130px;
+            top: 60%;
+            opacity: .25;
+        }
+
+        .stats-panel {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+        .stat:nth-child(2) {
+            border-right: 0;
+        }
+
+        .stat:nth-child(-n+2) {
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .data-panel {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .about-page {
+            width: min(92%, 520px);
+        }
+
+        .about-section {
+            padding: 60px 0;
+        }
+
+        .feature-grid,
+        .workflow {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-panel {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .stat {
+            padding: 22px 16px;
+        }
+
+        .data-panel {
+            padding: 20px;
+        }
+
+        .data-visual {
+            min-height: 180px;
+        }
+
+        .data-code {
+            width: 100%;
+            font-size: 8px;
+        }
+
+    }
+
+
+    @media (max-width: 460px) {
+
+        .about-page {
+            width: 94%;
+        }
+
+        .about-hero {
+            margin-top: 0.5%;
+            zoom: 0.7;
+        }
+
+        .hero-title, .hero-title span {
+            font-size: 28px;
+            letter-spacing: 1px;
+            line-height: normal;
+        }
+
+        .hero-description {
+            max-width: 650px;
+            margin: 32px 0 42px;
+            color: #ffffff;
+            font-size: clamp(14px, 1.2vw, 17px);
+            line-height: 1.75;
+            background: #00000014;
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-btn {
+            width: 100%;
+        }
+
+        .stats-panel {
+            grid-template-columns: 1fr;
+        }
+
+        .stat {
+            border-right: 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat:last-child {
+            border-bottom: 0;
+        }
+
+        .hero-btn.secondary {
+            border: 1px solid #b30c1bc9;
+            background: rgb(0 0 0 / 36%);
+            color: #fef9f9;
+        }
+    }
+
+
+    /* LARGE SCREENS */
+
+    @media (min-width: 1800px) {
+
+        .about-page {
+            width: min(1500px, 88%);
+        }
+
+        .about-hero {
+            min-height: 700px;
+            width: min(1640px, 100%);
+            place-self: center;
+        }
+
+        /* .about-section {
+            padding: 110px 0;
+        } */
+
+    }
+
+
+    @media (min-width: 2600px) {
+
+        .about-page {
+            width: min(1700px, 82%);
+        }
+
+        .hero-title {
+            font-size: 82px;
+        }
+
+        .hero-description {
+            font-size: 18px;
+        }
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<main class="about-page">
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="about-hero">
+
+    <div class="hero-content">
+
+        <div class="hero-label">
+            ABOUT THE PLATFORM
+        </div>
+
+        <h1 class="hero-title">
+            Explore Chemistry<br>
+            <span>through Cheminformatics.</span>
+        </h1>
+
+        <p class="hero-description">
+            ChemSmileAI is a molecular exploration platform designed to make
+            accessibility to chemical information and RDKit based 
+            computations easier to discover, compare and understand with 
+            1 click. 
+            Providing search on the basis of 
+            Molecule Structure (SMILES), CHEMBL ID, 
+            and Molecule Sketching Feature.
+
+        </p>
+
+        <div class="hero-actions">
+
+            <a href="/"
+               class="hero-btn primary">
+                Explore molecules →
+            </a>
+
+            <a href="#features"
+               class="hero-btn secondary">
+                See what you can do
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Molecular visual -->
+
+    <div class="hero-visual">
+
+        <div class="orbit"></div>
+        <div class="orbit"></div>
+        <div class="orbit"></div>
+
+        <div class="molecule-core"></div>
+
+        <div class="atom-dot red atom-1"></div>
+        <div class="atom-dot atom-2"></div>
+        <div class="atom-dot red atom-3"></div>
+        <div class="atom-dot atom-4"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- FEATURES -->
+
+<section class="about-section"
+         id="features">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            WHAT YOU CAN EXPLORE
+        </span>
+
+        <h2>
+            From SMILES to meaningful chemical information.
+        </h2>
+
+        <p>
+            Explore chemical structures from multiple perspectives
+            instead of looking at molecular data as isolated numbers.
+        </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <article class="feature-card">
+            <div class="feature-icon">⌬</div>
+            <h3>
+                Molecule Analysis and Information
+            </h3>
+            <p>
+                Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the 
+                fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted 
+                using RDKit and see the visual representation. Molecules information such as Name, COmmon Name, IUPAC Name 
+                and CHEMBL ID are also listed.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">01</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">≈</div>
+            <h3>
+                Molecule Similarity Search Engine
+            </h3>
+            <p>
+                Find similar compounds from millions of compounds with related structural patterns
+                as of query molecule and investigate how closely molecules resemble one another. 
+                Quick similarity search from millions of moleculas an get SMILES, CHEMBL ID, Tanimoto Similarity 
+                Score, 2D SVG as well.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">02</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">⇄</div>
+
+            <h3>
+                Molecule Comparison
+            </h3>
+            <p>
+                Compare two molecules side by side to evaluate the molecular properties and identify
+                differences or similarities in their structures, descriptors, fingerprints, substructure and other properties. 
+                Molecules' information such as Name, Common Name, IUPAC Name and CHEMBL ID are also listed.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">03</div>
+
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">✎</div>
+            <h3>
+                Molecule Sketching
+            </h3>
+            <p>
+                Interactive 2D structure editor with a variety of built in features to draw custom molecular 
+                structures directly in the browser and output SMILES, MOL or other format data.
+                Use SMILES string directly to view and manipulate the structure.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">04</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">⌗</div>
+            <h3>
+                Delete/Replace Fragment <br><small>Substructure Analysis</small>
+            </h3>
+            <p>
+                Investigate shared structural fragments based on input SMILES.
+                Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
+                Highlighted SVG, new SMILES are generated as well.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">05</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>
+                Molecule Fingerprint
+            </h3>
+            <p>
+                Represent molecular structures as fingerprints into 2048 bits. Using 
+                Morgan Fingerprints (ECFP4: radius of 2): Length of onbits and 
+                Index of onbits are computed.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">06</div>
+        </article>
+        
+
+        <article class="feature-card">
+            <div class="feature-icon">◈</div>
+            <h3>
+                Molecular Descriptors
+            </h3>
+            <p>
+                Calculate over 35+ descriptors (1D, 1D, 2D and 3D descriptors)  
+                including molecular weight, hydrogen bond donors/acceptors, 
+                surface area, refractivity, and many more. Examine molecular descriptors.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">07</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">✣</div>
+            <h3>
+                2D and 3D Structures
+            </h3>
+            <p>
+                Generate high-resolution vector 2D SVG diagrams and 3D spatial conformers 
+                optimized with ETKDG and MMFF force field calculations.
+                SVG/PNG image export for 2D structures and 
+                Interactive 3D conformer viewer.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">08</div>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">⤓</div>
+            <h3>
+                Download Features
+            </h3>
+            <p>
+                Access to 9 file formats for ease of information of a molecule.
+                SDF, MOL, MOL2, PDF, SVG, PNG, HTML/JS, CSV, and JSON
+            </p>
+
+            <div class="hero-actions">
+                <a href="/"
+                class="hero-btn primary">
+                    Explore it →
+                </a>
+            </div>
+
+            <div class="feature-number">09</div>
+        </article>
+
+        
+    </div>
+
+</section>
+
+
+
+<!-- STATS -->
+
+<section class="about-section">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            MOLECULAR DATA
+        </span>
+
+        <h4>
+            Built around chemical information. Supports SMILES as input for any kind of explorations and research. 
+        </h4>
+
+    </div>
+
+
+    <div class="stats-panel">
+
+        <div class="stat">
+
+            <div class="stat-value">
+                2.9<span>M+</span>
+            </div>
+
+            <div class="stat-label">
+                Chemical compounds
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-value">
+                SMILES
+            </div>
+
+            <div class="stat-label">
+                Machine-readable structures
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-value">
+                SVG and HTML
+            </div>
+
+            <div class="stat-label">
+                Molecular visualization
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-value">
+                SKETCHING
+            </div>
+
+            <div class="stat-label">
+                Structure manipulation
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- WORKFLOW of the WEBSITE -->
+
+<section class="about-section">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            HOW IT WORKS
+        </span>
+
+        <h2>
+            Learn about the workflow of functions and features in a few steps
+        </h2>
+
+        <p>
+            ChemSmileAI combines search features with sophisticated cheminformatics 
+            functions into a single, user-friendly platform that is based on minimum clicks and maximum detailed information and results. 
+            This makes it an essential resource for researchers, students, and professionals in the chemical sciences, streamlining the management of chemical information, 
+            promoting molecular exploration, and facilitating computational chemistry tasks, thus enhancing both usability 
+            and research efficiency.
+
+        </p>
+
+    </div>
+
+    <!-- 1. Molecule Analysis -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Analysis and Molecule Information
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Find a compound
+            </h3>
+            <p>
+                Search using SMILES or draw the structure if incase SMILES is not known. 
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Input validated
+            </h3>
+            <p>
+                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Computation of Results
+            </h3>
+            <p>
+                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
+                Functions are called for computing all the 12 major functions from route. 
+                Everything is computed at once, so that all information is provided for the ease of user.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Result displayed
+            </h3>
+            <p>
+                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                Download Panel
+            </h3>
+            <p>
+                Loads the Download Panel with 9 file formats for the ease of research.
+            </p>
+
+        </article>
+
+    </div>
+
+    <!-- 2. Molecule Similarity Search Engine -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Similarity Search Engine
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Find a compound
+            </h3>
+            <p>
+                Search using SMILES or draw the structure if incase SMILES is not known. 
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Input validated
+            </h3>
+            <p>
+                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Computation of Results
+            </h3>
+            <p>
+                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
+                Functions are called for computing all the 12 major functions from route. 
+                Everything is computed at once, so that all information is provided for the ease of user.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Result displayed
+            </h3>
+            <p>
+                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                Download Panel
+            </h3>
+            <p>
+                Loads the Download Panel with 9 file formats for the ease of research.
+            </p>
+
+        </article>
+
+    </div>
+
+    <!-- 4. Molecule Sketching -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Sketching
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Open Draw Molecule Tool
+            </h3>
+            <p>
+                A Molecule Sketching container pops-up with Sketching Area and a variety of 
+                tools for easy manipulation. Integrated "Ketcher" for this featutre. 
+                "
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Sketch Molecule
+            </h3>
+            <p>
+               Draw a molecular structure using the features of Ketcher and it provides several built-in chemistry functional groups, atoms, and 
+               access to Periodic Table. "Use Molecule" button gets the smile from Ketcher to the Forms inputbar.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Manipulate Molecule
+            </h3>
+            <p>
+                Provides easy manipulation using any given SMILES. After manipulating, use the new smiles for exploration and research.
+                "Use Molecule" button gets the smile from Ketcher to the Forms inputbar.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Use Molecule
+            </h3>
+            <p>
+                "Use Molecule" button gets the smile from Ketcher to the Forms inputbar. Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                Result displayed
+            </h3>
+            <p>
+                Jinja template renders everything on the frontend in structured format.
+            </p>
+        </article>
+
+    </div>
+
+
+
+    <!-- 1. Molecule Analysis -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Analysis and Molecule Information
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Find a compound
+            </h3>
+            <p>
+                Search using SMILES or draw the structure if incase SMILES is not known. 
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Input validated
+            </h3>
+            <p>
+                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Computation of Results
+            </h3>
+            <p>
+                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
+                Functions are called for computing all the 12 major functions from route. 
+                Everything is computed at once, so that all information is provided for the ease of user.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Result displayed
+            </h3>
+            <p>
+                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                Download Panel
+            </h3>
+            <p>
+                Loads the Download Panel with 9 file formats for the ease of research.
+            </p>
+
+        </article>
+
+    </div>
+
+    <!-- 1. Molecule Analysis -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Analysis and Molecule Information
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Find a compound
+            </h3>
+            <p>
+                Search using SMILES or draw the structure if incase SMILES is not known. 
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Input validated
+            </h3>
+            <p>
+                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Computation of Results
+            </h3>
+            <p>
+                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
+                Functions are called for computing all the 12 major functions from route. 
+                Everything is computed at once, so that all information is provided for the ease of user.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Result displayed
+            </h3>
+            <p>
+                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                Download Panel
+            </h3>
+            <p>
+                Loads the Download Panel with 9 file formats for the ease of research.
+            </p>
+
+        </article>
+
+    </div>
+
+
+
+</section>
+
+
+
+<!-- =====================================================
+     DATA PANEL
+===================================================== -->
+
+<section class="about-section">
+
+    <div class="data-panel">
+
+
+        <div class="data-content">
+
+            <span class="section-label">
+                BEHIND THE MOLECULE
+            </span>
+
+            <h2>
+                Chemistry, represented as data.
+            </h2>
+
+            <p>
+                A molecule can be represented in several ways.
+                Structural strings, molecular descriptors,
+                fingerprints and identifiers each provide a
+                different perspective on the same chemical entity.
+            </p>
+
+
+            <div class="data-tags">
+
+                <span class="data-tag">
+                    SMILES
+                </span>
+
+                <span class="data-tag">
+                    Molecular Formula
+                </span>
+
+                <span class="data-tag">
+                    Descriptors
+                </span>
+
+                <span class="data-tag">
+                    Fingerprints
+                </span>
+
+                <span class="data-tag">
+                    Similarity
+                </span>
+
+                <span class="data-tag">
+                    Substructures
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="data-visual">
+
+            <div class="data-code">
+
+                <div>
+                    <span class="key">compound</span>:
+                    <span class="value">"Paracetamol"</span>
+                </div>
+
+                <div>
+                    <span class="key">formula</span>:
+                    <span class="value">"C8H9NO2"</span>
+                </div>
+
+                <div>
+                    <span class="key">structure</span>:
+                    <span class="value">"CC(=O)NC1=..."</span>
+                </div>
+
+                <div>
+                    <span class="key">fingerprint</span>:
+                    <span class="value">"101001011..."</span>
+                </div>
+
+                <div>
+                    <span class="key">similarity</span>:
+                    <span class="value">"0.87"</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FAQ
+===================================================== -->
+
+<section class="about-section">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            FAQ
+        </span>
+
+        <h2>
+            Questions about the platform.
+        </h2>
+
+    </div>
+
+
+    <div class="faq">
+
+
+        <div class="faq-item">
+
+            <button class="faq-question">
+
+                What is this platform designed for?
+
+                <span>+</span>
+
+            </button>
+
+            <div class="faq-answer">
+
+                <p>
+                    It provides an interactive environment for
+                    searching, viewing, comparing and exploring
+                    molecular information and structural
+                    relationships.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <button class="faq-question">
+
+                What is molecular similarity?
+
+                <span>+</span>
+
+            </button>
+
+            <div class="faq-answer">
+
+                <p>
+                    Molecular similarity describes how closely
+                    two compounds resemble each other according
+                    to a selected structural or fingerprint-based
+                    comparison method.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <button class="faq-question">
+
+                What are molecular fingerprints?
+
+                <span>+</span>
+
+            </button>
+
+            <div class="faq-answer">
+
+                <p>
+                    Molecular fingerprints encode structural
+                    features of a molecule into a computational
+                    representation that can be used for tasks
+                    such as similarity searching.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <button class="faq-question">
+
+                Can I compare two molecules?
+
+                <span>+</span>
+
+            </button>
+
+            <div class="faq-answer">
+
+                <p>
+                    Yes. The comparison interface allows two
+                    molecular structures to be examined side by
+                    side along with their relevant molecular
+                    information.
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- CTA -->
+
+<section class="about-cta">
+
+    <h2>
+        Ready to explore a molecule?
+    </h2>
+
+    <p>
+        Start with a compound name or molecular structure and
+        discover the information behind it.
+    </p>
+
+    <a href="/similarity"
+       class="hero-btn primary">
+        Start exploring →
+    </a>
+
+</section>
+
+
+</main>
+
+
+
+<script>
+
+
+document.querySelectorAll(".faq-question").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const item = button.parentElement;
+        const answer = item.querySelector(".faq-answer");
+
+        /* Close other answers */
+
+        document.querySelectorAll(".faq-item").forEach(other => {
+
+            if (other !== item) {
+
+                other.classList.remove("active");
+
+                other.querySelector(".faq-answer")
+                    .style.maxHeight = null;
+
+            }
+
+        });
+
+
+        /* Toggle current */
+
+        item.classList.toggle("active");
+
+        if (item.classList.contains("active")) {
+
+            answer.style.maxHeight =
+                answer.scrollHeight + "px";
+
+        } else {
+
+            answer.style.maxHeight = null;
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+
+
+{% endblock %}

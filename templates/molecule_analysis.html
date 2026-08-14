@@ -1,0 +1,2777 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 3%;
+        letter-spacing: -1px;
+    }
+    /* Input Element Forms styling maps */
+    .search-container-bar {
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%, #150204 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 6px;
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        max-width: 75%;
+        margin-bottom: 1%;
+        margin-top: 1%;
+    }
+    .search-container-bar form {
+        display: flex;          /* makes input + button inline */
+        align-items: center;    /* vertically aligned */
+        width: 100%;
+    }
+
+    .search-input-field {
+        background: transparent;
+        border: None;
+        color: #ffffff;
+        padding: 20px 25px;
+        width: 100%;
+        font-size: 1.05rem;
+        display: flex;
+        flex: 1; /* makes input take up remaining space */
+        margin-right: 10px; /* adds spacing between input and button */
+    }
+
+    .search-input-field:focus {
+        outline: none;
+    }
+
+    .search-input-field::placeholder, subsruct-search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.863);
+        font-size: 100%;  /* Font size */
+        opacity: 1; /* Ensure full visibility */
+    }
+    
+    .draw-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 40px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px; 
+        flex-shrink: 0; /* prevents button from shrinking */
+        align-self: center; 
+    }
+
+    .draw-btn:hover{
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    }
+
+    .para-describe{
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #ffffff;
+        text-align: left;
+        width: 100%;
+    }
+
+
+    /* Cards only take up the horizontal space they actually need */
+    .analysis-card {
+        background: #09101a;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 18px 33px;
+        color: #ffffff;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content; /* Force card to shrink horizontally to fit content */
+        max-width: 100%;
+        backdrop-filter: blur(8px);
+    }
+
+    .analysis-card:hover {
+        background: rgb(13 28 42 / 64%);
+        /* background: rgba(27, 58, 87, 0.85); */
+        border-color: #ce0010;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(206, 0, 16, 0.2);
+    }
+
+    /* Active Expanded Card State */
+    .analysis-card.expanded {
+        background: rgba(13, 22, 34, 0.95);
+        border-color: #ce0010;
+        grid-column: 1 / -1; /* spans the entire row */
+        /* width: 100%;  */
+        /* Automatically expands horizontally when clicked to show detailed metrics table */
+        cursor: default;
+    }
+
+    .result-design{
+        background: #ffffff0a;
+        padding: 1rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border: 1px solid #ffffff15;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-title-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .card-arrow {
+        margin-left: 15px;
+        transition: transform 0.2s ease;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .analysis-card.expanded .card-arrow {
+        transform: rotate(90deg);
+        color: #ce0010;
+    }
+
+    /* Hidden Drawer Content for calculated properties */
+    .card-details-drawer {
+        display: none;
+        width: 100%;
+        margin-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 15px;
+    }
+
+    .analysis-card.expanded .card-details-drawer {
+        display: block;
+    }
+
+    .drawer-table th {
+        /* background: #212529; */        
+        background-color: #6e050e;
+        /* color: rgba(255, 255, 255, 0.856); */
+        color: white;
+        font-weight: 600;
+        /* padding: 10px 22px; */
+    }
+    .drawer-table td {
+        background: #212529;
+        font-weight: 400;
+        color: #ffffff;
+        align-items: center;
+        /* padding: 10px 22px; */
+    }
+    .table table-borderless drawer-table align-middle {
+        background: #212529;
+    }
+    
+    .if-error{
+        background: rgba(16, 34, 54, 0.486);
+        border-radius: 50px;
+        padding: 14px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content; /* Force card to shrink horizontally to fit content */
+        max-width: 100%;
+        /*backdrop-filter: blur(8px);*/
+        color: #ffffff;
+        /* margin-left: 40px;
+        margin-top: 15px; */
+    }
+
+    .if-replace-delete-error{
+        /* background: rgb(255 255 255); */
+        border-radius: 50px;
+        padding: 7px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        max-width: 100%;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .subsruct-search-container-bar {
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%, #150204 100%);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 50px;
+        /*padding: 6px;*/
+        display: flex;
+        justify-content: center; /* centers the form inside */
+        margin-top: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        width: 100%;        
+        margin-left: 15px;
+        max-width: 80%;
+        margin-top: 10px;
+    }
+    .subsruct-search-container-bar form {
+        display: flex;          /* makes input + button inline */
+        align-items: center;    /* vertically aligned */
+        width: 100%;
+    }
+
+    .subsruct-search-input-field {
+        background: transparent;
+        border: None;
+        color: #ffffff;
+        padding: 10px 12px;
+        width: 100%;
+        font-size: 1.05rem;
+        display: flex;
+        flex: 1; /* makes input take up remaining space */
+        margin-right: 10px; /* adds spacing between input and button */
+    }
+    .subsruct-search-input-field:focus {
+        outline: none;
+    }
+    .subsruct-search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.863);
+    }
+
+    .subsruct-submit-action-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 32px;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 10px;
+        flex-shrink: 0;
+        align-self: center;
+        padding: 2px 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .subsruct-submit-action-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    }
+
+    .delete-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    /* Tablet + Mobile */
+    @media (max-width: 1200px) {
+        .subsruct-submit-action-btn {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+        }
+
+        .delete-text {
+            display: none;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+        }
+
+        .delete-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .delete-icon:hover{
+            transform: scale(1.02);
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .btn-iconn {
+            display: none;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+        }
+    }
+
+    .table-scroll-container {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar {
+        height: 8px; /* Height of horizontal scrollbar */
+    }
+
+    .table-scroll-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar-thumb {
+        background: #9292927e; /* Accent red thumb */
+        border-radius: 10px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #fdfcfc;
+    }
+
+    /* Forces table cells to handle long unbroken strings cleanly */
+    /* .drawer-table td, .drawer-table th {
+        white-space: nowrap; /* Prevents text from awkwardly squishing
+        padding: 10px 16px;
+    } 
+    */
+    .array-cell {
+        white-space: pre-wrap;
+        max-width: 200px;
+        word-break: break-all;
+    }
+
+    /* Right side Download container */
+
+    .analysis-wrapper{
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+        /* margin-right: 2rem;
+        margin-left: auto; */
+        position: sticky;
+        top: 15rem;
+    }
+
+    .analysis-options{
+        flex:1;
+    }
+
+    .download-panel{
+        width: stretch;
+        position: sticky;
+        /* margin-top: -6.5rem; */
+        background: rgba(16, 34, 54, 0.65);
+        backdrop-filter: blur(18px);
+        border-radius: 22px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, .08);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+        /* margin-right: -1rem; */
+        justify-self: center;
+    }
+
+    .download-panel:hover {
+        background: rgb(13 28 42 / 64%);
+        border-color: #ce0010;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(206, 0, 16, 0.2);
+    }
+
+    .download-panel h3{
+        color:white;
+        margin-bottom:20px;
+        text-align:center;
+    }
+
+    .download-section{
+        margin-bottom:12px;
+        padding-bottom:10px;
+        border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .download-section:last-child{
+        border-bottom:none;
+    }
+
+    .download-section h4{
+        color:#d8d8d8;
+        margin-bottom:12px;
+        font-size: 1.05rem;
+    }
+
+    .download-section button{
+        margin:4px;
+        padding: 3px 8px;
+        background:#17263d;
+        color:white;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.12);
+        cursor:pointer;
+        transition:.25s;
+    }
+
+    .download-section button:hover{
+        background:#c10b1b;
+        transform:translateY(-2px);
+
+    }
+
+    .mol-name {
+        font-size: large;
+        font-weight: 500;
+        /* max-width: 70%; */
+        /* display: flex; */
+        width: fit-content;
+    }
+
+    iframe{
+        width:70%;
+        height:70%;
+        border:none;
+    }
+
+    .table-dark th{
+        color: #ffffff; 
+        text-align: left;
+        font-size: 1.1rem; 
+        background-color: #6e050e; 
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    
+    @media (max-width: 576px) {        
+        .search-container-bar {
+            flex-direction: column;
+            border-radius: 16px;
+            padding: 10px;
+            /* gap: 10px; */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 4.5rem;   
+            max-width: stretch;         
+        }
+        
+        .search-input-field{
+            padding: 0px;
+            padding-left: 10px;
+        }
+
+        .search-and-name{
+            flex-direction: column-reverse;
+        }
+    }
+
+    @media (max-width: 440px) { 
+        .search-container-bar {
+            flex-direction: column;
+            border-radius: 16px;
+            padding: 10px;
+            /* gap: 10px; */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 4.5rem;
+            justify-self: center;
+            max-width: stretch;          
+        }
+        
+        .search-input-field{
+            padding: 0px;
+            padding-left: 10px;
+        }
+
+        .table-width-control{
+            width: auto;
+        }
+        
+        .tablecol1width{
+            width: 10%;
+        }
+
+        .mobile-3d{
+            margin: 0 1.0rem;
+            max-height: 18rem;
+            margin-top: 2rem;   
+        }
+
+        .interactive-card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+            width: 100%;
+            background: #ffffff0a;
+            gap: 0.75rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #ffffff3b;
+        }
+
+        .analysis-and-download{
+            /* display: inline-flex;  */
+            flex-direction: column; 
+            align-items: flex-start;
+        }
+
+        .analysis-wrapper{
+            width: 100%;
+        }
+
+        .download-panel{
+            margin-top: 1rem;
+        }
+
+        .results{
+            margin-top: 0.25rem;
+        }
+
+        .hero-title {
+            margin-top: 0.75rem;
+            font-size: 2.5rem;
+        }
+
+        .para-describe{
+            font-size: 1rem;
+        }
+    }
+
+
+    @media(max-width: 576.99px){
+        .interactive-card-grid, .analysis-wrapper {
+            width: 100%;
+        }
+
+        .interactive-card-grid {
+            width: 100%;            
+            flex-direction: column;
+            width: 100%;
+            /* display: flex; */ 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .analysis-and-download{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .analysis-card{
+            background: #09101a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 9px 16px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;            
+            max-width: 100%;
+            backdrop-filter: blur(8px);
+            width: stretch;
+        }
+
+        #propFontSize{
+            font-size: 1.1rem;
+        }
+
+        #propDescription{
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .hero-title {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .download-section {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            transform: scale(0.9);
+        }
+
+        .download-panel{
+            width: stretch;
+            position: sticky;            
+            background: #09101a;
+            backdrop-filter: blur(18px);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+            justify-self: center;
+            }
+
+        .html-3d{
+            min-width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-self: center;
+            width: 50%;
+            zoom: 35%;
+        }
+    }
+    
+    @media (min-width: 576px) and (max-width: 767.98px){
+        .interactive-card-grid, .analysis-wrapper {
+            width: 100%;
+        }
+
+        .interactive-card-grid {
+            width: 100%;            
+            flex-direction: column;
+            width: 100%;
+            /* display: flex; */ 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .analysis-and-download{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .analysis-card{
+            background: #09101a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 9px 16px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;            
+            max-width: 100%;
+            backdrop-filter: blur(8px);
+            width: stretch;
+        }
+
+        #propFontSize{
+            font-size: 1.1rem;
+        }
+
+        #propDescription{
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .hero-title {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .download-section {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            transform: scale(0.9);
+        }
+
+        .download-panel{
+            width: stretch;
+            position: sticky;            
+            background: #09101a;
+            backdrop-filter: blur(18px);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+            justify-self: center;
+            }
+
+        .search-container-bar{
+            max-width: stretch;
+        }
+
+        .html-3d{
+            min-width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-self: center;
+            width: 50%;
+            zoom: 55%;
+        }
+        
+        .svg-2d{
+            zoom: 55%;
+            justify-self: center;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 991.98px){
+        .interactive-card-grid {                        
+            flex-direction: column;
+            width: 100%;
+            /* display: flex; */ 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .analysis-wrapper {
+            width: 29%;
+        }
+
+        .analysis-and-download{
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .analysis-card{
+            background: #09101a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 9px 16px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;            
+            max-width: 100%;
+            backdrop-filter: blur(8px);
+            width: stretch;
+        }
+
+        #propFontSize{
+            font-size: 1.1rem;
+        }
+
+        #propDescription{
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .hero-title {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .download-section {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            transform: scale(0.9);
+        }
+
+        .download-panel{
+            width: stretch;
+            position: sticky;            
+            background: #09101a;
+            backdrop-filter: blur(18px);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+            justify-self: center;
+            }
+
+        .search-container-bar{
+            max-width: stretch;
+        }
+
+        .submit-action-btn{
+            margin-right: 1rem;
+        }
+
+        .download-panel h3{
+            font-size: 135%;
+        }
+
+        .html-3d{
+            width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            zoom: 70%;
+        }
+
+        .svg-2d{
+            zoom: 70%;
+            /* justify-self: center; */
+        }
+    }
+
+
+    @media (min-width: 992px){
+        .interactive-card-grid {                        
+            /* flex-direction: column;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem; */
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            /* margin-top: 20px; */
+            width: 65%;
+        }
+
+        .analysis-wrapper {
+            width: 29%;
+        }
+
+        .analysis-and-download{
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .analysis-card{
+            background: #09101a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 18px 30px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;            
+            max-width: 100%;
+            backdrop-filter: blur(8px);
+            /* width: stretch; */
+            width: max-content;
+            
+        }
+
+        #propFontSize{
+            font-size: 1.1rem;
+        }
+
+        #propDescription{
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .download-section {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            transform: scale(0.9);
+        }
+
+        .download-panel{
+            width: stretch;
+            position: sticky;            
+            background: #09101a;
+            backdrop-filter: blur(18px);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+            justify-self: center;
+            }
+
+         .analysis-card.expanded {
+            background: rgba(13, 22, 34, 0.95);
+            border-color: #ce0010;
+            width: 100%; /* Automatically expands horizontally when clicked to show detailed metrics table */
+            cursor: default;
+        }
+
+        .submit-action-btn{
+            margin-right: 1rem;
+        }
+
+        .download-panel h3{
+            font-size: 140%;
+        }
+
+        .html-3d{
+            width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            zoom: 70%;
+        }
+        .svg-2d{
+            zoom: 70%;
+            /* justify-self: center; */
+        }
+    }
+
+    @media (min-width: 1200px){
+        .download-panel h3{
+            font-size: 1.75rem;
+        }
+
+        .html-3d{
+            width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            zoom: 80%;
+        }
+
+        .svg-2d{
+            zoom: 80%;
+            /* justify-self: center; */
+        }
+    }
+
+    .results{
+        margin-top: 1.5rem;
+    }
+
+    /* Main Search bar */
+
+    .submit-action-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 24px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .submit-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(168, 10, 24, 0.5);
+    }
+
+    /* Default: show text, hide icon */
+    .submit-action-btn .btn-icon {
+        display: none;
+    }
+    .submit-action-btn .btn-text {
+        display: inline;
+    }
+
+    @media (min-width: 0px) and (max-width: 299.9999px) {
+        /* 0 to 299.9999px */
+        .html-3d{
+            min-width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-self: center;
+            width: 50%;
+            zoom: 35%;
+        }
+
+        .svg-2d{
+            zoom: 35%;
+            justify-self: center;
+        }
+
+        large{
+            color: #FFC107;
+            font-size: 1.25rem;
+        }
+
+        .analysis-card {
+            background: #09101a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 9px 16px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 90%;
+            backdrop-filter: blur(8px);
+            width: stretch;
+        }
+    }
+
+    @media (min-width: 300px) and (max-width: 377.9999px) {
+        /* 300 to 377.9999px */
+        .html-3d{
+            min-width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-self: center;
+            width: 50%;
+            zoom: 43%;
+        }
+
+        .svg-2d{
+            zoom: 40%;
+            justify-self: center;
+        }
+    }
+
+    @media (min-width: 378px) and (max-width: 575.9999px) {
+        /* 300 to 575.9999px */
+        .html-3d{
+            min-width: fit-content;
+            min-height: 320px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-self: center;
+            width: 50%;
+            zoom: 55%;
+        }
+
+        .svg-2d{
+            zoom: 50%;
+            justify-self: center;
+        }
+    }
+
+
+    /* On small screens (e.g., < 576px) */
+    @media (max-width: 576px) {
+        .submit-action-btn{
+            width: 10%;
+            background: transparent;
+            width: 10%;
+            border-radius: 12px;
+            display: inline;
+            border: none;
+        }
+        
+        .submit-action-btn .btn-text {
+            display: none;   /* hide text */
+        }
+        
+        .submit-action-btn .btn-icon {
+            display: inline; /* show icon */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .submit-action-btn:hover {
+            transform: translateY(0px);
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .search-container-bar {
+            flex-direction: column;
+            border-radius: 16px;
+            padding: 10px;
+            /* gap: 10px; */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 4.5rem; 
+            max-width: stretch;           
+        }
+
+    }
+    
+    small{
+        color: #ffffffa2; 
+        white-space: nowrap; 
+        font-size: 1rem; 
+        margin-bottom: -0.5rem
+        }
+
+    large{
+        color: #FFC107;        
+        font-size: 1.75rem;
+    }
+
+</style>
+
+<h1 class="hero-title">Molecular Analysis Engine</h1>
+<div class="para-describe"> 
+    <p .>
+        Assess molecular features such as Lipinski’s Rule of 5, complexity, and descriptors to predict drug-likeness and bioavailability. Identify functional groups, substructures, and Use fingerprints, atom/bond analysis, and substructure searching to understand chemical reactivity and biological activity. Generate 2D/3D images, shape/structure models, and downloadable formats (SDF, Mol2, PDF) for deeper computational and experimental use.
+    </p>
+</div>
+
+<!-- Main Search Bar for "Molecular Analysis Engine" -->
+<div class="row search-and-name">
+    <div class="col-12">
+        <div class="search-container-bar" style="margin-top: 20px;">
+            <form method="POST" action="/molecule_analysis">
+                <input type="text" name="smiles1" class="search-input-field" id = "smiles1" 
+                       placeholder="Enter the Molecular Canonical Smiles to know ..." 
+                       value="{{ request.form.get('smiles1', '') }}" required>
+                    <!-- <button id="drawBtn" class="draw-btn">Draw and Know</button> -->
+                     <button type="button" id="drawBtn" class="svg-draw-pencil-button" style="background: transparent; border: none; padding: 1px 6px; margin-right: 0rem;">
+                        <!-- Draw Molecule Button -->
+                        <svg class="svg-draw-pencil" fill="#ffffff" height="22" width="25" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+                        <path d="M70.2,337.4l104.4,104.4L441.5,175L337,70.5L70.2,337.4z M0.6,499.8c-2.3,9.3,2.3,13.9,11.6,11.6L151.4,465L47,360.6
+                            L0.6,499.8z M487.9,24.1c-46.3-46.4-92.8-11.6-92.8-11.6c-7.6,5.8-34.8,34.8-34.8,34.8l104.4,104.4c0,0,28.9-27.2,34.8-34.8
+                            C499.5,116.9,534.3,70.6,487.9,24.1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="document.getElementById('smiles1').value = ''" style="background: transparent; border: none;" >
+                        <!-- Delete input button 1 -->
+                        <span class="btn-text">
+                            <i class="fas fa-search btn-icon">
+                                <svg id="svg-delete" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0,0,256,256">
+                                <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                                </svg>
+                            </i>
+                        </span>
+                    </button>
+                <!-- <button type="submit" class="submit-action-btn">Know it without Coding</button> -->
+                <button type="submit" class="submit-action-btn">
+                    <!-- SUbmit button -->
+                    <span class="btn-text">Know it without Coding</span>                    
+                    <i class="fas fa-search btn-icon" style="margin-right: -20px; margin-left: -20px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0,0,256,256">
+                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" 
+                        stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" 
+                        text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M21,3c-9.37891,0 -17,7.62109 -17,17c0,9.37891 7.62109,17 17,17c3.71094,0 7.14063,-1.19531 9.9375,-3.21875l13.15625,13.125l2.8125,-2.8125l-13,-13.03125c2.55469,-2.97656 4.09375,-6.83984 4.09375,-11.0625c0,-9.37891 -7.62109,-17 -17,-17zM21,5c8.29688,0 15,6.70313 15,15c0,8.29688 -6.70312,15 -15,15c-8.29687,0 -15,-6.70312 -15,-15c0,-8.29687 6.70313,-15 15,-15z"></path></g></g>
+                        </svg>
+                    </i>
+                </button>
+            </form>                
+        </div>
+        {% if error %}
+
+        <div class = "if-error" role="alert">
+            ⚠️ Please submit a valid SMILES structure above to query properties.
+        </div>
+        {% endif %}
+    </div>
+
+    {% if data %}
+        <div class="mol-name">
+            {% set name = data.home_mol_name %} 
+                {% if name | length < 80 %}
+                <div class="div-title">
+                    <small>Molecule Name</small>
+                </div>
+                <div class="div-name">
+                    <large>{{ data.home_mol_name}}</large>
+                </div>
+                    {% endif %}
+        </div>
+
+        <div class="mol-name">
+            {% set name = data.home_mol_name %} 
+                {% if name | length >= 80 %}
+                    <div class="div-title" style="width: 16rem; white-space: nowrap; font-size: 0.5em; margin-bottom: -0.5rem">
+                        <small>Molecule Name</small></div>
+                    <div class="div-name" /*style="max-width:60%;"*/>
+                        <large>{{ data.home_mol_name}}</large>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+
+
+
+<main class="row results">
+    <div class="col-12 analysis-and-download">      
+        <!-- Interactive Horizontal Fit Grid Layout -->
+        <div class="interactive-card-grid result-design">
+
+            <!-- Card 1: Molecular Property -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Molecular Property</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Molecular properties are the distinct characteristics of a molecule that 
+                            define its chemical, physical, and structural behavior, excluding 
+                            pharmacological or biological effects. 
+                            It Molecular Property is a set of information about a molecule's name, 
+                            smiles, formula, and other properties that determines how a molecule 
+                            behaves and interacts with its environment.
+                        </p>
+                    </div>
+                    {% if data %}
+                    
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p><br>
+                    <div class="table-scroll-container">
+                    <table class="table table-dark align-middle mb-0">
+                        <thead class="table-dark" style="text-align: left;">
+                            <tr>
+                                <th style="font-weight: bold; font-size: 1.1rem; color:aliceblue; width: 20%;">Property</th>
+                                <th style="font-weight: bold; font-size: 1.1rem; color:aliceblue;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <td>Compound Name</td>
+                                <td>{{ data.molecular_property.compound_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Common Name</td>
+                                <td>{{ data.molecular_property.common_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Predicted IUPAC Name</td>
+                                <td>
+                                    {{ data.molecular_property.predicted_iupac_name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CHEMBL ID</td>
+                                <td>
+                                    {{ data.molecular_property.predicted_chembl_id }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Canonical Smiles</td>
+                                <td><code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></td>
+                            </tr>
+                            <tr>
+                                <td>Elemental Formula</td>
+                                <td>{{ data.molecular_property.elemental_formula }}</td>
+                            </tr>
+                            <tr>
+                                <td>Molecular Weight (MW)</td>
+                                <td>{{ data.molecular_property.mw }} g/mol</td>
+                            </tr>
+                            <tr>
+                                <td>Computed LogP Index</td>
+                                <td>{{ data.molecular_property.logp }}</td>
+                            </tr>
+                            <tr>
+                                <td>TPSA Metric (Å²)</td>
+                                <td>{{ data.molecular_property.tpsa }} Å²</td>
+                            </tr>
+                            <tr>
+                                <td>Rotatable Free Bonds</td>
+                                <td>{{ data.molecular_property.rotatable_bonds }}</td>
+                            </tr>
+                            <tr>
+                                <td>Lipinski Rule of 5</td>
+                                <td>
+                                    {% if data.molecular_property.lipinski == 'Pass' %}
+                                    <span class="badge bg-success px-3 py-2 rounded-pill">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill">{{ data.molecular_property.lipinski }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Application & Summary</td>
+                                <td>{{ data.molecular_property.summary }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                    {% else %}
+                    <p class="text-secondary small m-0">Please submit a valid structure token above to query properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 2: Lipinski Property of 5 -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Lipinski Property of 5</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p  id="propDescription">
+                            The Lipinski Rule of Five is a pharmaceutical guideline to predict if a chemical compound will likely be orally bioavailable as a drug. 
+                            Compounds that fall within these parameters are more likely to have favorable pharmacokinetics (absorption and distribution) in the human body.
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }} </code></p><br>
+                    <div class="table-scroll-container">
+                    <table class="table table-dark align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="border-top-left-radius:16px; width: 40%; text-align: left;"><strong>Rule of 5 Status</strong></th>
+                                <th style="padding-left:5rem; text-align: left;"><strong>Value</strong></th>
+                                <th style="border-top-right-radius:16px; text-align:center;">
+                                    {% if data.lipinski5.lipinski == 'Pass' %}
+                                    <span class="badge bg-success" style="font-weight: 600; width:10rem;"><strong>Status: Pass</strong></span>
+                                    {% else %}
+                                    <span class="badge bg-danger" style="font-weight: 600; width:10rem;"><strong>Status: Fail</strong></span>
+                                    {% endif %}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <td>Calculated Molecular Weight</td>
+                                <td style="padding-left:5rem;">{{ data.lipinski5.mw }}(g/mol)</td>
+                                <td style="text-align:center;">
+                                    {% if data.lipinski5.mw < 500 %}
+                                    <span class="badge bg-success">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Calculated Lipophilicity (logP)</td>
+                                <td style="padding-left:5rem;">{{ data.lipinski5.logp }}</td>
+                                <td style="text-align:center;">
+                                    {% if data.lipinski5.logp < 5 %}
+                                    <span class="badge bg-success">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Calculated Hydrogen Bond Donor</td>
+                                <td style="padding-left:5rem;">{{ data.lipinski5.hbd }}</td>
+                                <td style="text-align:center;">
+                                    {% if data.lipinski5.hbd < 5 %}
+                                    <span class="badge bg-success">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Calculated Hydrogen Bond Acceptor</td>
+                                <td style="padding-left:5rem;">{{ data.lipinski5.hbd }}</td>
+                                <td style="text-align:center;">
+                                    {% if data.lipinski5.hba < 10 %}
+                                    <span class="badge bg-success">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    {% else %}
+                            <p class="text-secondary small m-0">Please submit a valid structure token above to get Lipinskis' properties.</p>
+                        {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 3: Fingerprint -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Molecular Fingerprint</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Morgan fingerprints (circular fingerprints) are high-dimensional numerical vectors that map complex chemical structures into standardized bit arrays for computational molecular property analysis, virtual screening, and similarity mapping. 
+                            Derived from the Morgan algorithm, they operate by assigning invariant identifiers to atoms in a molecular graph and iteratively updating them based on their surrounding radial chemical environments up to a user-defined bond radius. 
+                        </p>
+                    </div>
+                    <!-- Only render these fields if data has been computed and returned by Flask because otherwise it was giving errors.-->
+                        {% if data %}
+                        <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p><br>
+                        <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th style="border-top-left-radius:16px;">Fingerprint Details</th>
+                                    <th style="border-top-right-radius:16px;">Values</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <td>Morgan Fingerprint</td>
+                                    <td>{% if data.morganfp.morganfingerprint %}
+                                            {{ data.morganfp.morganfingerprint }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Length of Morgan Fingerprint</td>
+                                    <td>{% if data.morganfp.lenmf %}
+                                            {{ data.morganfp.lenmf }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>No. of OnBits</td>
+                                    <td>{% if data.morganfp.onbits %}
+                                            {{ data.morganfp.onbits }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-bottom-left-radius:16px;">Index of OnBits</td>
+                                    <td>{% if data.morganfp.idxonbits %}
+                                            {{ data.morganfp.idxonbits }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        {% else %}
+                            <p class="text-secondary small m-0">Please submit a valid structure token above to query fingerprint properties.</p>
+                        {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 4: Atom Analysis -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Atom Analysis</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Atom Analysis refers to the process of examining and extracting information 
+                            about individual atoms within a molecule. 
+                            This allows chemists and data scientists to calculate properties, understand 
+                            chemical structure, and prepare molecular features for modeling or further analysis.
+                            It provides access to: Atom type, Hybridization, 
+                            Charges, Hydrogen counts, including several other features.
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6"> {{ data.molecular_property.smiles }}</code></p>
+                    <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th>Index</th>
+                                    <th>Symbol</th>
+                                    <th>Atomic Num</th>
+                                    <th>Mass</th>
+                                    <th>Hybridization</th>
+                                    <th>Charge</th>
+                                    <th>Degree</th>
+                                    <th>Total H's</th>
+                                    <th>Explicit Val</th>
+                                    <th>Implicit Val</th>
+                                    <th>Aromatic</th>
+                                    <th>Chiral Tag</th>
+                                    <th>Isotope</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.atom_analysis %}
+                                    {% for row in data.atom_analysis %}
+                                    <tr>
+                                        <td><strong>{{ row.index }}</strong></td>
+                                        <td><mark style="background: rgba(16, 34, 54, 0.65); color:white; padding: 2px 6px; border-radius: 3px;">{{ row.symbol }}</mark></td>
+                                        <td>{{ row.atomic_number }}</td>
+                                        <td>{{ row.atomic_mass }}</td>
+                                        <td>{{ row.hybridization }}</td>
+                                        <td>{{ row.charge }}</td>
+                                        <td>{{ row.degree }}</td>
+                                        <td>{{ row.total_hs }}</td>
+                                        <td>{{ row.explicit_valence }}</td>
+                                        <td>{{ row.implicit_valence }}</td>
+                                        <td>{{ row.aromatic }}</td>
+                                        <td>{{ row.chiral }}</td>
+                                        <td>{{ row.isotope }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="13" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                   </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to atoms' properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 5: Bond Analysis -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Bond Analysis</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Bond Analysis involves examining the connections between atoms in a molecule 
+                            to determine properties like bond type, aromaticity, bond start and end indices
+                            and whether the bond is part of a ring structure. 
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p>
+                    <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th>Begin Atom Index</th>
+                                    <th>End Atom Index</th>
+                                    <th>Bond</th>
+                                    <th>Bond Type</th>
+                                    <th>Is Ring</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.bond_analysis %}
+                                    {% for roow in data.bond_analysis %}
+                                    <tr>
+                                        <td style="text-align: center;">{{ roow.begin_atom_index }}</td>
+                                        <td style="text-align: center;">{{ roow.end_atom_index }}</td>
+                                        <td>{{ roow.bond }}</td>
+                                        <td>{{ roow.bond_type }}</td>
+                                        <td>{{ roow.is_ring }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to bonds' properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- Card 6: Substructure Searching -->
+                <div class="analysis-card" onclick="toggleCard(this)">
+                     <!-- onclick="toggleCard(this)" -->
+                    <div class="card-title-header">
+                        <span id="propFontSize">Substructure Search Mapping <small style="font-size: 0.7rem;">(Delete/Replace Fragment)</small></span>
+                        <span class="card-arrow">▶</span>
+                    </div>
+                    <div class="card-details-drawer" onclick="event.stopPropagation();">
+                        <!-- onclick="event.stopPropagation();" -->
+                        <div style="margin-left: 15px;">
+                            <p id="propDescription">
+                                A substructure search is a method to find molecules or portions of molecules 
+                                matching a specific pattern. It is done using SMARTS, which is a language to 
+                                define chemical patterns. SMARTS allows you to represent atom types, connectivity, 
+                                and optional properties in a flexible way. The Highlighted SVGs help visually 
+                                confirm which part of the molecule matches the substructure pattern.
+                            </p>
+                        </div>
+                        {% if data %}
+                        <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p>
+                        
+                        <!-- Search form input specifically targeting this card -->
+                        
+                        <div class="subsruct-search-container-bar">
+                            <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+                            <form method="POST">
+                                <!-- FIX 1: Retain active SMILES string structure across page loads -->
+                                <input type="hidden" name="smiles1" value="{{ data.molecular_property.smiles if data else '' }}">
+                                <input type="text" name="smarts" placeholder="Enter SMARTS pattern to search Substruct" class="subsruct-search-input-field">
+                                <button type="button" onclick="document.getElementById('smiles').value = ''" style="background: transparent; border: none;" >
+                                    <!-- Delete input button -->
+                                    <span class="btn-text">
+                                        <i class="fas fa-search btn-icon">
+                                            <svg id="svg-delete" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0,0,256,256">
+                                            <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                                            </svg>
+                                        </i>
+                                    </span>
+                                </button>
+                                    <!-- Search button -->
+                                <button type="submit" class="subsruct-submit-action-btn">
+                                    <i class="fas fa-search btn-iconn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0,0,256,256">
+                                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" 
+                                        stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" 
+                                        text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M21,3c-9.37891,0 -17,7.62109 -17,17c0,9.37891 7.62109,17 17,17c3.71094,0 7.14063,-1.19531 9.9375,-3.21875l13.15625,13.125l2.8125,-2.8125l-13,-13.03125c2.55469,-2.97656 4.09375,-6.83984 4.09375,-11.0625c0,-9.37891 -7.62109,-17 -17,-17zM21,5c8.29688,0 15,6.70313 15,15c0,8.29688 -6.70312,15 -15,15c-8.29687,0 -15,-6.70312 -15,-15c0,-8.29687 6.70313,-15 15,-15z"></path></g></g>
+                                        </svg>
+                                    </i>
+                                    <span class="delete-text">Search Pattern</span>
+                                </button>
+                            </form>
+                        </div><br>
+                        
+                        {% if data.substruct_search.pattern %}
+                        <p style="margin-left: 15px;">Target Substructure SMART pattern: {{ data.substruct_search.pattern }}</p>
+                        {% endif %}
+                        
+                        {% if data and data.substruct_search %}
+                            <div style="margin-left: 15px;">
+                                
+                                {% if data.substruct_search.error and data.substruct_search.error == "No SMARTS pattern entered." %}
+                                    <!-- CASE A: There is a local error caught by function (e.g., Invalid SMARTS syntax) -->
+                                    <p style="color: #ff0000;" class = "if-error">❌ Substructure not entered!</p>
+                                    <div class="table-scroll-container">
+                                    <table class="table table-dark align-middle mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th style="border-top-left-radius:16px; text-align: left;"><strong>Substructure Details</strong></th>
+                                                <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                            <tr>
+                                                <td>Substructure is: </td>
+                                                <td>None</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Count</td>
+                                                <td>None</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Indices</td>
+                                                <td>None</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-bottom-left-radius:16px;">Substructure Highlight SVG</td>
+                                                <td>
+                                                    <div class="svg-2d" style="max-width: device-width; margin: auto;" style= "color: #ff0000;">
+                                                        {% if data.substruct_search.svg %}
+                                                            {{ data.substruct_search.svg | safe }}
+                                                        {% else %}
+                                                            <p style="text-align: left;">⚠ Error: Substructure not entered yet.</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                <p style="margin-left: 0px;" class="text-secondary small">The other molecular analytics structural profiles above remain active.</p>
+                                
+                                {% elif not data.substruct_search.present and data.substruct_search.error == "Invalid SMARTS pattern syntax." %}
+                                    <!-- CASE B: Error due to Invalid SMARTS pattern. -->
+                                     <p style="color: #ffbf00;" class = "if-error">❌ Invalid SMARTS pattern syntax.</p>
+                                    
+                                    <div class="table-scroll-container">
+                                     <table class="table table-dark align-middle mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th style="border-top-left-radius:16px; text-align: left;"><strong>Substructure Details</strong></th>
+                                                <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                            <tr>
+                                                <td>Substructure SMARTS Pattern</td>
+                                                <td>{{ data.substruct_search.pattern }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure is: </td>
+                                                <td>{% if data.substruct_search.present == True %}
+                                                        Present
+                                                    {% else %}
+                                                        Absent
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Count</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Highlighted Atoms Count</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Indices</td>
+                                                <td>None</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-bottom-left-radius:16px;">Substructure Highlight SVG</td>
+                                                <td>
+                                                    <div class="svg-2d" style="max-width: 300px; margin: auto;" style= "color: #ffbf00;">
+                                                        {% if data.substruct_search.svg %}
+                                                            {{ data.substruct_search.svg | safe }}
+                                                        {% else %}
+                                                            <p style="text-align: left;">Invalid SMARTS pattern syntax.</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                
+                                {% elif not data.substruct_search.present and data.substruct_search.error == "Substructure not found in this molecule." %}
+                                    <!-- CASE C: No errors, but no structural matches found -->
+                                    <p style="color: #ffbf00;" class = "if-error">❌ Substructure Match Not Found!</p>
+                                    <div class="table-scroll-container">
+                                    <table class="table table-dark align-middle mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th style="border-top-left-radius:16px; text-align: left;"><strong>Substructure Details</strong></th>
+                                                <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                            <tr>
+                                                <td>Substructure SMARTS Pattern</td>
+                                                <td>{{ data.substruct_search.pattern }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure is </td>
+                                                <td>{% if data.substruct_search.present == True %}
+                                                        Present
+                                                    {% else %}
+                                                        Absent
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Count</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Highlighted Atoms Count</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Indices</td>
+                                                <td>None</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-bottom-left-radius:16px;">Substructure Highlight SVG</td>
+                                                <td>
+                                                    <div class="svg-2d" style="max-width: 300px; margin: auto;" style= "color: #ffbf00;">
+                                                        {% if data.substruct_search.svg %}
+                                                            {{ data.substruct_search.svg | safe }}
+                                                        {% else %}
+                                                            <p style="text-align: left;">Substructure not found in this molecule.</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </div>
+
+                                {% elif data.substruct_search.present %}
+                                    <!-- CASE D: Success! Render the highlighted SVG matrix safely -->
+                                    <p style="color: #00ff37;" class = "if-error">✔ Substructure Match Found!</p>
+                                    <div class="table-scroll-container">
+                                    <table class="table table-dark align-middle mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th style="border-top-left-radius:16px; text-align: left;"><strong>Substructure Details</strong></th>
+                                                <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                            <tr>
+                                                <td>Substructure SMARTS Pattern</td>
+                                                <td>{{ data.substruct_search.pattern }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure is: </td>
+                                                <td> 
+                                                    {% if data.substruct_search.present == True %}
+                                                        Present
+                                                    {% else %}
+                                                        Absent
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Count</td>
+                                                <td>{{ data.substruct_search.count_matches }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Highlighted Atoms Count</td>
+                                                <td>{{ data.substruct_search.highlight_atoms }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Substructure Indices</td>
+                                                <td>{{ data.substruct_search.indices }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-bottom-left-radius:16px;">Substructure Highlight SVG</td>
+                                                <td>
+                                                    <div class="svg-2d" style="max-width: device-width; margin: auto;"">
+                                                        {{ data.substruct_search.svg | safe }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table> 
+                                    </div>  
+
+                                     <br>
+                                     
+                                     <!-- ================= DELETE FRAGMENT SECTION ================= -->
+                                    <div style="margin-left: 15px;">
+                                        <h3>Delete Fragment</h3>
+                                        <p id="propDescription">
+                                            Matches against custom SMARTS query paradigms to highlight the common 
+                                            structure, deletes the fragment, and generates a new 2D structure.
+                                        </p>
+                                    </div>
+
+                                    <div class="subsruct-search-container-bar">
+                                        <!-- form for getting -->
+                                        <form method="POST" action="/delete_replace">
+                                            <input type="hidden" name="smiles1" value="{{ data.molecular_property.smiles if data else '' }}">
+                                            <input readonly type="text" name="smarts1" value = "{{ data.substruct_search.pattern if data else '' }}" class="subsruct-search-input-field">
+                                            <button type="button" onclick="document.getElementById('smiles').value = ''" style="background: transparent; border: none;" >
+                                                <!-- Delete input button -->
+                                                <span class="btn-text">
+                                                    <i class="fas fa-search btn-icon">
+                                                        <svg id="svg-delete" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0,0,256,256">
+                                                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </button>
+                                            <!-- <button type="submit" name="deleteaction" class="subsruct-submit-action-btn">Delete Fragment</button> -->
+                                            <button type="submit" name="deleteaction" class="subsruct-submit-action-btn">
+                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" style="width: 30px; height: 30px;">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier"> 
+                                                    <path d="M10 12V17" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    </path> <path d="M14 12V17" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    </path> <path d="M4 7H20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                                    <path d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                                    <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                                    </g>
+                                                </svg>
+                                                <span class="delete-text">Delete Fragment</span>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    {% if data and data.delete_fragment and data.delete_fragment.present %}
+                                        <p style="color: #00ff37;" class="if-replace-delete-error">✔ Substructure Fragment Deleted and new Molecule Generated!</p>
+                                        <div class="table-scroll-container">
+                                        <table class="table table-dark align-middle mb-0">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th style="border-top-left-radius:16px; text-align: left;"><strong>Deleted Fragment Details</strong></th>
+                                                    <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                <tr>
+                                                    <td>Original SMILES Pattern</td>
+                                                    <td>{{ data.molecular_property.smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Updated SMILES Pattern</td>
+                                                    <td>{{ data.delete_fragment.new_smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Substructure SMARTS Pattern</td>
+                                                    <td>{{ data.delete_fragment.pattern }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Delete Substructs Status</td>
+                                                    <td> 
+                                                        {% if data.delete_fragment.deleted is true %}
+                                                            <span class="badge bg-success">Deleted</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Error: not deleted</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>New SVG (After Delete)</td>
+                                                    <td>
+                                                        <div class="svg-2d" style="max-width: 100%; margin: auto;">
+                                                            {{ data.delete_fragment.svg | safe }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>  
+                                        </div>
+
+                                        {% elif data and data.delete_fragment and data.delete_fragment.present is false %}
+                                        <p style="color: #00ff37;" class="if-replace-delete-error">✔ Substructure Fragment Deleted and new Molecule Generated!</p>
+                                        <div class="table-scroll-container">
+                                        <table class="table table-dark align-middle mb-0">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th style="border-top-left-radius:16px; text-align: left;"><strong>Deleted Fragment Details</strong></th>
+                                                    <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                <tr>
+                                                    <td>Original SMILES Pattern</td>
+                                                    <td>{{ data.molecular_property.smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Updated SMILES Pattern</td>
+                                                    <td>{{ data.delete_fragment.new_smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Substructure SMARTS Pattern</td>
+                                                    <td>{{ data.delete_fragment.pattern }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Delete Substructs Status</td>
+                                                    <td> 
+                                                        {% if data.delete_fragment.deleted is true %}
+                                                            <span class="badge bg-success">Deleted</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Error: not deleted</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>  
+                                                <tr>
+                                                    <td>Error</td>
+                                                    <td>{{ data.delete_fragment.error }}</td>
+                                                </tr>                                              
+                                            </tbody>
+                                        </table>  
+                                        </div>
+                                    {% endif %}
+
+                                    <br>
+
+                                    <!-- ================= REPLACE PATTERN SECTION ================= -->
+                                    <div style="margin-left: 15px;">
+                                        <h3>Replace Pattern</h3>
+                                        <p id="propDescription">
+                                            Matches against custom SMARTS query paradigms to highlight the common 
+                                            structure, replaces the fragment, and generates a new 2D structure.
+                                        </p>
+                                    </div>
+
+                                    <div class="subsruct-search-container-bar">
+                                        <!-- CRITICAL FIX: Pass SMILES to Flask on submit -->
+                                        <form method="POST" action="/delete_replace">
+                                            <input readonly type="hidden" name="smiles1" value="{{ data.molecular_property.smiles if data else '' }}">
+                                            <input readonly type="text" name="smarts1" value = "{{ data.substruct_search.pattern if data else '' }}" class="subsruct-search-input-field">
+                                            <input type="text" name="newsmarts1" placeholder="New SMARTS/SMILES" class="subsruct-search-input-field">
+                                            <button type="button" onclick="document.getElementById('smiles').value = ''" style="background: transparent; border: none;" >
+                                                <!-- Delete input button -->
+                                                <span class="btn-text">
+                                                    <i class="fas fa-search btn-icon">
+                                                        <svg id="svg-delete" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0,0,256,256">
+                                                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </button>
+                                            <!-- <button type="submit" name="replaceaction" class="subsruct-submit-action-btn">Replace Fragment</button> -->
+                                            <button type="submit" name="replaceaction" class="subsruct-submit-action-btn">
+                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" style="width: 30px; height: 30px;">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier"> 
+                                                    <path d="M20.003 18.9423L18.9423 20.003L15.9193 16.98C14.655 18.229 12.9176 19 11 19C8.76823 19 6.78139 17.9557 5.5 16.3303L5.5 18L4 18L4.00001 13.5H8.4138V15H6.38927C7.37111 16.5058 9.07009 17.5 11 17.5C14.0376 17.5 16.5 15.0376 16.5 12H18C18 13.4058 17.5856 14.7149 16.8722 15.8116L20.003 18.9423Z" fill="#ffffff"></path> 
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 7.16965L16.5 5.5L18 5.5L18 10H13.5862V8.5H15.6107C14.6289 6.99416 12.9299 6 11 6C7.96244 6 5.50001 8.46243 5.50001 11.5H4.00001C4.00001 7.63401 7.13401 4.5 11 4.5C13.2318 4.5 15.2186 5.54431 16.5 7.16965Z" fill="#ffffff"></path> </g>
+                                                </svg>
+                                                <span class="delete-text">Replace Fragment</span>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    {% if data and data and data.replace_fragment and data.replace_fragment.present %}
+                                        <p style="margin-left: 5px; color: #00ff37;" class="if-replace-delete-error">✔ Substructure Fragment Replaced and new Molecule Generated!</p>
+                                        <div class="table-scroll-container">
+                                        <table class="table table-dark align-middle mb-0">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th style="border-top-left-radius:16px; text-align: left;"><strong>Replaced Fragment Details</strong></th>
+                                                    <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                <tr>
+                                                    <td>Original SMILES Pattern</td>
+                                                    <td>{{ data.molecular_property.smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Updated SMILES Pattern</td>
+                                                    <td>{{ data.replace_fragment.new_smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Substructure Pattern Deleted</td>
+                                                    <td>{{ data.replace_fragment.pattern }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Substructure Pattern Replaced By</td>
+                                                    <td>{{ data.replace_fragment.new_pattern }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Replace Substructs Status</td>
+                                                    <td> 
+                                                        {% if data.replace_fragment.replaced is true %}
+                                                            <span class="badge bg-success">Replaced</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Error: not replaced</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Highlighted SVG (Inserted Fragment)</td>
+                                                    <td>
+                                                        <div class="svg-2d" style="max-width: 100%; margin: auto;">
+                                                            {{ data.replace_fragment.highlighted_svg | safe }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>New SVG (Full Replaced Molecule)</td>
+                                                    <td>
+                                                        <div class="svg-2d" style="max-width: 100%; margin: auto;">                                                            
+                                                            {{ data.replace_fragment.svg | safe }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>  
+                                        </div>
+
+                                        {% elif data and data and data.replace_fragment and data.replace_fragment.present is false%}
+                                        <p style="color: #ff0000;" class = "if-replace-delete-error">❌ Substructure Fragment not Replaced!</p>                                        
+                                        <div class="table-scroll-container">
+                                        <table class="table table-dark align-middle mb-0">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th style="border-top-left-radius:16px; text-align: left;"><strong>Replaced Fragment Details</strong></th>
+                                                    <th style="border-top-right-radius:16px; text-align: left;"><strong>Values</strong></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                <tr>
+                                                    <td>Original SMILES Pattern</td>
+                                                    <td>{{ data.molecular_property.smiles }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Updated SMILES Pattern</td>
+                                                    <td>None</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Substructure Pattern Deleted</td>
+                                                    <td>None</td>
+                                                </tr>                                                
+                                                <tr>
+                                                    <td>Replace Substructs Status</td>
+                                                    <td> 
+                                                        {% if data.replace_fragment.replaced is true %}
+                                                            <span class="badge bg-success">Replaced</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Error: not replaced</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>   
+                                                <tr>
+                                                    <td>Error</td>
+                                                    <td>{{ data.replace_fragment.error }}</td>
+                                                </tr>                                         
+                                            </tbody>
+                                        </table>  
+                                        </div>
+                                    {% endif %}
+                                                                 
+                                {% else %}
+                                    <!-- Fallback if the card function returned an initial state tracker -->
+                                    <p class="text-secondary small" style="margin-left: 15px;">Submit a valid SMARTS pattern token above to map matches.</p>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-secondary small" style="margin-left: 15px;">Submit a structural SMILES and a valid SMARTS pattern token above to map matches.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            <!-- Card 7: Identify Groups -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Identify Groups</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            A Functional group is a specific group of atoms within a molecule that is 
+                            responsible for the characteristic chemical reactions of that molecule. 
+                            The functional group determines how a molecule behaves in 
+                            chemical reactions and its physical properties. Get details about the 
+                            presence or absence of some of the common functional groups.
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6"> {{ data.molecular_property.smiles }}</code></p>
+                    <!-- <div class="table table-borderless drawer-table align-middle"> -->
+                    <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th style="border-top-left-radius:16px;">Functional Group</th>
+                                    <th>Present</th>
+                                    <th style="border-top-right-radius:16px;">Count</th>
+                                    <!-- <th>Indices</th> -->
+                                </tr>
+                            </thead>
+
+                            <tbody class="table-group-divider"> 
+
+                            {% if data and data.identify_groups %}
+                                {% for name, group in data.identify_groups.items() %}
+                                <tr>
+                                    <td>{{ name }}</td>
+                                    <td>
+                                        {% if group.present %}
+                                            <span class="badge bg-success">Yes</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ group.count }}</td>
+                                    <!-- <td>{{ group.indices }}</td> -->
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">
+                                        No functional groups available.
+                                    </td>
+                                </tr>
+                            {% endif %}
+
+                            </tbody>
+                        </table>
+                   </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to scan for specific atomic custom functional groupings.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 8: Molecular Complexity -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Molecular Complexity</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Molecular complexity involves examining the topological indices and 
+                            graph descriptors of a chemical structure, such as BertzCT, Balaban J index, 
+                            AvgIpc, and TPSA, to mathematically quantify features like branching, size, 
+                            and polarity.
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p>
+                    <!-- <div class="table table-borderless drawer-table align-middle"> -->
+                    <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th style="border-top-left-radius:16px;">BertzCT</th>
+                                    <th>Balaban J index</th>
+                                    <th>AvgIpc</th>
+                                    <th style="border-top-right-radius:16px;">TPSA</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_complexity %}
+                                    <tr>
+                                        <td>{{ data.molecular_complexity.BertzCT }}</td>
+                                        <td>{{ data.molecular_complexity.BalabanJ }}</td>
+                                        <td>{{ data.molecular_complexity.AvgIpc }}</td>
+                                        <td>{{ data.molecular_complexity.tpsa }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to Molecular Complexity properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Card 9: 2D Structure -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">2D Structure</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p  id="propDescription">
+                            A 2D molecular structure is a flat representation of a molecule showing the 
+                            arrangement of atoms and the bonds between them in two dimensions, without 
+                            depicting the molecule's three-dimensional shape. It is not a hardcoded image, 
+                            but a programmatic spatial mapping of a molecular graph onto a flat coordinate 
+                            plane. This function renders chemical structures as SVG 
+                            (Scalable Vector Graphics) ensures infinitely scalable, crisp drawings perfect 
+                            for high-quality figures or web rendering. 
+                        </p>
+                    </div>
+                    <div class="svg-container">
+                        {% if data %}
+                            <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p><br>
+                                <div class="svg-2d">
+                                    {{ data.svg | safe }}
+                                </div>
+                        {% else %}
+                            <span class="text-dark small">Please submit a valid structure token above to view the 2D structure.</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 10: 3D Structure -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">3D Structure (Ball & Stick)</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            A 3D molecular conformer is a specific, energetically stable 
+                            three-dimensional arrangement of atoms in a molecule that can 
+                            interconvert through the rotation of single bonds without breaking 
+                            chemical bonds. a conformer captures the dynamic, physical shape of 
+                            the molecule in 3D space. Because single bonds rotate freely, a single 
+                            molecule can exist in thousands of different conformers—some of higher 
+                            energy (less stable) and some of lower energy (more stable). 
+                            Visualising it using py3Dmol.
+                        </p>
+                    </div>
+                    {% if data %}
+                        <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }} </code></p><br>
+                        {% if data.html_3d %}
+                            <!-- Render raw HTML directly from main route -->
+                            <div class="bg-dark rounded p-2 text-center html-3d">
+                                {{ data.html_3d | safe }}
+                            </div>
+                        {% else %}
+                            <p class="text-warning small m-0">Could not calculate 3D conformer coordinates for this compound.</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-secondary small m-0">Please submit a valid structure token above to view the 3D molecule.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- Card 11: Descriptors -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Molecular Descriptors</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Molecular descriptors are numerical values that represent the 
+                            chemical, physical, and structural properties of a molecule. 
+                            They transform complex chemical information into standardized numbers, 
+                            allowing computers to analyse molecules, predict their behaviours, and 
+                            build models for drug discovery and material science. Based on 
+                            dimensionality, descriptors are classified as: 0D, 1D, 2D, 3D and 4D 
+                            descriptors. 
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES:<code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p>
+                    <!-- <div class="table-responsive"><br> -->
+                    <div class="table-scroll-container"><br>
+                        <p style="margin-left: 15px;">0D Descriptors</p>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 0D Descriptors -->
+                                    <th style="border-top-left-radius:16px;">Molecular Weight</th>
+                                    <th>LogP</th>
+                                    <th>H-Bond Donors</th>
+                                    <th>H-Bond Acceptors</th>
+                                    <th>Rotatable Bonds</th>
+                                    <th>TPSA</th>
+                                    <th>Heavy Atom Count</th>
+                                    <th>Valence Electrons</th>
+                                    <th>Radial Eelectrons</th>
+                                    <th style="border-top-right-radius:16px;">Aromatic Rings</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.MolecularWeight }}</td>
+                                        <td>{{ data.molecular_descriptors.LogP }}</td>
+                                        <td>{{ data.molecular_descriptors.HBondDonors }}</td>
+                                        <td>{{ data.molecular_descriptors.HBondAcceptors }}</td>
+                                        <td>{{ data.molecular_descriptors.RotatableBonds }}</td>
+                                        <td>{{ data.molecular_descriptors.TPSA }}</td>
+                                        <td>{{ data.molecular_descriptors.HeavyAtomCount }}</td>
+                                        <td>{{ data.molecular_descriptors.ValenceElectrons }}</td>
+                                        <td>{{ data.molecular_descriptors.RadialEelectrons }}</td>
+                                        <td>{{ data.molecular_descriptors.AromaticRings }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+
+                        <p style="margin-left: 15px;">1D Descriptors</p>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 1D Descriptors -->
+                                    <th style="border-top-left-radius:16px;">Molar Refractivity</th>
+                                    <th>Aromatic Rings</th>
+                                    <th>H-Bond Donors</th>
+                                    <th>H-Bond Acceptors</th>
+                                    <th>Rotatable Bonds</th>
+                                    <th>TPSA</th>
+                                    <th>Heavy Atom Count</th>
+                                    <th style="border-top-right-radius:16px;">Valence Electrons</th>
+                                       
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.MolarRefractivity }}</td>
+                                        <td>{{ data.molecular_descriptors.AromaticRings }}</td>
+                                        <td>{{ data.molecular_descriptors.HBondDonors }}</td>
+                                        <td>{{ data.molecular_descriptors.HBondAcceptors }}</td>
+                                        <td>{{ data.molecular_descriptors.RotatableBonds }}</td>
+                                        <td>{{ data.molecular_descriptors.TPSA }}</td>
+                                        <td>{{ data.molecular_descriptors.HeavyAtomCount }}</td>
+                                        <td>{{ data.molecular_descriptors.ValenceElectrons }}</td>
+
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+
+                        <p style="margin-left: 15px;">2D Descriptors</p>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 2D Descriptors -->                                    
+                                    <th style="border-top-left-radius:16px;">Chi0v</th>
+                                    <th>Chi1v</th>
+                                    <th>Chi2v</th>
+                                    <th>Chi3v</th>
+                                    <th style="border-top-right-radius:16px;">Chi4v</th>                                    
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->                                        
+                                        <td>{{ data.molecular_descriptors.Chi0v }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi1v }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi2v }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi3v }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi4v }}</td>                                        
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 2D Descriptors -->                                    
+                                    <th style="border-top-left-radius:16px;">Chi0n</th>
+                                    <th>Chi1n</th>
+                                    <th>Chi2n</th>
+                                    <th>Chi3n</th>
+                                    <th style="border-top-right-radius:16px;">Chi4n</th>                                    
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.Chi0n }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi1n }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi2n }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi3n }}</td>
+                                        <td>{{ data.molecular_descriptors.Chi4n }}</td>                                        
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 2D Descriptors -->
+                                    <th style="border-top-left-radius:16px;">Kappa1</th>
+                                    <th>Kappa2</th>
+                                    <th style="border-top-right-radius:16px;">Kappa3</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.Kappa1 }}</td>
+                                        <td>{{ data.molecular_descriptors.Kappa2 }}</td>
+                                        <td>{{ data.molecular_descriptors.Kappa3 }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 2D Descriptors -->
+                                    <th style="border-top-left-radius:16px;">Balaban J Index</th>
+                                    <th>Bertz CT</th>
+                                    <th style="border-top-right-radius:16px;">BCUT 2D</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.BalabanJIndex }}</td>
+                                        <td>{{ data.molecular_descriptors.BertzCT }}</td>
+                                        <td>{{ data.molecular_descriptors.BCUT2D }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+
+                        <p style="margin-left: 15px;">3D Descriptors</p>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 3D Descriptors -->
+                                    <th style="border-top-left-radius:16px;">PMI1</th>
+                                    <th>PMI2</th>
+                                    <th>PMI3</th>
+                                    <th>NPRI1</th>
+                                    <th>NPRI2</th>
+                                    <th style="border-top-right-radius:16px;">Radius of Gyration</th>                                
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors.molecular_descriptors3d %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.PMI1 }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.PMI2 }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.PMI3 }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.NPR1 }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.NPR2 }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.RadiusOfGyration }}</td>                                        
+                                     </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <!-- 3D Descriptors -->                                                                        
+                                    <th style="border-top-left-radius:16px;">Inertial Shape Factor</th>
+                                    <th>Eccentricity</th>
+                                    <th>Asphericity</th>
+                                    <th>Spherocity Index</th>
+                                    <th style="border-top-right-radius:16px;">PBF</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.molecular_descriptors.molecular_descriptors3d %}
+                                    <tr>
+                                        <!-- Calculating it again because cards are independent -->                                        
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.InertialShapeFactor }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.Eccentricity }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.Asphericity }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.SpherocityIndex }}</td>
+                                        <td>{{ data.molecular_descriptors.molecular_descriptors3d.PBF }}</td>
+                                     </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table><br>
+                    </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to Molecular Complexity properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 12: Molecular Scaffold Analysis -->
+            <div class="analysis-card" onclick="toggleCard(this)">
+                <div class="card-title-header">
+                    <span id="propFontSize">Scaffold Analysis</span>
+                    <span class="card-arrow">▶</span>
+                </div>
+                <div class="card-details-drawer" onclick="event.stopPropagation();">
+                    <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Scaffold analysis in RDKit is a method used to identify and group 
+                            molecules based on their chemical scaffolds, which are the core ring 
+                            systems and linkers of molecules. This analysis is crucial for tasks 
+                            such as clustering, diversity analysis, and scaffold-based splits. 
+                            The Murcko scaffolds, a specific type of scaffold analysis, are used 
+                            to remove all side chains and substituents, allowing for a chemically 
+                            diverse set of molecules to be selected.
+                        </p>
+                    </div>
+                    {% if data %}
+                    <p style="margin-left: 15px;">Target Compound SMILES: <code class="text-warning text-break fs-6">{{ data.molecular_property.smiles }}</code></p>
+                    <!-- <div class="table table-borderless drawer-table align-middle"> -->
+                    <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark" style="text-align: left;">
+                                <tr>
+                                    <th style="border-top-left-radius:16px; width: 30%;">Scaffold</th>                                    
+                                    <th style="border-top-right-radius:16px;">SMILES</th> 
+                                </tr>                                
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% if data and data.scaffold_analysis %}
+                                    <tr>
+                                        <td >Murcko Scaffold SMILES</td>
+                                        <td style="padding-left: 1rem;">{{ data.scaffold_analysis.scaffold_smiles }}</td>                                                         
+                                    </tr>
+                                    <tr>
+                                        <td>Generic Scaffold SMILES</td> 
+                                        <td style="padding-left: 1rem;">{{ data.scaffold_analysis.generic_scaffold_smiles }}</td>                                        
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-secondary small m-0">No context available. Please submit a valid compound above.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                    {% else %}<p class="text-secondary small m-0">Please submit a valid structure token above to Molecular Complexity properties.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        <!--  Download Panel Card  -->
+
+        </div>
+
+        <div class="analysis-wrapper result-design">
+            <!-- Card : Download SDF, PDF, Mol2 -->
+            <aside class="download-panel">
+                <h3 id="download-panel">Download Panel</h3>
+                {% if data %}
+                    <form method="POST" action="/download">
+                        <!-- <input type="hidden" name="smiles1" value="{{ data.molecular_property.smiles if data else '' }}"> -->
+                        <input type="hidden" name="smiles1" value="{{ request.form.get('smiles1', '') if data else ''}}">
+                        <div class="download-section">
+                            <h4>Download Data</h4>
+                            <button type="submit" name="action" value="data_sdf">SDF</button>
+                            <button type="submit" name="action" value="data_mol">MOL</button>
+                            <!-- <button type="submit" name="action" value="data_mol2">MOL2</button> -->
+                            <button type="submit" name="action" value="data_json">JSON</button>
+                            <button type="submit" name="action" value="data_csv">CSV</button>
+                        </div>
+
+                        <div class="download-section">
+                            <h4>2D Structure</h4>
+                            <button type="submit" name="action" value="2d_sdf">SDF</button>
+                            <button type="submit" name="action" value="2d_mol">MOL</button>
+                            <button type="submit" name="action" value="2d_mol2">MOL2</button>
+                            <button type="submit" name="action" value="2d_pdf">PDF</button>
+                            <button type="submit" name="action" value="2d_svg">SVG</button>
+                            <button type="submit" name="action" value="2d_png">PNG</button>
+                        </div>
+
+                        <div class="download-section">
+                            <h4>3D Structure</h4>
+                            <button type="submit" name="action" value="3d_sdf">SDF</button>
+                            <button type="submit" name="action" value="3d_mol">MOL</button>
+                            <button type="submit" name="action" value="3d_mol2">MOL2</button>
+                            <button type="submit" name="action" value="3d_html">HTML/JS</button>
+                            <button type="submit" name="action" value="3d_json">JSON</button>
+                        </div>
+                    </form>
+                <div style="margin-left: 15px;">
+                        <p id="propDescription">
+                            Download the molecule's data in a variety of file types.
+                        </p>
+                    </div>
+                    
+                {% else %}<p class="text-secondary small m-0" style="align-items: center; color: #d8d8d8;">Please submit the SMILES above to access the download panel.</p>
+                    
+                {% endif %}
+            </aside>
+
+        </div>
+
+    </div>
+</main>
+
+
+<div id="ketcherModal" class="ketcher-modal">
+    <div class="ketcher-window">
+        <div class="ketcher-header">
+            <h2>Draw Molecule</h2>
+            <button type = "submit" id="closeKetcher">✖</button>
+              
+        </div>
+
+        <iframe
+            id="ketcherFrame"
+            src="{{ url_for('static', filename='ketcher/index.html') }}">
+        </iframe>
+
+        <div class="ketcher-footer">
+            <button type = "submit" id="useMolecule" onclick="sendSmiles()">
+                Use Molecule
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const ketcherModal = document.getElementById("ketcherModal");
+    const drawBtn = document.getElementById("drawBtn");
+    const closeBtn = document.getElementById("closeKetcher");
+
+    drawBtn.addEventListener("click", function (e) {
+        e.preventDefault();      // remove if drawBtn is type="button"
+        console.log("Opening Ketcher");
+        ketcherModal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", function () {
+        console.log("Close button clicked");
+        ketcherModal.style.display = "none";
+    });
+
+    window.addEventListener("click", function (event) {
+        if (event.target === ketcherModal) {
+            console.log("Close by clicking outside");
+            ketcherModal.style.display = "none";
+        }
+    });
+
+    async function sendSmiles() {
+    const frame = document.getElementById("ketcherFrame");
+    const smiles = await frame.contentWindow.ketcher.getSmiles();
+
+    document.querySelector('input[name="smiles1"]').value = smiles;
+    console.log("Smiles sent to the form textbox:", smiles);
+    ketcherModal.style.display = "none";
+
+    // Automatic Form Submit
+    // document.querySelector("form").submit();
+
+    // Sends smiles to Flask via JS function and it receives via route
+    await fetch("/receive_smiles_for_home", {
+    method: "POST",
+    headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            smiles: smiles
+        })
+    });
+    }
+</script>
+
+<script>
+    <!-- Client-side independent card drawer toggle logic -->
+    //  Using this for the various cards.
+    function toggleCard(cardElement) {
+        // Simply toggle the 'expanded' class on the clicked card, leaving others untouched
+        cardElement.classList.toggle('expanded');
+    }
+
+    document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function() {
+        this.classList.toggle('open'); // only this card toggles
+    });
+    });
+
+
+    </script>
+
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+
+{% endblock %}

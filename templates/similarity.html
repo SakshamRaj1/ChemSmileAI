@@ -1,0 +1,2666 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    /* GLOBAL */
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 2%;
+        letter-spacing: -1px;
+    }
+
+    body {
+        color: #ffffff;
+    }
+
+    .body {
+        color: #ffffff;
+    }
+
+    form {
+        display: block;
+    }
+
+    /* SEARCH CONTAINER */
+
+    .search-container-bar {
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%,#150204 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        max-width: 75%;
+        /* margin: 1% auto; */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        box-sizing: border-box;
+    }
+
+    /* Search form */
+    .search-container-bar form.from {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin: 0;
+    }
+
+    /* UPPER SEARCH INPUT */
+
+    .upper-input {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    /* Search input */
+    .search-input-field {
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        padding: 14px 20px;
+        width: 100%;
+        min-width: 0;
+        font-size: 1.05rem;
+        display: block;
+        flex: 1;
+        margin-right: 0;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    /* Search input focus */
+    .search-input-field:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+
+    /* Placeholder */
+    .search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.863);
+        font-size: 100%;
+        opacity: 1;
+    }
+
+    /* Clear button */
+    .upper-input > button {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Clear/search icon */
+    .upper-input .btn-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upper-input .btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upper-input .btn-icon svg {
+        width: 36px;
+        height: 36px;
+        display: block;
+    }
+
+
+    /* LOWER SEARCH ROW */
+
+    .lower-input {
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        box-sizing: border-box;
+    }
+
+
+    /* RANGE CONTROL */
+
+    .range-action-btn {
+        background: linear-gradient(135deg,#a80a18 0%,#09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 40px;
+        padding: 10px 20px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-sizing: border-box;
+    }
+
+    /* Range value */
+    .range-action-btn .value-display {
+        font-size: 14px;
+        font-weight: 600;
+        min-width: 40px;
+        text-align: right;
+        color: #ffffff;
+        flex: 0 0 auto;
+    }
+
+    /* Range input */
+    .range-action-btn input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        flex: 1;
+        min-width: 80px;
+        height: 6px;
+        background: #ffffff;
+        border-radius: 3px;
+        outline: none;
+        transition: background 0.2s ease;
+        cursor: pointer;
+    }
+
+    /* Range hover */
+    .range-action-btn input[type="range"]:hover {
+        background: #d0d0d0;
+    }
+
+
+    /* RANGE THUMB - CHROME / SAFARI / EDGE */
+
+    .range-action-btn input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#a80a18 0%, #09111c 100%);
+        border: 2px solid #ffffff;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition:
+            transform 0.1s ease,
+            background-color 0.2s ease;
+    }
+
+    .range-action-btn input[type="range"]::-webkit-slider-thumb:hover {
+        background: #ffffff;
+        transform: scale(1.1);
+    }
+
+    /* RANGE THUMB - FIREFOX*/
+
+    .range-action-btn input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#a80a18 0%, #09111c 100%);
+        border: 2px solid #ffffff;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition:
+            transform 0.1s ease,
+            background-color 0.2s ease;
+    }
+
+    .range-action-btn input[type="range"]::-moz-range-thumb:hover {
+        background: linear-gradient(135deg,#a80a18 0%, #09111c 100%);
+        transform: scale(1.1);
+    }
+
+
+    /* SUBMIT BUTTON */
+
+    .submit-action-btn {
+        background: linear-gradient(135deg,#a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 24px;
+        min-height: 48px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .submit-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 4px 15px rgba(168, 10, 24, 0.5);
+    }
+
+    .submit-action-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Desktop: show text, hide icon */
+    .submit-action-btn .btn-text {
+        display: inline;
+    }
+
+    .submit-action-btn .btn-icon {
+        display: none;
+    }
+
+    .submit-action-btn .btn-icon svg {
+        display: block;
+    }
+
+    /* DESCRIPTION */
+
+    .para-describe {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #ffffff;
+        text-align: left;
+        width: 100%;
+    }
+
+    /* ERROR MESSAGE  */
+
+    .if-error {
+        background: rgba(16, 34, 54, 0.486);
+        border-radius: 50px;
+        padding: 14px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        max-width: calc(100% - 30px);
+        color: #ffffff;
+        margin-left: 40px;
+        margin-top: 15px;
+        box-sizing: border-box;
+    }
+
+
+    /* RESULTS PANEL */
+    .results-panel {
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 30px;
+        margin-top: 50px;
+        margin-left: 3rem;
+        margin-right: 6rem;
+        backdrop-filter: blur(10px);
+        box-sizing: border-box;
+    }
+
+    /* CARD */
+
+    .card {
+        border-radius: 24px;
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        justify-self: center;
+    }
+
+
+    /* SVG CANVAS */
+
+    .svg-canvas-box {
+        background: #ffffff;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        min-width: 200px;
+        box-sizing: border-box;
+        margin: 1rem;
+    }
+
+
+    /* TABLES */
+    .data-grid-table th {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .table-dark th {
+        color: #ffffff;
+        text-align: center;
+        font-size: 1.1rem;
+        background-color: #6e050e;
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    .data-grid-table td {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+
+    /* Responsive table container */
+    .table-scroll-container {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar-thumb {
+        background: #9292927e;
+        border-radius: 10px;
+    }
+
+    .table-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #fdfcfc;
+    }
+
+    /* RE-SIMILARITY BUTTON */
+
+    .re-similarity-button {
+        background: linear-gradient(135deg,#a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        align-self: center;
+        text-decoration: none;
+        margin-bottom: 3%;
+    }
+
+
+    .re-similarity-button:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 4px 15px rgba(168, 10, 24, 0.5);
+        color: #ffffff;
+    }
+
+
+    /* QUERY SUMMARY */
+
+    .query-summary {
+        margin: 1rem;
+    }
+
+    /* BOOTSTRAP COLUMN CUSTOMIZATION */
+
+    .col-md-7 {
+        padding: 3.5rem;
+        margin: auto;
+        place-items: center;
+        border-radius: 24px;
+        background-color: rgba(13, 22, 34, 0.8);
+        box-sizing: border-box;
+    }
+
+    .col-md-8 {
+        padding: 3.5rem;
+        margin: 4% 0;
+        place-items: center;
+        border-radius: 24px;
+        background-color: rgba(13, 22, 34, 0.8);
+        width: 86.66666667%;
+        box-sizing: border-box;
+        justify-self: center;
+    }
+
+
+    /* RESULT DESIGN */
+
+    .result-design {
+        background: #ffffff0a;
+        padding: 1rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border: 1px solid #ffffff15;
+        margin-bottom: 1.5rem;
+        box-sizing: border-box;
+    }
+
+    /* SIDEBARS */
+
+    .left-sidebar {
+        background-color: rgba(13, 22, 34, 0.8);
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        margin-bottom: 24px;
+        box-sizing: border-box;
+        top: 4rem;
+    }
+
+
+    .right-sidebar {
+        background-color: rgba(13, 22, 34, 0.8);
+        border-radius: 24px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 24px;
+        width: fit-content;
+        box-sizing: border-box;
+    }
+
+
+    /* TEXT / SMALL ELEMENTS  */
+    .text-breakk {
+        color: rgba(255, 255, 255, 0.7);
+        word-wrap: break-word !important;
+    }
+
+
+    small {
+        color: #ffffffa2;
+        white-space: nowrap;
+        font-size: 1rem;
+        margin-bottom: -0.5rem;
+    }
+
+
+    large {
+        color: #FFC107;
+        font-size: 1.75rem;
+    }
+
+
+    /* AUTOFILL STYLE CORRECTION - Override */
+
+    .search-input-field:-webkit-autofill,
+    .search-input-field:-webkit-autofill:hover,
+    .search-input-field:-webkit-autofill:focus,
+    .search-input-field:-webkit-autofill:active {
+
+        -webkit-text-fill-color: #ffffff !important;
+        transition: background-color 50000s ease-in-out 0s;
+        caret-color: #ffffff;
+    }
+
+
+    /* VERY SMALL DEVICES 0 - 299px */
+
+    @media (max-width: 299.99px) {
+        .hero-title {
+            font-size: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .para-describe {
+            font-size: 0.9rem;
+        }
+
+        .search-container-bar {
+            max-width: 96%;
+            padding: 7px;
+            border-radius: 12px;
+        }
+
+        .search-input-field {
+            padding: 10px 8px;
+            font-size: 0.85rem;
+        }
+
+        .upper-input > button {
+            width: 38px;
+            flex-basis: 38px;
+        }
+
+        .upper-input .btn-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .lower-input {
+            gap: 5px;
+        }
+
+        .range-action-btn {
+            padding: 8px 10px;
+            gap: 8px;
+        }
+
+        .range-action-btn input[type="range"] {
+            min-width: 50px;
+        }
+
+        .range-action-btn .value-display {
+            min-width: 30px;
+            font-size: 12px;
+        }
+
+        .submit-action-btn {
+            padding: 8px;
+            min-height: 42px;
+        }
+
+        .submit-action-btn .btn-text {
+            display: none;
+        }
+
+        .submit-action-btn .btn-icon {
+            display: flex;
+        }
+
+        .submit-action-btn .btn-icon svg {
+            width: 25px;
+            height: 25px;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            gap: 15px;
+            margin-top: 4%;
+        }
+
+        .svg-2d {
+            zoom: 35%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .svg-2dd {
+            zoom: 65%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .table-dark th {
+            font-size: 0.75rem;
+            padding: 0.6rem;
+        }
+
+        .h5,
+        h5 {
+            font-size: 1rem;
+        }
+
+        .h2,
+        h2 {
+            font-size: 1.25rem;
+        }
+
+        .p-3 {
+            padding: 0.2rem !important;
+        }
+
+        .table {
+            font-size: 0.8rem;
+        }
+
+        .col-md-8 {
+            padding: 1rem;
+            width: 94%;
+        }
+
+        .badge {
+            font-size: 13px;
+        }
+
+        #break-text {
+            width: 20%;
+        }
+    }
+
+
+    /* SMALL MOBILE 300 - 377px */
+
+    @media (min-width: 300px) and (max-width: 377.99px) {
+
+        .hero-title {
+            margin-top: 0.75rem;
+            font-size: 2.2rem;
+        }
+
+        .para-describe {
+            font-size: 1rem;
+        }
+
+        .search-container-bar {
+            max-width: 96%;
+        }
+
+        .search-input-field {
+            padding: 10px 10px;
+            font-size: 0.9rem;
+        }
+
+        .upper-input > button {
+            width: 40px;
+            flex-basis: 40px;
+        }
+
+        .lower-input {
+            gap: 6px;
+        }
+
+        .range-action-btn {
+            padding: 8px 12px;
+            gap: 10px;
+        }
+
+        .range-action-btn .value-display {
+            font-size: 13px;
+        }
+
+        .submit-action-btn {
+            padding: 8px;
+            min-height: 44px;
+        }
+
+        .submit-action-btn .btn-text {
+            display: none;
+        }
+
+        .submit-action-btn .btn-icon {
+            display: flex;
+        }
+
+        .submit-action-btn .btn-icon svg {
+            width: 27px;
+            height: 27px;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            gap: 15px;
+            margin-top: 4%;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .svg-2d {
+            zoom: 80%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        #break-text {
+            width: 20%;
+        }
+
+        .table-dark th {
+            font-size: 0.8rem;
+            padding: 0.7rem;
+        }
+
+        .col-md-8 {
+            padding: 1.5rem;
+            width: 92%;
+        }
+    }
+
+
+    /* MOBILE 378 - 575px*/
+
+    @media (min-width: 378px) and (max-width: 575.99px) {
+
+        .hero-title {
+            margin-top: 0.75rem;
+            font-size: 2.5rem;
+        }
+
+        .para-describe {
+            font-size: 1rem;
+        }
+
+        .search-container-bar {
+            max-width: 96%;
+            padding: 8px;
+        }
+
+        .search-input-field {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        .upper-input > button {
+            width: 42px;
+            flex-basis: 42px;
+        }
+
+        .lower-input {
+            gap: 8px;
+        }
+
+        .range-action-btn {
+            padding: 9px 15px;
+            gap: 10px;
+        }
+
+        .range-action-btn .value-display {
+            font-size: 14px;
+            min-width: 36px;
+        }
+
+        .submit-action-btn {
+            padding: 9px;
+            min-height: 46px;
+        }
+
+        .submit-action-btn .btn-text {
+            display: none;
+        }
+
+        .submit-action-btn .btn-icon {
+            display: flex;
+        }
+
+        .submit-action-btn .btn-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 4%;
+        }
+
+        .left-sidebar {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .right-sidebar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .svg-2d {
+            zoom: 40%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        #break-text {
+            width: 20%;
+        }
+
+        #similarity-details {
+            width: 50%;
+        }
+
+        .col-md-8 {
+            padding: 1.5rem;
+            width: 90%;
+        }
+
+        .text-breakk {
+            word-wrap: break-word !important;
+        }
+    }
+
+
+    /* TABLET 576 - 767px */
+
+    @media (min-width: 576px) and (max-width: 767.98px) {
+
+        .hero-title {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .search-container-bar {
+            max-width: 94%;
+        }
+
+        .search-input-field {
+            padding: 12px 16px;
+        }
+
+        .submit-action-btn {
+            padding: 10px 16px;
+            min-height: 46px;
+        }
+
+        .submit-action-btn .btn-text {
+            display: inline;
+            font-size: 0.9rem;
+        }
+
+        .submit-action-btn .btn-icon {
+            display: none;
+        }
+
+        .range-action-btn {
+            padding: 10px 18px;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 5%;
+        }
+
+        .right-sidebar,
+        .left-sidebar {
+            width: 100%;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .svg-2d {
+            zoom: 80%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .col-md-8 {
+            padding: 1.5rem;
+            width: 88%;
+        }
+
+        .text-breakk {
+            word-wrap: break-word !important;
+        }
+    }
+
+
+    /* TABLET / SMALL LAPTOP
+    768 - 991px */
+
+    @media (min-width: 768px) and (max-width: 991.98px) {
+
+        .hero-title {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .search-container-bar {
+            max-width: 90%;
+        }
+
+        .search-input-field {
+            padding: 13px 18px;
+        }
+
+        .submit-action-btn {
+            padding: 11px 18px;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 5%;
+        }
+
+        .left-sidebar {
+            background-color: rgba(13, 22, 34, 0.8);
+            padding: 1rem;
+            max-width: 100%;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            margin-bottom: 24px;
+            box-sizing: border-box;
+        }
+
+        .right-sidebar {
+            max-width: 100%;
+            width: 100%;
+            background-color: rgba(13, 22, 34, 0.8);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .h5, h5 {
+            font-size: 1.3rem;
+        }
+
+        .svg-2d {
+            justify-self: center;
+            width: 100%;
+        }
+
+        .svg-2dd {
+            zoom: 80%;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .text-breakk {
+            word-wrap: break-word !important;
+        }
+
+        .col-md-8 {
+            width: 88%;
+            padding: 2rem;
+        }
+    }
+
+
+    /* DESKTOP 992px+ */
+
+    @media (min-width: 992px) {
+
+        .search-container-bar {
+            max-width: 75%;
+        }
+
+        .similarity-results {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 4%;
+        }
+
+        .left-sidebar {
+            background-color: rgba(13, 22, 34, 0.8);
+            padding: 1rem;
+            max-width: 29%;
+            width: 29%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            margin-bottom: 24px;
+            flex: 0 0 29%;
+            box-sizing: border-box;
+            position: sticky;
+            top: 4rem;
+        }
+
+        .right-sidebar {
+            max-width: 68%;
+            width: 68%;
+            background-color: rgba(13, 22, 34, 0.8);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+            flex: 0 0 68%;
+            box-sizing: border-box;
+        }
+        .svg-2d {
+            zoom: 80%;
+        }
+
+        .text-breakk {
+            color: rgba(255, 255, 255, 0.7);
+            word-wrap: break-word !important;
+            word-break: break-all;
+        }
+    }
+
+
+    /* LARGE DESKTOP */
+
+    @media (min-width: 1400px) {
+
+        .search-container-bar {
+            max-width: 1100px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+        }
+
+        .search-input-field {
+            font-size: 1.1rem;
+        }
+
+        .submit-action-btn {
+            min-width: 220px;
+        }
+    }
+
+
+    /* MOBILE SEARCH OVERRIDE
+    I am writing it here intentionally at the end so it wins over
+    desktop/tablet rules. */
+
+    @media (max-width: 767.98px) {
+
+        .search-container-bar {
+            width: calc(100% - 20px);
+            max-width: none;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 8px;
+            border-radius: 16px;
+        }
+
+        .search-container-bar form.from {
+            width: 100%;
+            gap: 5px;
+        }
+
+        /* Row 1: input + clear button */
+        .upper-input {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0;
+        }
+
+        .search-input-field {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+            padding: 10px 12px;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .upper-input > button {
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+        }
+
+        /* Row 2:
+        range + search icon */
+        .lower-input {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .range-action-btn {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+            background: transparent;
+            border: none;
+            border-radius: 40px;
+            padding: 7px 10px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .range-action-btn input[type="range"] {
+            width: 100%;
+            min-width: 0;
+            height: 5px;
+        }
+
+        .range-action-btn .value-display {
+            min-width: 36px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        /*
+        Mobile submit button becomes icon-only
+        */
+        .submit-action-btn {
+            flex: 0 0 48px;
+            width: 48px;
+            min-width: 48px;
+            height: 46px;
+            min-height: 46px;
+            padding: 5px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .submit-action-btn .btn-text {
+            display: none;
+        }
+
+        .submit-action-btn .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 !important;
+        }
+
+        .submit-action-btn .btn-icon svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        .submit-action-btn:hover {
+            transform: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .submit-action-btn:active {
+            transform: scale(0.95);
+        }
+    }
+
+
+    /* EXTRA SMALL PHONE SEARCH */
+
+    @media (max-width: 380px) {
+
+        .search-container-bar {
+            width: calc(100% - 12px);
+            padding: 6px;
+        }
+
+        .search-input-field {
+            font-size: 0.85rem;
+            padding: 9px 8px;
+        }
+
+        .upper-input > button {
+            flex-basis: 38px;
+            width: 38px;
+            height: 40px;
+        }
+
+        .upper-input .btn-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .range-action-btn {
+            padding: 6px 7px;
+            gap: 6px;
+        }
+
+        .range-action-btn .value-display {
+            min-width: 30px;
+            font-size: 12px;
+        }
+
+        .submit-action-btn {
+            flex-basis: 42px;
+            width: 42px;
+            min-width: 42px;
+            height: 42px;
+        }
+
+        .submit-action-btn .btn-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+    }
+
+
+    /* VERY NARROW PHONE */
+
+    @media (max-width: 320px) {
+
+        .search-input-field {
+            font-size: 0.78rem;
+        }
+
+        .range-action-btn .value-display {
+            min-width: 27px;
+            font-size: 11px;
+        }
+
+        .submit-action-btn {
+            flex-basis: 38px;
+            width: 38px;
+            min-width: 38px;
+        }
+    }
+
+
+    /* EXTRA RESPONSIVE CONTENT */
+
+    @media (max-width: 767.98px) {
+
+        .results-panel {
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 18px;
+        }
+
+        .col-md-7,
+        .col-md-8 {
+            width: 94%;
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .svg-canvas-box {
+            min-width: 0;
+            width: calc(100% - 1rem);
+            margin: 0.5rem;
+        }
+
+        .re-similarity-button {
+            margin-right: 0;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .if-error {
+            margin-left: 10px;
+            max-width: calc(100% - 20px);
+            padding: 12px 18px;
+            font-size: 0.9rem;
+        }
+
+        .query-summary {
+            margin: 0.5rem;
+        }
+    }
+
+    /* FINAL MOBILE TYPOGRAPHY */
+
+    @media (max-width: 440px) {
+
+        .hero-title {
+            margin-top: 0;
+            font-size: 2.5rem;
+        }
+
+        .para-describe {
+            font-size: 1rem;
+        }
+    }
+
+
+    /* FINAL MOBILE TABLE */
+
+    @media (max-width: 576.99px) {
+
+        .table-dark th {
+            font-size: 0.8rem;
+
+            padding: 0.7rem;
+        }
+
+        .table {
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (min-width: 1200px) {
+
+    /* SEARCH BAR - SINGLE ROW ABOVE 1200px */
+
+    .search-container-bar {
+        width: 100%;
+        max-width: 75%;
+        padding: 8px 12px;
+        padding-right: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        margin-top: 40px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .search-container-bar form.from {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    /* SMILES INPUT */
+
+    .search-container-bar .upper-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+    }
+
+    .search-input-field {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        padding: 20px 25px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    /* Clear button */
+    .upper-input > button {
+        flex: 0 0 42px;
+        width: 42px;
+        height: 46px;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upper-input .btn-icon svg {
+        width: 34px;
+        height: 34px;
+    }
+
+
+    /* RANGE */
+
+    .search-container-bar .lower-input {
+        flex: 0 0 auto;
+        width: auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .range-action-btn {
+        flex: 0 1 300px;
+        width: 300px;
+        min-width: 220px;
+        height: 46px;
+        margin: 0;
+        padding: 8px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-sizing: border-box;
+    }
+
+    .range-action-btn input[type="range"] {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 100px;
+    }
+
+    .range-action-btn .value-display {
+        flex: 0 0 40px;
+        min-width: 40px;
+        text-align: right;
+    }
+
+
+    /* SEARCH BUTTON */
+
+    .submit-action-btn {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 210px;
+        height: 46px;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-sizing: border-box;
+    }
+
+    .submit-action-btn .btn-text {
+        display: inline;
+        white-space: nowrap;
+    }
+
+    .submit-action-btn .btn-icon {
+        display: none;
+    }
+}
+
+
+/* =========================== Exploration of Molecules =============================== */
+
+    /* MOLECULE EXPLORER */
+
+    .similarity-explorer {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .explorer-heading {
+        margin-bottom: 22px;
+        padding: 1rem 2rem;
+        background: #09101a91;
+        border-radius: 24px;
+        border: 2px solid #ffffff17;
+        box-shadow: 0px 28px 52px #444444ab;
+    }
+
+    .section-label {
+        color: #b30c1b;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+        text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff;
+    }
+
+    .explorer-heading h2 {
+        margin: 7px 0 0;
+        color: #f4f5f7;
+        font-size: 25px;
+        
+    }
+
+    .explorer-heading p {
+        margin: 8px 0 0;
+        max-width: 650px;
+        color: #ff9400;
+        font-size: 1rem;
+        line-height: 1.6;
+        
+    }
+
+
+    /* Cards */
+
+    .molecule-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+        border-radius: 16px;
+        background: #ffffff0a;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border: 1px solid #ffffff15;
+        margin-bottom: 1.5rem;
+    }
+
+    .molecule-card {
+        position: relative;
+        padding: 0;
+        overflow: hidden;
+        text-align: left;
+        color: #f5f6f7;
+        border: 1px solid rgba(145,160,175,.15);
+        border-radius: 18px;
+        background: linear-gradient(145deg,#111a23,#0c1219);
+        cursor: pointer;
+        outline: none;
+        transition: .25s ease;
+    }
+
+    .molecule-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(210,35,53,.55);
+        box-shadow:
+            0 20px 50px rgba(0,0,0,.38),
+            0 0 30px rgba(184,14,32,.07);
+    }
+
+    .molecule-card.selected {
+        border-color: #c92135;
+        box-shadow:
+            0 0 0 1px rgba(201,33,53,.14),
+            0 15px 45px rgba(0,0,0,.35);
+    }
+
+
+    /* Structure */
+
+    .card-structure {
+        height: 165px;
+        display: grid;
+        place-items: center;
+        border-bottom: 1px solid rgba(255,255,255,.055);
+        background: radial-gradient(
+            circle at center,
+            rgba(255,255,255,.065),
+            transparent 60%
+        );
+    }
+
+    .card-structure svg {
+        width: 210px;
+        height: 145px;
+        transition: transform .3s ease;
+    }
+
+    .molecule-card:hover .card-structure svg {
+        transform: scale(1.07);
+    }
+
+
+    /* Bonds */
+
+    .bond-lines {
+        fill: none;
+        stroke: #8d99a5;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .atom {
+        stroke-width: 2;
+    }
+
+    .atom.carbon {
+        fill: #111b24;
+        stroke: #768492;
+    }
+
+    .atom.nitrogen {
+        fill: #10233a;
+        stroke: #579cff;
+    }
+
+    .atom.oxygen {
+        fill: #32151b;
+        stroke: #ef5668;
+    }
+
+    .atom-text {
+        fill: white;
+        font: 800 8px Arial;
+        text-anchor: middle;
+    }
+
+
+    /* Card content */
+
+    .card-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px 7px;
+    }
+
+    .card-category {
+        display: block;
+        margin-bottom: 5px;
+        color: #697682;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .card-content h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .card-content p {
+        margin: 5px 0 0;
+        color: #7d8995;
+        font-size: 11px;
+    }
+
+    .card-arrow {
+        width: 33px;
+        height: 33px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border: 1px solid rgba(213,58,74,.2);
+        border-radius: 50%;
+        color: #dc4253;
+        background: rgba(184,14,32,.08);
+        font-size: 18px;
+        transition: .2s ease;
+    }
+
+    .molecule-card:hover .card-arrow {
+        color: white;
+        background: #b80e20;
+        transform: translateX(3px);
+    }
+
+
+    /* Footer */
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 18px 16px;
+    }
+
+    .card-footer > span:first-child {
+        color: #c5ddf3;
+        font: 10px "SFMono-Regular", Consolas, monospace;
+    }
+
+    .card-action {
+        color: #aeb6bf;
+        font-size: 10px;
+    }
+
+    .molecule-card:hover .card-action {
+        color: #e04a5b;
+    }
+
+
+    /* Input feedback */
+
+    .similarity-input-active {
+        box-shadow: 0 0 0 2px rgba(213,58,74,.18);
+    }
+
+    
+/* ---------------------------------------------------------
+   Interactive guide
+   --------------------------------------------------------- */
+
+    .similarity-guide {
+
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr 1px 1fr;
+        align-items: center;
+        gap: 24px;
+        margin-top: 34px;
+        padding: 22px 24px;
+        border:
+            1px solid
+            rgba(145,160,175,.12);
+        border-radius: 16px;
+        background: #000000b0;
+        zoom: 1.5;
+        /* justify-items: center; */
+    }
+
+    .guide-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .guide-icon {
+        width: 35px;
+        height: 35px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border-radius: 10px;
+        color: #b30c1b;
+        background: #b30c1b14;
+        border: 1px solid #ffffff63;
+        font-size: 17px;
+    }
+
+    .guide-item strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #dfe3e7;
+        font-size: 12px;
+    }
+
+    .guide-item span {
+        display: block;
+        color: #c5c5c5;
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .guide-divider {
+        width: 1px;
+        height: 38px;
+        background:
+            rgba(255,255,255,.08);
+    }
+
+    /* Mobile */
+
+    @media (max-width: 900px) {
+        .molecule-card-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .molecule-card-grid {
+        grid-template-columns:
+            1fr 1fr;
+        }
+
+        .molecule-card:last-child {
+            grid-column:
+                1 / -1;
+        }
+
+        .similarity-guide {
+            grid-template-columns:
+                1fr;
+            gap: 15px;
+        }
+
+        .guide-divider {
+            width: 100%;
+            height: 1px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .similarity-explorer {
+            padding: 1.2rem;
+        }
+
+        .molecule-card-grid {
+            grid-template-columns: 1fr;
+            zoom: 0.6;
+        }
+
+        .card-structure {
+            height: 150px;
+        }
+
+        .card-structure svg {
+            width: stretch;
+            height: 145px;
+            transition: transform .3s ease;
+        }
+
+        .molecule-card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .molecule-card:last-child {
+            grid-column: auto;
+        }
+
+        .card-structure {
+            height: 150px;
+        }
+
+        .similarity-guide {
+            padding: 18px;
+        }
+    }
+</style>
+
+<h1 class="hero-title">Similarity Search Playgroung</h1>
+<div class="para-describe">
+    <p>Searches 2.9M+ records instantaneously for finding the most similar molecules with Tanimoto similarity between 0 to 100%.</p>
+</div>
+<div class="search-container-bar">
+    <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+    <form action="/search" method="POST" class="from">
+        <div class="upper-input">
+            <input type="text" 
+                    name="chembl_id1" 
+                    value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}"
+                    placeholder="Enter a CHEMBL ID or Canonical SMILES"
+                    id = "chembl_id1"
+                    class="search-input-field" 
+                    style="display: flex;" required>
+            <button type="button" style="display: flex; background: transparent; border: none;" onclick="document.getElementById('chembl_id1').value = ''">
+                <!-- Delete input button 1 -->
+                <span class="btn-text" style="align-self: center;">
+                    <i class="fas fa-search btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0,0,256,256" style="/* background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); */ color: #ffffff; /*border: 1px solid rgba(255, 255, 255, 0.3)*/; border-radius: 6px; font-weight: 600; white-space: nowrap; transition: all 0.3s ease; flex-shrink: 0;">
+                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                        </svg>
+                    </i>
+                </span>
+            </button>
+        </div>
+
+        <div class="lower-input">
+            <div class="range-action-btn">
+                <input type="range" 
+                        id="myRange" name="myRange" 
+                        min="0" max="1" step="0.01" 
+                        value="{{ request.form.get('myRange', '') if request.method == 'POST' else 0.90 }}">
+                <span class="value-display" id="rangeValue">{{ request.form.get('myRange', '') if request.method == 'POST' else 0.90 }}</span>
+            </div>
+            <button type="submit" class="submit-action-btn" id="similarity-button" style="display: flex;">
+                <!-- SUbmit button -->
+                <span class="btn-text" style="align-self: center;">Search Similar Molecules</span>                    
+                    <i class="fas fa-search btn-icon" style="margin-right: -20px; margin-left: -20px;">
+                        <svg fill="#fcfcfc" width="30px" height="30px" viewBox="-0.64 -0.64 17.28 17.28" xmlns="http://www.w3.org/2000/svg" stroke="#fcfcfc"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12.027 9.92L16 13.95 14 16l-4.075-3.976A6.465 6.465 0 0 1 6.5 13C2.91 13 0 10.083 0 6.5 0 2.91 2.917 0 6.5 0 10.09 0 13 2.917 13 6.5a6.463 6.463 0 0 1-.973 3.42zM1.997 6.452c0 2.48 2.014 4.5 4.5 4.5 2.48 0 4.5-2.015 4.5-4.5 0-2.48-2.015-4.5-4.5-4.5-2.48 0-4.5 2.014-4.5 4.5z" fill-rule="evenodd"></path> </g>
+                        </svg>
+                    </i>
+            </button>
+        </div>
+        <!-- value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}" -->
+    </form>
+
+</div>
+
+<!-- Invalid input error handling -->
+
+{% if error %}
+<button onclick="this.style.display='none'" class = "if-error" role="alert">
+    ⚠️ {{ error }}
+</button>
+
+{% endif %}
+
+<!-- Error Handling -->
+ <!-- a) CHEMBL ID does not exists -->
+ <!-- b) Invalid Smiles input -->
+
+{% if data and data.error%}
+
+<div class="col-md-8 align-middle">
+    <h2 class="mb-2 text-center" style="color: #ffffff; text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff, -1px 1px 0 #cdb6b6, 1px 1px 0 #ffffff;"><strong>Similarity Search Results</strong></h2>
+    <h3 class="cmb-2 text-center" style="color: #ffc107;">Input Error</h3><br>
+        <div class="table-scroll-container" style="width: stretch;">           
+            <table class="table table-dark align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th colspan="2" style="border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 1rem;">
+                            <h5 class="text-white text-center mb-2" style="font-size: 1.3rem;"><strong>Error Summary</strong></h5>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td style="width: 35%;"><strong>Target CHEMBL ID:</strong></td>
+                        <td class="text-breakk">{{ data.target_query }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target SMILES:</strong></td>
+                        <td class="text-breakk">{{ data.target_smiles }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Matches:</strong></td>
+                        <td>
+                            <h5 class="mb-0">                                            
+                                <span class="badge rounded-pill bg-warning text-dark">No Matches exists</span>
+                            </h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom-left-radius: 20px; padding: 0.5rem;">
+                            <strong>Error:</strong>
+                        </td>
+                        <td style="border-bottom-right-radius: 20px; padding-top: 1rem; padding-bottom: 1rem;" class="text-breakk">
+                            <span class="badge bg-danger px-2 py-1">
+                                <h5>{{ data.error }}</h5>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><br>
+        </div>
+    
+    <div class="mt-4 text-center">
+        <a href="/search" class="re-similarity-button">Perform Another Search</a><br><br>
+    </div>
+</div>
+{% endif %}
+
+{% if data %}
+{% set result_block = data %}
+
+<!-- If similar molecules does not exist then do not show the similarity table. Show the SVG and Wuery yable only-->
+
+{% if result_block.total_matches_found == 0 %}
+<div class="card shadow-sm mb-4" style="padding: 20px; margin-top: 40px;">
+    <h2 class="mb-2 text-center" style="color: #ffffff; text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff, -1px 1px 0 #cdb6b6, 1px 1px 0 #ffffff;"><strong>Similarity Search Results</strong></h2>
+    <h5 class="cmb-2 text-center" style="color: #ffc107;">Matching Compounds</h5>
+
+    <div class="card-body">
+        {% if result_block %}
+        
+        <!-- Centered container with custom layout proportions -->
+        <div class="row justify-content-center align-items-center">
+            <div class="col-12 col-xl-10">
+                <div class="row justify-content-center align-items-center">
+                    
+                    <!-- Left Side: SVG Image -->
+                    <div class="col-md-4 mb-4 mb-md-0 svg-2d">
+                        <div class="svg-canvas-box shadow-lg text-center p-3" style="height: 300px;">
+                            {{ data.svg | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Query Summary Table --> <br>
+                    <div class="col-md-7">
+                        <div class="table-scroll-container">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th colspan="2" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                                        <h5 class="text-white text-center mb-2" style="font-size: 1.3rem;"><strong>Query Summary</strong></h5>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <td style="width: 35%;"><strong>Target Query:</strong></td>
+                                    <td class="text-breakk">{{ result_block.target_query }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Target SMILES:</strong></td>
+                                    <td class="text-breakk">{{ result_block.target_smiles }}</td>
+                                </tr>    
+                                <tr>
+                                    <td><strong>Target Compound Name:</strong></td>
+                                    <td style="word-break: break-all; overflow-wrap: break-word;">
+                                        {{ result_block.target_chembl_name.pref_name }}
+                                    </td>
+                                </tr>                         
+                                <tr>
+                                    <td style="border-bottom-left-radius: 20px;"><strong>Total Matches:</strong></td>
+                                    <td style="border-bottom-right-radius: 20px;">
+                                        <h4 class="mb-0">
+                                            {% if result_block.total_matches_found == 0 %}
+                                            <span class="badge bg-danger px-2 py-1 rounded-pill">{{ result_block.total_matches_found }} Matches found</span>
+                                            {% else %}
+                                            <span class="badge bg-success px-2 py-1 rounded-pill">{{ result_block.total_matches_found }} Matches found</span>
+                                            {% endif %}
+                                        </h4>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="/search" class="re-similarity-button">Perform Another Search</a><br><br>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- If similar molecules exist then only show the similarity table along with svg and query table -->
+{% if data.results %}
+<div class="similarity-results">
+    
+    <!-- Similarity Data table on Left -->
+    <div class="right-sidebar">
+        <h2 class="mb-2 text-center" style="color: #ffffff; text-shadow: -1px -1px 0 #020202, 1px -1px 0 #ffffff, -1px 1px 0 #cdb6b6, 1px 1px 0 #ffffff;"><strong>Similarity Search Results</strong></h2>
+        <h5 class="mb-2 text-center" style="color: #ffc107;">{{ result_block.total_matches_found }} Matching Compounds</h5>
+
+        {% set result_block = data %}
+
+        {% if result_block %}
+
+        {% if result_block.results %}
+        <div class="card-body-results p-3" style="width: 100%;">
+            <div class="table-scroll-container">
+            <table class="table table-dark align-middle mb-0"
+                style="margin-bottom: 2rem; width: stretch;">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="border-top-left-radius: 24px;">
+                            S.No.
+                        </th>
+                        <th>
+                            CHEMBL ID
+                        </th>
+                        <th>
+                            Tanimoto Similarity
+                        </th>
+                        <th id="similarity-details">
+                            Details
+                        </th>
+                        <th style="border-top-right-radius: 24px;">
+                            SVG
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for item in result_block.results %}
+                        <tr>
+                            <td style="padding-left: 1.5rem;">{{ loop.index }}</td>
+                            <td class="text-breakk">{{ item.chembl_id }}</td>
+                            <td style="text-align: center;">
+                                {% if item.Tanimoto_Similarity == 1 or item.Tanimoto_Similarity >= 0.90 %}
+                                    <span class="badge bg-success">{{ item.Tanimoto_Similarity }}</span>
+                                {% elif item.Tanimoto_Similarity < 0.90 and item.Tanimoto_Similarity >= 0.80 %}
+                                    <span class="badge bg-warning text-dark">{{ item.Tanimoto_Similarity }}</span>
+                                {% elif item.Tanimoto_Similarity < 0.80 and item.Tanimoto_Similarity >= 0.60 %}
+                                    <span class="badge bg-danger">{{ item.Tanimoto_Similarity }}</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ item.Tanimoto_Similarity }}</span>
+                                {% endif %}
+                            </td>
+                            <td><code class="text-breakk">Smiles: {{ item.canonical_smiles }}</code><br> 
+                                <!-- {# {% if item.Tanimoto_Similarity <= 0.80 and item.Tanimoto_Similarity <= 1 %} #}
+                                    <code class="text-break"></code>                                    
+                                {# {% elif item.Tanimoto_Similarity > 0.80 and item.Tanimoto_Similarity <= 1%} #}
+                                    <code class="text-break">Preferred Name: {# {{ item.chembl_name.pref_name }} #}}</code>
+                                {# {% endif %} #}-->
+                            </td>
+                            <td class="svg-2dd">{{ item.svg_of_similar | safe }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+        </div>
+        {% endif %}
+        <div class="mt-4 text-center">
+            <a href="/search" class="re-similarity-button">Perform Another Search</a><br><br>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="left-sidebar">
+
+        <!-- SVG Canvas Box (Top Left) -->
+        <div class="svg-card-container shadow-lg">
+            <div class="svg-canvas-box shadow-lg text-center p-3 mb-3 svg-2d">
+                {{ data.svg | safe }}
+            </div>
+        </div>
+
+        <!-- Query Summary Table (Bottom Left) -->
+        <!-- <div class="query-summary"> -->
+        <div class="table-scroll-container">
+            <table class="table table-dark align-middle mb-0"
+                style="vertical-align: middle;">
+                <thead class="table-dark">
+                    <tr>
+                        <th colspan="2" style="border-top-left-radius: 20px;border-top-right-radius: 20px;">
+                            <h5 style="color: #ffc107; text-align: center;" class="mb-2">
+                                <strong>Query Summary</strong></h5>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td><strong>Target Query:</strong></td>
+                        <td>{{ result_block.target_query }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target SMILES:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">{{ result_block.target_smiles }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target Compound Name:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">
+                            {{ result_block.target_chembl_name.pref_name }}
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td><strong>Target Similarity Threshold:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">{{ result_block.threshold }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom-left-radius: 20px;"><strong>Total Matches:</strong></td>
+                        <td style="border-bottom-right-radius: 20px;">
+                            {% if result_block.total_matches_found == 0 %}
+                            <h4><span class="badge bg-danger px-2 py-1 rounded-pill">{{ result_block.total_matches_found }}
+                                Matches found</span></h4>
+                            {% else %}
+                            <h4><span class="badge bg-success px-2 py-1 rounded-pill">{{ result_block.total_matches_found }}
+                                Matches found</span></h4>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
+{% endif %}
+
+<!-- ==================================== Use Methods Molecule Examples with Smiles====================================================== -->
+{% if not data %}
+
+<!-- Interactive explanation -->
+    <div class="similarity-guide">
+        <div class="guide-item">
+            <div class="guide-icon">⌬</div>
+                <div>
+                    <strong>Choose a molecule</strong>
+                    <span>
+                        Pick an example or enter a compound's SMILES manually.
+                    </span>
+                </div>
+        </div>
+
+        <div class="guide-divider"></div>
+        <div class="guide-item">
+            <div class="guide-icon">≈</div>
+            <div>
+                <strong>Set your threshold</strong>
+                <span>
+                    Higher values will return the closer structural matches from the 2.9 million chemicals.
+                </span>
+            </div>
+        </div>
+
+        <div class="guide-divider"></div>
+        <div class="guide-item">
+            <div class="guide-icon">↗</div>
+            <div>
+                <strong>Explore the results</strong>
+                <span>
+                    Compare molecules ranked by similarity.
+                </span>
+            </div>
+        </div>
+    </div>
+
+<section class="similarity-explorer">
+    <div class="explorer-heading">
+        <span class="section-label">QUICK SIMILARITY SEARCH</span>
+        <h2>Start with a Molecule</h2>
+        <p>
+            Select an example below to use it as the starting
+            point for structural similarity search.
+        </p>
+    </div>
+
+
+    <div class="molecule-card-grid">
+
+        <!-- ================= 1. PARACETAMOL ================= -->
+
+        <!-- <button
+            type="button"
+            class="molecule-card"
+            data-name="Paracetamol"
+            data-smiles="CC(=O)Nc1ccc(O)cc1">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="65,35 115,35 140,75 115,115 65,115 40,75"/>
+                        <line x1="65" y1="35" x2="65" y2="20"/>
+                        <line x1="115" y1="35" x2="145" y2="18"/>
+                    </g>
+                    <circle class="atom carbon" cx="65" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="115" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="140" cy="75" r="5"/>
+                    <circle class="atom carbon" cx="115" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="65" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="40" cy="75" r="5"/>
+                    <circle class="atom oxygen" cx="65" cy="18" r="8"/>
+                    <text class="atom-text" x="65" y="21">O</text>
+                    <circle class="atom nitrogen" cx="151" cy="16" r="8"/>
+                    <text class="atom-text" x="151" y="19">N</text>
+                </svg>
+            </div>
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Pain & Fever</span>
+                    <h3>Paracetamol</h3>
+                    <p>Acetaminophen · C₈H₉NO₂</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL112</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button> -->
+
+        <!-- ================= 2. METFORMIN ================= -->
+
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Metformin"
+            data-smiles="CN(C)C(=N)NC(=N)N">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <line x1="48" y1="75" x2="90" y2="75"/>
+                        <line x1="90" y1="75" x2="130" y2="48"/>
+                        <line x1="130" y1="48" x2="170" y2="75"/>
+                        <line x1="130" y1="48" x2="130" y2="105"/>
+                    </g>
+                    <circle class="atom carbon" cx="48" cy="75" r="5"/>
+                    <circle class="atom carbon" cx="90" cy="75" r="5"/>
+                    <circle class="atom nitrogen" cx="130" cy="48" r="8"/>
+                    <text class="atom-text" x="130" y="51">N</text>
+                    <circle class="atom nitrogen" cx="170" cy="75" r="8"/>
+                    <text class="atom-text" x="170" y="78">N</text>
+                    <circle class="atom nitrogen" cx="130" cy="105" r="8"/>
+                    <text class="atom-text" x="130" y="108">N</text>
+                </svg>
+            </div>
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Antidiabetic</span>
+                    <h3>Metformin</h3>
+                    <p>Biguanide · C₄H₁₁N₅</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL1431</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button>
+
+        <!-- ================= 3. OMEPRAZOLE ================= -->
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Omeprazole"
+            data-smiles="COc1ccc2[nH]c([S+]([O-])Cc3ncc(C)c(OC)c3C)nc2c1">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="38,50 68,30 98,50 98,88 68,108 38,88"/>
+                        <polygon points="122,50 152,30 182,50 182,88 152,108 122,88"/>
+                        <line x1="98" y1="69" x2="122" y2="69"/>
+                    </g>
+                    <circle class="atom carbon" cx="38" cy="50" r="5"/>
+                    <circle class="atom carbon" cx="68" cy="30" r="5"/>
+                    <circle class="atom nitrogen" cx="98" cy="50" r="8"/>
+                    <text class="atom-text" x="98" y="53">N</text>
+                    <circle class="atom carbon" cx="122" cy="50" r="5"/>
+                    <circle class="atom carbon" cx="152" cy="30" r="5"/>
+                    <circle class="atom nitrogen" cx="182" cy="50" r="8"/>
+                    <text class="atom-text" x="182" y="53">N</text>
+                    <circle class="atom oxygen" cx="110" cy="69" r="8"/>
+                    <text class="atom-text" x="110" y="72">O</text>
+                </svg>
+            </div>
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Gastrointestinal</span>
+                    <h3>Omeprazole</h3>
+                    <p>Proton pump inhibitor · C₁₇H₁₉N₃O₃S</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL1503</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button>
+
+        <!--========================  5. Ibuprofen ================================-->
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Ibuprofen"
+            data-smiles="CC(C)Cc1ccc(C(C)C(=O)O)cc1.NCCCC[C@H](N)C(=O)O"
+        >
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon
+                            points="60,35 110,35 135,75 110,115 60,115 35,75"
+                        />
+                        <line x1="135" y1="75" x2="168" y2="52"/>
+                        <line x1="168" y1="52" x2="194" y2="67"/>
+                    </g>
+                    <circle class="atom carbon" cx="60" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="110" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="135" cy="75" r="5"/>
+                    <circle class="atom carbon" cx="110" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="60" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="35" cy="75" r="5"/>
+                    <circle class="atom oxygen" cx="194" cy="67" r="8"/>
+                    <text class="atom-text" x="194" y="71">O</text>
+                </svg>
+            </div>
+
+            <div class="card-content">
+                <div>
+                    <span class="card-category">
+                        Anti-inflammatory
+                    </span>
+                    <h3>Ibuprofen</h3>
+                    <p>
+                        Explore structurally related compounds
+                    </p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+
+            <div class="card-footer">
+                <span>CHEMBL1201141</span>
+                <span class="card-action">
+                    Use molecule
+                </span>
+            </div>
+
+        </button>
+
+        <!-- ================= 5. ALBENDAZOLE ================= -->
+
+        <!-- <button
+            type="button"
+            class="molecule-card"
+            data-name="Albendazole"
+            data-smiles="CCCSc1ccc2[nH]c(NC(=O)OC)nc2c1">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="55,42 95,42 115,75 95,108 55,108 35,75"/>
+                        <line x1="115" y1="75" x2="155" y2="75"/>
+                        <line x1="155" y1="75" x2="185" y2="52"/>
+                    </g>
+                    <circle class="atom carbon" cx="55" cy="42" r="5"/>
+                    <circle class="atom nitrogen" cx="95" cy="42" r="8"/>
+                    <text class="atom-text" x="95" y="45">N</text>
+                    <circle class="atom carbon" cx="115" cy="75" r="5"/>
+                    <circle class="atom carbon" cx="95" cy="108" r="5"/>
+                    <circle class="atom nitrogen" cx="155" cy="75" r="8"/>
+                    <text class="atom-text" x="155" y="78">N</text>
+                    <circle class="atom oxygen" cx="185" cy="52" r="8"/>
+                    <text class="atom-text" x="185" y="55">O</text>
+                </svg>
+            </div>
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Anthelmintic</span>
+                    <h3>Albendazole</h3>
+                    <p>Antiparasitic · C₁₂H₁₅N₃O₂S</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL1483</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button> -->
+
+        <!-- ================= 6. CETIRIZINE ================= -->
+
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Cetirizine"
+            data-smiles="Cl.Cl.O=C(O)COCCN1CCN(C(c2ccccc2)c2ccc(Cl)cc2)CC1">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="35,48 65,30 95,48 95,84 65,102 35,84"/>
+                        <line x1="95" y1="66" x2="130" y2="66"/>
+                        <line x1="130" y1="66" x2="160" y2="45"/>
+                        <line x1="160" y1="45" x2="190" y2="66"/>
+                    </g>
+                    <circle class="atom carbon" cx="35" cy="48" r="5"/>
+                    <circle class="atom carbon" cx="65" cy="30" r="5"/>
+                    <circle class="atom carbon" cx="95" cy="48" r="5"/>
+                    <circle class="atom nitrogen" cx="130" cy="66" r="8"/>
+                    <text class="atom-text" x="130" y="69">N</text>
+                    <circle class="atom oxygen" cx="160" cy="45" r="8"/>
+                    <text class="atom-text" x="160" y="48">O</text>
+                    <circle class="atom oxygen" cx="190" cy="66" r="8"/>
+                    <text class="atom-text" x="190" y="69">O</text>
+                </svg>
+            </div>
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Antihistamine</span>
+                    <h3>Cetirizine</h3>
+                    <p>Allergy medicine · C₂₁H₂₅ClN₂O₃</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL1000</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button>
+
+        <!-- ================ 7. AZITHROMYCIN ================= -->
+
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Azithromycin"
+            data-smiles="CC[C@H]1OC(=O)[C@H](C)[C@@H](O[C@H]2C[C@@](C)(OC)[C@@H](O)[C@H](C)O2)[C@H](C)[C@@H](O[C@@H]2O[C@H](C)C[C@H](N(C)C)[C@H]2O)[C@](C)(O)C[C@@H](C)CN(C)[C@H](C)[C@@H](O)[C@]1(C)O">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="55,50 85,32 115,50 108,88 75,100"/>
+                        <polygon points="115,50 145,32 175,52 168,90 135,98"/>
+                        <line x1="85" y1="32" x2="105" y2="15"/>
+                        <line x1="145" y1="32" x2="160" y2="15"/>
+                        <line x1="175" y1="52" x2="198" y2="42"/>
+                    </g>
+                    <circle class="atom oxygen" cx="55" cy="50" r="7"/>
+                    <text class="atom-text" x="55" y="53">O</text>
+                    <circle class="atom oxygen" cx="115" cy="50" r="7"/>
+                    <text class="atom-text" x="115" y="53">O</text>
+                    <circle class="atom nitrogen" cx="175" cy="52" r="8"/>
+                    <text class="atom-text" x="175" y="55">N</text>
+                    <circle class="atom oxygen" cx="198" cy="42" r="7"/>
+                    <text class="atom-text" x="198" y="45">O</text>
+                </svg>
+            </div>
+
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Antibiotic</span>
+                    <h3>Azithromycin</h3>
+                    <p>Macrolide antibiotic · C₃₈H₇₂N₂O₁₂</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL529</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button>
+
+        <!-- ================= 8. CAFFEINE ================= -->
+
+        <button
+            type="button"
+            class="molecule-card"
+            data-name="Caffeine"
+            data-smiles="Cn1c(=O)c2c(ncn2C)n(C)c1=O">
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon points="60,45 100,28 140,48 132,92 88,108 55,78"/>
+                        <line x1="100" y1="28" x2="125" y2="12"/>
+                        <line x1="140" y1="48" x2="170" y2="30"/>
+                    </g>
+                    <circle class="atom carbon" cx="60" cy="45" r="5"/>
+                    <circle class="atom carbon" cx="100" cy="28" r="5"/>
+                    <circle class="atom carbon" cx="140" cy="48" r="5"/>
+                    <circle class="atom carbon" cx="132" cy="92" r="5"/>
+                    <circle class="atom nitrogen" cx="88" cy="108" r="8"/>
+                    <text class="atom-text" x="88" y="111">N</text>
+                    <circle class="atom nitrogen" cx="125" cy="12" r="8"/>
+                    <text class="atom-text" x="125" y="15">N</text>
+                    <circle class="atom oxygen" cx="170" cy="30" r="8"/>
+                    <text class="atom-text" x="170" y="33">O</text>
+                    <circle class="atom oxygen" cx="132" cy="115" r="8"/>
+                    <text class="atom-text" x="132" y="118">O</text>
+                </svg>
+            </div>
+
+            <div class="card-content">
+                <div>
+                    <span class="card-category">Stimulant</span>
+                    <h3>Caffeine</h3>
+                    <p>Methylxanthine · C₈H₁₀N₄O₂</p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+            <div class="card-footer">
+                <span>CHEMBL113</span>
+                <span class="card-action">Use molecule</span>
+            </div>
+
+        </button>
+
+        <!-- ================= 9. ASPIRIN ================= -->
+
+        <!-- <button
+            type="button"
+            class="molecule-card"
+            data-name="Aspirin"
+            data-smiles="CC(=O)Oc1ccccc1C(=O)O"
+        >
+            <div class="card-structure">
+                <svg viewBox="0 0 220 150">
+                    <g class="bond-lines">
+                        <polygon
+                            points="65,35 115,35 140,75 115,115 65,115 40,75"
+                        />
+                        <line x1="115" y1="35" x2="155" y2="18"/>
+                        <line x1="140" y1="75" x2="176" y2="96"/>
+                    </g>
+                    <circle class="atom carbon" cx="65" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="115" cy="35" r="5"/>
+                    <circle class="atom carbon" cx="140" cy="75" r="5"/>
+                    <circle class="atom carbon" cx="115" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="65" cy="115" r="5"/>
+                    <circle class="atom carbon" cx="40" cy="75" r="5"/>
+                    <circle class="atom oxygen" cx="155" cy="18" r="8"/>
+                    <text class="atom-text" x="155" y="22">O</text>
+                    <circle class="atom oxygen" cx="176" cy="96" r="8"/>
+                    <text class="atom-text" x="176" y="100">O</text>
+                </svg>
+            </div>
+
+            <div class="card-content">
+                <div>
+                    <span class="card-category">
+                        Analgesic
+                    </span>
+                    <h3>Aspirin</h3>
+                    <p>
+                        Explore structurally related compounds
+                    </p>
+                </div>
+                <span class="card-arrow">→</span>
+            </div>
+
+            <div class="card-footer">
+                <span>CHEMBL25</span>
+                <span class="card-action">
+                    Use molecule
+                </span>
+            </div>
+        </button> -->
+
+    </div>
+
+</section>
+
+{% endif%}
+
+<script>
+    // Script for Example Molecules
+document.querySelectorAll(".molecule-card").forEach(card => {
+    card.onclick = () => {
+        document.querySelectorAll(".molecule-card")
+            .forEach(c => c.classList.remove("selected"));
+
+        card.classList.add("selected");
+
+        const input = document.getElementById("chembl_id1");
+
+        if (input && card.dataset.smiles) {
+            input.value = card.dataset.smiles;
+            input.classList.add("similarity-input-active");
+
+            setTimeout(() => {
+                input.classList.remove("similarity-input-active");
+            }, 400);
+        }
+
+        document.getElementById("similarity-button")?.click();
+    };
+});
+</script>
+
+<script>
+    const rangeInput = document.getElementById('myRange');
+
+    // Update display when slider moves
+    rangeInput.addEventListener('input', () => {
+        rangeValue.textContent = parseFloat(rangeInput.value).toFixed(2);
+    });
+
+</script>
+
+{% endblock %}
+

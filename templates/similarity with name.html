@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    /* Typography Style Elements */
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 2%;
+        letter-spacing: -1px;
+    }
+
+    /* Input Element Forms styling maps */
+    .search-container-bar {
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%, #150204 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
+        padding: 6px;
+        display: flex;
+        justify-content: center;
+        /* centers the form inside */
+        margin-top: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        max-width: 70%;
+    }
+
+    .search-container-bar form {
+        display: flex;
+        /* makes input + button inline */
+        align-items: center;
+        /* vertically aligned */
+        width: 100%;
+    }
+
+    .search-input-field {
+        background: transparent;
+        border: None;
+        color: #ffffff;
+        padding: 20px 25px;
+        width: 100%;
+        font-size: 1.05rem;
+        display: flex;
+        flex: 1;
+        /* makes input take up remaining space */
+        margin-right: 10px;
+        /* adds spacing between input and button */
+    }
+
+    .search-input-field:focus {
+        outline: none;
+    }
+
+    .search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.863);
+    }
+
+    .submit-action-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 40px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        /* prevents button from shrinking */
+    }
+
+    .submit-action-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    }
+
+    .range-action-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 40px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        /* prevents button from shrinking */
+    }
+
+    /* .range-action-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.4);
+    } */
+
+    .para-describe {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #ffffff;
+        text-align: left;
+        width: 60%;
+    }
+
+    .if-error {
+        background: rgba(16, 34, 54, 0.486);
+        border-radius: 50px;
+        padding: 14px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        /* Force card to shrink horizontally to fit content */
+        max-width: 100%;
+        /*backdrop-filter: blur(8px);*/
+        color: #ffffff;
+        margin-left: 40px;
+        margin-top: 15px;
+    }
+
+    .results-panel {
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 30px;
+        margin-top: 50px;
+        margin-left: 3rem;
+        margin-right: 6rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .card {
+        border-radius: 24px;
+        background: rgba(13, 22, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        margin-right: 2rem;
+    }
+
+    .text-break {
+        color: rgba(255, 255, 255, 0.7)
+    }
+
+    .body {
+        color: white
+    }
+
+    .svg-canvas-box {
+        background: #ffffff;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        /* Equal width for both boxes */
+        min-width: 200px;
+        /* Prevents boxes from shrinking too small */
+        box-sizing: border-box;
+        /* Includes padding in width */
+        margin: 1rem;
+    }
+
+    .data-grid-table th {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .table-dark th{
+        /* similarity results table */
+        color: #ffffff; 
+        text-align: center;
+        font-size: 1.1rem; 
+        background-color: #6e050e; 
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    .data-grid-table td {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .re-similarity-button {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 40px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        align-self: center;
+        text-decoration: none;
+    }
+
+    .left-sidebar {
+        background-color: rgba(13, 22, 34, 0.8);
+        padding: 1rem;
+        max-width: 25%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        margin-bottom: 24px;
+        /* First container = 25% width */
+        flex: 0 0 25%;          /* Do not grow/shrink, fixed at 25% */
+        box-sizing: border-box;
+        position: sticky;
+        top: 4rem;
+    }
+
+    .right-sidebar {
+        max-width: 73.5%;
+        background-color: rgba(13, 22, 34, 0.8);
+        border-radius: 24px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        margin-bottom: 24px;
+        width: fit-content;
+        /* Second container = 75% width */
+        flex: 0 0 75%;          /* Do not grow/shrink, fixed at 75% */
+        padding: 20px;
+        box-sizing: border-box;
+
+    }
+
+    .similarity-results{
+        /* CSS for parent container in flexbox -> side by side view */
+        min-width: 200px;
+        width: 100%; 
+        display: flex;              /* Enable flexbox */
+        flex-direction: row;        /* Arrange items horizontally (default) */
+        gap: 20px;                   /* Space between items */
+        justify-content: flex-start; /* Align items horizontally */
+        align-items: flex-start;     /* Align items vertically */
+        padding: 10px;
+    }
+
+    .query-summary {
+        margin: 1rem;
+    }
+
+    .col-md-7{
+        padding: 3.5rem; 
+        margin: auto; 
+        place-items: center; 
+        border-radius:24px; 
+        background-color: rgba(13, 22, 34, 0.8);
+    }
+
+    /* Value display styling */
+    .range-action-btn .value-display {
+        font-size: 14px;
+        font-weight: 600;
+        min-width: 36px;
+        text-align: right;
+        color: #ffffff;
+    }
+
+    /* Base reset for the range input */
+    .range-action-btn input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 200px;
+        height: 6px;
+        background: #ffffff;
+        border-radius: 3px;
+        outline: none;
+        transition: background 0.2s ease;
+    }
+
+    /* Hover state for the track */
+    .range-action-btn input[type="range"]:hover {
+        background: #d0d0d0;
+    }
+
+    /* --- Webkit Browsers (Chrome, Safari, Edge) --- */
+    .range-action-btn input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); /* Indigo primary color */
+        border: white 2px solid; /* White border */
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+
+    .range-action-btn input[type="range"]::-webkit-slider-thumb:hover {
+        background: #ffffff;
+        transform: scale(1.1);
+    }
+
+    /* --- Firefox --- */
+    .range-action-btn input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border: none;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        border: white 2px solid; /* White border */
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+
+    .range-action-btn input[type="range"]::-moz-range-thumb:hover {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        transform: scale(1.1);
+    }
+
+    /* Value display styling */
+    .range-action-btn .value-display {
+        font-size: 14px;
+        font-weight: 600;
+        min-width: 36px;
+        text-align: right;
+        color: #ffffff;
+    }
+
+    /* Override Browser Autofill Styles permanently */
+    .search-input-field:-webkit-autofill,
+    .search-input-field:-webkit-autofill:hover,
+    .search-input-field:-webkit-autofill:focus,
+    .search-input-field:-webkit-autofill:active {
+        /* Changes the text color back to white inside autofill */
+        -webkit-text-fill-color: #ffffff !important;
+
+        /* Forces the background to stay transparent using a massive transition delay */
+        transition: background-color 50000s ease-in-out 0s;
+
+        /* Optional: Matches the caret (cursor) color */
+        caret-color: #ffffff;
+    }
+</style>
+
+
+<h1 class="hero-title">Similarity Search Playgroung</h1>
+<div class="para-describe">
+    <p>Searches 2.9M+ records instantaneously for finding the most similar molecules with 90% or more Tanimoto
+        similarity.</p>
+</div>
+<div class="search-container-bar">
+    <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+    <form action="/search" method="POST">
+        <input type="text" 
+                name="chembl_id1" 
+                value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}"
+                placeholder="Enter a CHEMBL ID or Canonical SMILES"
+                class="search-input-field" required>
+        <div class="range-action-btn">
+            <input type="range" 
+                    id="myRange" name="myRange" 
+                    min="0" max="1" step="0.01" 
+                    value="{{ request.form.get('myRange', '') if request.method == 'POST' else 0.90 }}">
+            <span class="value-display" id="rangeValue">{{ request.form.get('myRange', '') if request.method == 'POST' else 0.90 }}</span>
+        </div>
+        <button type="submit" class="submit-action-btn">
+            Search Similar Molecules
+        </button>
+        <!-- value="{{ request.form.get('chembl_id1') if request.method == 'POST' else request.args.get('chembl_id1', '') }}" -->
+    </form>
+
+</div><br><br>
+
+<!-- Error Handling -->
+ <!-- a) CHEMBL ID does not exists -->
+ <!-- b) Invalid Smiles input -->
+
+{% if data and data.error%}
+
+<div class="col-md-7 align-middle">
+    <h2 class="mb-2 text-center" style="color: #ffffff;">Similarity Search Results</h2>
+    <h3 class="cmb-2 text-center" style="color: #ffc107;">Input Error</h3><br>
+        <div class="align-items-center align-middle" style="width: stretch;">
+           
+        <table class="table table-dark align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th colspan="2" style="border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 1rem;">
+                        <h5 class="text-white text-center mb-2" style="font-size: 1.3rem;"><strong>Error Summary</strong></h5>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <td style="width: 35%;"><strong>Target CHEMBL ID:</strong></td>
+                    <td class="text-break">{{ data.target_query }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Target SMILES:</strong></td>
+                    <td class="text-break">{{ data.target_smiles }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Matches:</strong></td>
+                    <td>
+                        <h5 class="mb-0">                                            
+                            <span class="badge rounded-pill bg-warning text-dark">No Matches exists</span>
+                        </h5>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-bottom-left-radius: 20px; padding: 0.5rem;">
+                        <strong>Error:</strong>
+                    </td>
+                    <td style="border-bottom-right-radius: 20px; padding-top: 1rem; padding-bottom: 1rem;" class="text-break">
+                        <span class="badge bg-danger px-2 py-1">
+                            <h5>{{ data.error }}</h5>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table><br>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="/search" class="re-similarity-button">Perform Another Search</a>
+    </div>
+{% endif %}
+
+{% if data %}
+{% set result_block = data %}
+
+<!-- If similar molecules does not exist then do not show the similarity table. Show the SVG and Wuery yable only-->
+
+{% if result_block.total_matches_found == 0 %}
+<div class="card shadow-sm mb-4" style="padding: 20px;">
+    <h2 class="mb-2 text-center" style="color: #ffffff">Similarity Search Results</h2>
+    <h5 class="cmb-2 text-center" style="color: #ffc107;">Matching Compounds</h5>
+
+    <div class="card-body">
+        {% if result_block %}
+        
+        <!-- Centered container with custom layout proportions -->
+        <div class="row justify-content-center align-items-center">
+            <div class="col-12 col-xl-10">
+                <div class="row justify-content-center align-items-center">
+                    
+                    <!-- Left Side: SVG Image -->
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="svg-canvas-box shadow-lg text-center p-3" style="height: 300px;">
+                            {{ data.svg | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Query Summary Table -->
+                    <div class="col-md-7">
+                        <table class="table table-dark align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th colspan="2" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                                        <h5 class="text-white text-center mb-2" style="font-size: 1.3rem;"><strong>Query Summary</strong></h5>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <td style="width: 35%;"><strong>Target Query:</strong></td>
+                                    <td class="text-break">{{ result_block.target_query }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Target SMILES:</strong></td>
+                                    <td class="text-break">{{ result_block.target_smiles }}</td>
+                                </tr>
+                                <!-- <tr>
+                                    <td><strong>Target Compound Name:</strong></td>
+                                    <td style="word-break: break-all; overflow-wrap: break-word;">
+                                        {{ result_block.target_chembl_name.names.pref_name }}
+                                    </td>
+                                </tr> -->
+                                <tr>
+                                    <td style="border-bottom-left-radius: 20px;"><strong>Total Matches:</strong></td>
+                                    <td style="border-bottom-right-radius: 20px;">
+                                        <h4 class="mb-0">
+                                            {% if result_block.total_matches_found == 0 %}
+                                            <span class="badge bg-danger px-2 py-1 rounded-pill">{{ result_block.total_matches_found }} Matches found</span>
+                                            {% else %}
+                                            <span class="badge bg-success px-2 py-1 rounded-pill">{{ result_block.total_matches_found }} Matches found</span>
+                                            {% endif %}
+                                        </h4>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="/search" class="re-similarity-button">Perform Another Search</a><br><br>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- If similar molecules exist then only show the similarity table along with svg and query table -->
+{% if data.results %}
+<div class="similarity-results">
+    
+    <!-- Similarity Data table on Right -->
+    <div class="right-sidebar">
+        <h2 class="mb-2 text-center" style="color: #ffffff">Similarity Search Results</h2>
+        <h5 class="cmb-2 text-center" style="color: #ffc107;">{{ result_block.total_matches_found }} Matching Compounds</h5>
+
+        {% set result_block = data %}
+
+        {% if result_block %}
+
+        {% if result_block.results %}
+        <div class="card-body-results p-3">
+            <table class="table table-dark align-middle mb-0"
+                style="margin-bottom: 2rem; width: stretch; margin: 1rem;">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="border-top-left-radius: 24px;">
+                            S.No.
+                        </th>
+                        <th>
+                            CHEMBL ID
+                        </th>
+                        <th>
+                            Tanimoto Similarity
+                        </th>
+                        <th>
+                            Details
+                        </th>
+                        <th style="border-top-right-radius: 24px;">
+                            SVG
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for item in result_block.results %}
+                    <tr>
+                        <td style="padding-left: 1.5rem;">{{ loop.index }}</td>
+                        <td>{{ item.chembl_id }}</td>
+                        <td>
+                            {% if item.Tanimoto_Similarity == 1 or item.Tanimoto_Similarity >= 0.90 %}
+                            <span class="badge bg-success">{{ item.Tanimoto_Similarity }}</span>
+                            {% elif item.Tanimoto_Similarity < 0.90 and item.Tanimoto_Similarity >= 0.80 %}
+                            <span class="badge bg-warning text-dark">{{ item.Tanimoto_Similarity }}</span>
+                            {% elif item.Tanimoto_Similarity < 0.80 and item.Tanimoto_Similarity >= 0.60 %}
+                                <span class="badge bg-danger">{{ item.Tanimoto_Similarity }}</span>
+                            {% else %}
+                            <span class="badge bg-light text-dark">{{ item.Tanimoto_Similarity }}</span>
+                            {% endif %}
+                        </td>
+                        <td><code class="text-break">Smiles: {{ item.canonical_smiles }}</code><br> 
+                            <!-- <code class="text-break">Preferred Name: {{ item.chembl_name.pref_name }}</code> -->
+                        </td>
+                        <td>{{ item.svg_of_similar | safe }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        <div class="mt-4 text-center">
+            <a href="/search" class="re-similarity-button">Perform Another Search</a><br><br>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="left-sidebar">
+
+        <!-- SVG Canvas Box (Top Left) -->
+        <div class="svg-canvas-box shadow-lg text-center p-3 mb-3">
+            {{ data.svg | safe }}
+        </div>
+
+        <!-- Query Summary Table (Bottom Left) -->
+        <div class="query-summary">
+            <table class="table table-dark align-middle mb-0"
+                style="vertical-align: middle;">
+                <thead class="table-dark">
+                    <tr>
+                        <th colspan="2" style="border-top-left-radius: 20px;border-top-right-radius: 20px;">
+                            <h5 style="color: #ffc107; text-align: center; font-size: 1.3rem;" class="mb-2">
+                                <strong>Query Summary</strong></h5>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td><strong>Target Query:</strong></td>
+                        <td>{{ result_block.target_query }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target SMILES:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">{{ result_block.target_smiles }}
+                        </td>
+                    </tr>
+                     <!-- <tr>
+                        <td><strong>Target Compound Name:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">
+                            {{ result_block.target_chembl_name.pref_name }}
+                        </td>
+                    </tr>  -->
+                    <tr>
+                        <td><strong>Target Similarity Threshold:</strong></td>
+                        <td style="word-break: break-all; overflow-wrap: break-word;">{{ result_block.threshold }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom-left-radius: 20px;"><strong>Total Matches:</strong></td>
+                        <td style="border-bottom-right-radius: 20px;">
+                            {% if result_block.total_matches_found == 0 %}
+                            <h4><span class="badge bg-danger px-2 py-1 rounded-pill">{{ result_block.total_matches_found }}
+                                Matches found</span></h4>
+                            {% else %}
+                            <h4><span class="badge bg-success px-2 py-1 rounded-pill">{{ result_block.total_matches_found }}
+                                Matches found</span></h4>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
+{% endif %}
+
+<script>
+    const rangeInput = document.getElementById('myRange');
+
+    // Update display when slider moves
+    rangeInput.addEventListener('input', () => {
+        rangeValue.textContent = parseFloat(rangeInput.value).toFixed(2);
+    });
+
+</script>
+
+{% endblock %}
+

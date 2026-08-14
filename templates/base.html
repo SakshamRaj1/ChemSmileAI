@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChemSmileAI - Molecular Webapp{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+    /* ==========================================================================
+       1. Global Base Theme
+       ========================================================================== */
+    body {
+        /* background: radial-gradient(circle at 90% 50%, #11253c 0%, #060d15 70%); */
+        /* background-image: 
+            radial-gradient(at 0% 0%, #11253c 0px, transparent 50%),
+            radial-gradient(at 100% 100%, #060d15 0px, transparent 50%); */
+        background: radial-gradient(circle at 50% 90%, #ffffff94 10%, #000000f5 50%);
+        background-attachment: fixed;
+        color: #ffffff;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;  
+        overscroll-behavior-y: none;
+
+    }
+
+    .container-fluid {
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .custom-navbar {
+            background: rgba(13, 22, 34, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* border-radius: 20px; */
+            /* margin: 15px auto; */
+            padding: 10px 24px;
+            /* width: 100%; */
+            /* max-width: 90%; */
+            box-shadow: 0px 28px 52px #200000ab;
+            z-index: 1030;
+    }
+    }
+
+    /* ==========================================================================
+       2. Top Navbar & Brand Styling
+       ========================================================================== */
+    @media (min-width: 576px) {
+        .custom-navbar {
+            background: rgba(13, 22, 34, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 15px auto;
+            padding: 10px 24px;
+            width: 100%;
+            max-width: 90%;
+            /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); */
+            box-shadow: 0px 28px 52px #200000ab;
+            z-index: 1030;
+        }
+    }
+
+    .navbar-brand-logo {
+        font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+        font-weight: 800;
+        background: linear-gradient(142deg, #ffffff 10%, #b30c1b 95%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        text-decoration: none;
+    }
+
+    .nav-link-btn {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 500;
+        padding: 8px 16px !important;
+        border-radius: 12px;
+        transition: all 0.25s ease-in-out;
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    .nav-link-btn:hover, 
+    .nav-link-btn.active,
+    .show > .nav-link-btn {
+        color: #ffffff !important;
+        background: rgba(179, 12, 27, 0.4);
+        box-shadow: 0 0 15px rgba(179, 12, 27, 0.3);
+    }
+
+    .navbar-toggler-custom {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 6px 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ==========================================================================
+       3. Shared Dropdown Menu Styling & Scrollbar Hiding
+       ========================================================================== */
+    .dropdown-menu {
+        width: max-content;
+    }
+
+    .custom-dropdown-menu {
+        background: rgba(13, 22, 34, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        max-height: 75vh;
+        overflow-y: auto;
+        scrollbar-width: none; /* Hide scrollbar for Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+    }
+
+    .custom-dropdown-menu::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for Chrome/Safari/Opera */
+        width: 0;
+        height: 0;
+    }
+
+    .dropdown-item-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.92rem;
+        transition: all 0.2s ease;
+        white-space: normal;
+        display: block;
+    }
+
+    .dropdown-item-link:hover {
+        color: #ffffff !important;
+        background: rgba(179, 12, 27, 0.6);
+        transform: translateX(4px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+    4. DESKTOP VIEW (>= 992px): Hover Dropdown Alignment & Hover Bridge Fix
+    ========================================================================== */
+    @media (min-width: 992px) {
+        .nav-item-wrapper {
+            position: relative !important;
+            /* Ensures the hover hit-box stays active while moving mouse down */
+            padding-bottom: 10px !important; 
+            margin-bottom: -10px !important;
+        }
+
+        .custom-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            margin-top: 0px !important; /* Set to 0 so there is no gap */
+            z-index: 1050 !important;
+            min-width: 240px;
+        }
+
+        /* Invisible "Hover Bridge" pseudo-element covering any pixel gap */
+        .custom-dropdown-menu::before {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: transparent;
+        }
+
+        /* Keep dropdown visible when hovering either the parent button OR the dropdown itself */
+        .nav-item-wrapper:hover .custom-dropdown-menu,
+        .custom-dropdown-menu:hover {
+            display: block !important;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+    }
+
+    /* ==========================================================================
+       5. MOBILE VIEW (< 992px): Full Height Left Sidebar & Accordion Submenus
+       ========================================================================== */
+     @media (max-width: 991.98px) {
+        .offcanvas-mobile-sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            width: 300px !important;
+            max-width: 85vw !important;
+            background: #080e17 !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+            z-index: 2000 !important;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        .offcanvas-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem 1.5rem;
+        }
+
+        .offcanvas-body {
+            padding: 1.2rem;
+            overflow-y: auto;
+        }
+
+        .nav-link-btn {
+            padding: 12px 14px !important;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item-wrapper {
+            position: static !important;
+        }
+
+        /* Submenus hidden by default on mobile inside offcanvas */
+        .offcanvas-mobile-sidebar .custom-dropdown-menu {
+            display: none !important;
+            position: static !important;
+            transform: none !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px !important;
+            margin: 6px 0 10px 10px !important;
+            padding: 6px !important;
+            box-shadow: none !important;
+            width: calc(100% - 10px) !important;
+        }
+
+        /* Show mobile submenu when toggled via click script */
+        .offcanvas-mobile-sidebar .custom-dropdown-menu.mobile-open {
+            display: block !important;
+        }
+    }
+
+    /* ==========================================================================
+       6. Form Inputs & Autofill Overrides
+       ========================================================================== */
+    footer {
+            margin-top: auto;
+            background: rgba(6, 12, 20, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 10px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+    .search-input-field:focus,
+    .subsruct-search-input-field:-webkit-autofill:focus {
+        background-color: transparent !important;
+        color: #ffffff !important;
+        outline: none;
+    }
+
+    .search-input-field:-webkit-autofill,
+    .search-input-field:-webkit-autofill:hover,
+    .search-input-field:-webkit-autofill:focus,
+    .search-input-field:-webkit-autofill:active,
+    .subsruct-search-input-field:-webkit-autofill,
+    .subsruct-search-input-field:-webkit-autofill:hover,
+    .subsruct-search-input-field:-webkit-autofill:focus,
+    .subsruct-search-input-field:-webkit-autofill:active {
+        -webkit-text-fill-color: #ffffff !important;
+        transition: background-color 50000s ease-in-out 0s !important;
+        caret-color: #ffffff;
+    }
+
+    /* ==========================================================================
+    1. Ketcher Modal Overlay & Positioning Fixes
+    ========================================================================== */
+    .ketcher-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        top: 0; /* Reset top offset so backdrop covers full screen */
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 99999;
+        justify-content: center;
+        align-items: center;
+        padding: 15px; /* Creates outer safe area for mobile edges */
+    }
+
+    /* Modal Inner Container */
+    .ketcher-window {
+        width: 85%;
+        max-width: 1200px;
+        height: 80vh;
+        max-height: 850px;
+        background: #0d1117;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative; /* Fixed: Changed from 'sticky' to allow true flex-centering */
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ==========================================================================
+    2. Header & Content Area
+    ========================================================================== */
+    .ketcher-header {
+        height: 55px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 16px;
+        color: #ffffff;
+        background: #111827;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+    }
+
+    .ketcher-header h3, 
+    .ketcher-header h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    #ketcherFrame {
+        flex: 1;
+        border: none;
+        width: 100%;
+        height: 100%;
+        background: #ffffff; /* Gives Ketcher iframe a solid background */
+    }
+
+    /* ==========================================================================
+    3. Footer & Button Controls
+    ========================================================================== */
+    .ketcher-footer {
+        padding: 10px 16px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        background: #111827;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+    }
+
+    button#closeKetcher,
+    button#useMolecule {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        cursor: pointer;
+        margin-right: 0; /* Managed via flexbox gap */
+    }
+
+    button#closeKetcher:hover,
+    button#useMolecule:hover {
+        box-shadow: 0 0 15px rgba(168, 10, 24, 0.5);
+        border-color: #ff4d5a;
+        transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+    4. Mobile Responsiveness Tweaks (< 768px)
+    ========================================================================== */
+    @media (max-width: 767.98px) {
+        .ketcher-modal {
+            padding: 8px; /* Maximize canvas area on phones */
+        }
+
+        .ketcher-window {
+            width: 100% !important;
+            height: 90vh !important; /* Maximizes iframe viewport on phone screens */
+            border-radius: 12px;
+        }
+
+        .ketcher-header {
+            height: 50px;
+            padding: 0 12px;
+        }
+
+        .ketcher-footer {
+            padding: 8px 12px;
+        }
+
+        button#useMolecule {
+            flex: 1; /* Stretch buttons equally on narrow screens */
+            text-align: center;
+            padding: 10px 8px;
+            font-size: 13px;
+        }
+
+        button#useMolecule {
+            flex: 1; /* Stretch buttons equally on narrow screens */
+            text-align: center;
+            padding: 10px 8px;
+            font-size: 13px;
+        }
+    }
+
+    /* Suitability on big screens */
+
+    @media(min-width: 1920px){
+        html{
+            font-size: 16px;
+        }
+        body{
+            zoom: 1.0;
+        }
+    }
+
+    @media(min-width: 2560px){
+        html{
+            font-size: 16px;
+        }
+        body{
+            zoom: 1.2 /*1.7*/;
+        }
+    }
+
+    @media(min-width: 3840px){
+        html{
+            font-size: 16px;
+        }
+        body{
+            zoom: 1.8 /*2.8*/;
+        }
+    }
+
+    @media (min-width: 0px) and (max-width: 299.9999px) {
+        /* navbar looks good until 265px */
+        .custom-navbar{
+            zoom: 0.8;
+        }
+    }
+
+    /* CSS for SVG icons */
+
+        #svg-delete:hover{
+        /* background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); */
+        color: #ffffff;
+        /* border: 1px solid rgba(255, 255, 255, 0.3); */
+        border-radius: 6px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        transform: translateY(-2px);
+    }
+
+    .svg-draw-pencil:hover{
+        /* background: linear-gradient(135deg, #a80a18 0%, #09111c 100%); */
+        color: #ffffff;
+        /* border: 1px solid rgba(255, 255, 255, 0.3); */
+        border-radius: 6px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        transform: translateY(-2px);
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .svg-draw-pencil-button{        
+        color: #ffffff;        
+        border-radius: 40px;
+        padding: 12px 30px;
+        font-weight: 600;
+        white-space: nowrap;
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+        margin-right: 20px;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .svg-draw-pencil-button:hover{        
+        box-shadow: none;
+        transform: translateY(-2px);        
+    }
+
+    header, footer{
+        height: 60px;        
+        justify-content: space-between;
+        align-items: center;       
+        color: white;        
+    }
+
+
+</style>
+
+    {% block extra_head %}{% endblock %}
+
+</head>
+<body>
+
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+            <div class="container-fluid p-0">
+                
+                <!-- Brand Logo -->
+                <a class="navbar-brand me-auto" href="/">
+                    <span class="navbar-brand-logo">ChemSmileAI</span>
+                </a>
+
+                <!-- Mobile Hamburger Button -->
+                <button class="navbar-toggler navbar-toggler-custom d-lg-none" type="button" 
+                        data-bs-toggle="offcanvas" data-bs-target="#mobileLeftSidebar" 
+                        aria-controls="mobileLeftSidebar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Responsive Navigation Area -->
+                <div class="offcanvas offcanvas-start offcanvas-mobile-sidebar" tabindex="-1" id="mobileLeftSidebar" aria-labelledby="mobileLeftSidebarLabel">
+                    
+                    <!-- Sidebar Drawer Header (Visible on Mobile Only) -->
+                    <div class="offcanvas-header d-lg-none">
+                        <h5 class="offcanvas-title navbar-brand-logo" id="mobileLeftSidebarLabel">ChemSmileAI</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Menu Content (Inline on Desktop, Sidebar Body on Mobile) -->
+                    <div class="offcanvas-body p-lg-0">
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1">
+
+                            <!-- 1. MOLECULE ANALYSIS -->
+                            <li class="nav-item dropdown nav-item-wrapper">
+                                <a class="nav-link nav-link-btn dropdown-toggle {% if request.path == '/analysis' or request.path == '/molecule_analysis' %}active{% endif %}" 
+                                   href="/analysis" id="analysisDropdown" role="button" aria-expanded="false">
+                                    Molecule Analysis
+                                </a>
+                                <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="analysisDropdown">
+                                    <li><a class="dropdown-item dropdown-item-link" style="color: white; border-bottom: 2px solid #ffffff; "><strong>Featured Tools</strong></a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Molecular Property</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Lipinski Property of 5</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Molecular Fingerprint</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Atom Analysis</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Bond Analysis</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Substructure Search Mapping<br><small>Delete/Replace Fragment</small></a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Identify Groups</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Molecular Complexity</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">2D Structure</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">3D Structure</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Molecular Descriptors</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Scaffold Analysis</a></li>
+                                    <li><a href="/analysis" class="dropdown-item dropdown-item-link">Download Data</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- 2. SIMILARITY -->
+                            <li class="nav-item dropdown nav-item-wrapper">
+                                <a class="nav-link nav-link-btn dropdown-toggle {% if request.path == '/similarity' %}active{% endif %}" 
+                                   href="/similarity" id="similarityDropdown" role="button" aria-expanded="false">
+                                    Similarity
+                                </a>
+                                <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="similarityDropdown">
+                                    <li><a class="dropdown-item dropdown-item-link" style="color: white; border-bottom: 2px solid #ffffff; "><strong>Featured Tools</strong></a></li>
+                                    <li><a href="/similarity" class="dropdown-item dropdown-item-link">Molecular Similarity Search Engine</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- 3. COMPARE -->
+                            <li class="nav-item dropdown nav-item-wrapper">
+                                <a href="/compare" class="nav-link nav-link-btn dropdown-toggle {% if request.path == '/compare' %}active{% endif %}" 
+                                    id="compareDropdown" role="button" aria-expanded="false">
+                                    Compare
+                                </a>
+                                <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="compareDropdown">
+                                    <li><a class="dropdown-item dropdown-item-link" style="color: white; border-bottom: 2px solid #ffffff; "><strong>Featured Tools</strong></a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Molecular Property</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Lipinski Property of 5</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Fingerprint Analysis</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Bond Analysis</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Substructure Searching</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">2D Structure</a></li>
+                                    <li><a href="/compare" class="dropdown-item dropdown-item-link">Compare Smiles</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- 4. ABOUT -->
+                            <li class="nav-item">
+                                <a href="/about" class="nav-link nav-link-btn {% if request.path == '/about' %}active{% endif %}">About</a>
+                            </li>
+
+                            <!-- 5. CONTACT US -->
+                            <li class="nav-item">
+                                <a href="/contact" class="nav-link nav-link-btn {% if request.path == '/contact' %}active{% endif %}">Contact us</a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="container-fluid my-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center" style="padding: 10px 20px;">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 ChemSmileAI</p>
+            <p class="mb-0">A ChemInfomatics Webapp</p>
+
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Mobile Sub-dropdown handler -->
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Select all parent toggles inside the mobile sidebar
+    const mobileDropdownToggles = document.querySelectorAll(".offcanvas-mobile-sidebar .dropdown-toggle");
+
+    mobileDropdownToggles.forEach(toggle => {
+        toggle.addEventListener("click", function (e) {
+            // Only apply mobile accordion behavior on screens under 992px
+            if (window.innerWidth < 992) {
+                e.preventDefault(); // Stop page navigation so submenu can open!
+                e.stopPropagation();
+
+                const submenu = this.nextElementSibling;
+
+                if (submenu && submenu.classList.contains("custom-dropdown-menu")) {
+                    const isAlreadyOpen = submenu.classList.contains("mobile-open");
+
+                    // Close all other open submenus inside sidebar
+                    document.querySelectorAll(".offcanvas-mobile-sidebar .custom-dropdown-menu").forEach(menu => {
+                        menu.classList.remove("mobile-open");
+                    });
+
+                    // Toggle current clicked submenu
+                    if (!isAlreadyOpen) {
+                        submenu.classList.add("mobile-open");
+                    }
+                }
+            }
+        });
+    });
+});
+</script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

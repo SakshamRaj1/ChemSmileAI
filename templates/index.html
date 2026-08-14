@@ -1,0 +1,1442 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Error Handling CSS */
+    .if-error{
+        background: rgba(16, 34, 54, 0.486);
+        border-radius: 50px;
+        padding: 14px 24px;
+        border: 1px solid #ce0010;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        max-width: 100%;
+        backdrop-filter: blur(8px);
+        color: #ffffff;
+        margin-top: 2%;
+    }
+
+    /* ==========================================================================
+       1. Typography & Responsive Scaling
+       ========================================================================== */
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -1px;
+        margin-top: 2rem;
+    }
+
+    /* ==========================================================================
+       2. Hero Input Search Container
+       ========================================================================== */
+    .search-container-bar {
+        background: linear-gradient(90deg, #b30c1b 0%, #6e050e 40%, #150204 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        height: 5rem;
+    }
+
+    .search-input-field {
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        padding: 12px 20px;
+        width: 100%;
+        font-size: 1.15rem;
+    }
+
+    .search-input-field:focus {
+        outline: none;
+    }
+
+    .search-input-field::placeholder {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .submit-action-btn {
+        background: linear-gradient(135deg, #a80a18 0%, #09111c 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 24px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .submit-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(168, 10, 24, 0.5);
+    }
+
+    /* Default: show text, hide icon */
+    .submit-action-btn .btn-icon {
+        display: none;
+    }
+    .submit-action-btn .btn-text {
+        display: inline;
+    }
+
+    /* On small screens (e.g., < 576px) */
+    @media (max-width: 576px) {
+        .submit-action-btn{
+            width: 10%;
+            background: transparent;
+            width: 10%;
+            border-radius: 12px;
+            display: inline;
+            border: none;
+        }
+        
+        .submit-action-btn .btn-text {
+            display: none;   /* hide text */
+        }
+
+        .submit-action-btn .btn-icon {
+            display: inline; /* show icon */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .submit-action-btn:hover {
+            transform: translateY(0px);
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .search-container-bar {
+            flex-direction: column;
+            border-radius: 16px;
+            padding: 10px;
+            /* gap: 10px; */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 4.5rem;            
+        }
+        
+        .search-input-field{
+            padding: 0px;
+            padding-left: 10px;
+        }
+
+        .table-width-control{
+            width: auto;
+        }
+        
+        .tablecol1width{
+            width: 10%;
+        }
+
+        .mobile-3d{
+            margin: 0 1.0rem;
+            max-height: 300px;
+            margin-top: 0.8rem;   
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .td{
+            min-height: 100px;
+        }
+    }
+
+    /* ==========================================================================
+       3. Torus Graphic Component
+       ========================================================================== */
+    .torus-graphic-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .torus-fallback-shape {
+        width: clamp(240px, 25vw, 400px);
+        height: clamp(240px, 25vw, 400px);
+        border-radius: 40%;
+        border: clamp(30px, 4vw, 55px) double rgba(240, 242, 245, 0.85);
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+        animation: rotateTorus 30s linear infinite;
+    }
+
+    .torus-graphic-container1 {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .torus-fallback-shape1 {
+        width: clamp(150px, 12vw, 200px);
+        height: clamp(150px, 12vw, 200px);
+        border-radius: 40%;
+        border: transparent;
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+        animation: rotateTorus 30s linear infinite;
+    }
+
+    .pc-3d{
+        height: 25rem;
+        place-content: center;
+        place-items: center;
+    }
+
+    @keyframes rotateTorus {
+        100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================================================
+       4. Results Panel & Data Display Grid
+       ========================================================================== */
+    .results-panel {
+        /* background: linear-gradient(185deg, #0d162285, transparent); */
+        /* background: #09101a91; */
+        background: #09101a4f;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        backdrop-filter: blur(12px);
+        margin-top: 4rem;
+        box-shadow: 0 15px 35px rgba(104, 104, 104, 0.815);;
+    }
+
+    /* 2D Structure Card Wrapper */
+    .svg-card-container {
+        background: #0d1622;
+        /* background: white; */
+        border-radius: 16px;
+        overflow: hidden;
+        /* border: 1px solid rgba(255, 255, 255, 0.1); */
+        height: 100%;
+    }
+
+    .svg-main-conta {
+        padding: 12px;
+        text-align: center;
+        background: #6e050e;
+        color: #ffffff;
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;        
+    }
+
+    .svg-main-conta-text {
+        padding: 8px;
+        text-align: left;
+        background: #6e050e;
+        color: #ffffff;
+        margin: 0;
+        font-size: 1.0rem;
+        font-weight: 400;
+        height: 40px;
+    }
+
+    @media (max-width: 576px) {
+    .svg-main-conta-text {
+        padding: 8px;
+        text-align: left;
+        background: #6e050e;
+        color: #ffffff;
+        margin: 0;
+        font-size: 1.0rem;
+        font-weight: 400;
+        min-height: 50px;
+    }
+}
+
+    /* Responsive SVG constraints */
+    .svg-canvas-box svg {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .svg-canvas-box {
+        justify-self: center;
+    }
+
+    /* Descriptors Table Styling */
+    .data-grid-table {
+        margin-bottom: 0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .data-grid-table th.table-header {
+        background-color: #6e050e;
+        color: #ffffff;
+        text-align: center;
+        padding: 12px;
+    }
+
+    .data-grid-table td {
+        padding: 12px 16px;
+        vertical-align: middle;
+    }
+
+    /* Label column style */
+    .data-grid-table td:first-child {
+        color: rgba(255, 255, 255, 0.75);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Value column style */
+    .data-grid-table td:last-child {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .table-width-control{
+        width: 30%;
+    }
+    
+    /* Safari/Chrome Autofill Overrides */
+    .search-input-field:-webkit-autofill,
+    .search-input-field:-webkit-autofill:hover, 
+    .search-input-field:-webkit-autofill:focus, 
+    .search-input-field:-webkit-autofill:active {
+        -webkit-text-fill-color: #ffffff !important;
+        transition: background-color 50000s ease-in-out 0s;
+        caret-color: #ffffff;
+    }
+
+    /* Container wrapper setup for horizontal scroll */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Force table layout to separate borders so sticky positioning works */
+    .data-grid-table {
+        border-collapse: separate !important;
+        border-spacing: 0;
+        min-width: 550px; /* Forces horizontal scrolling on smaller screens */
+        width: 100%;
+    }
+
+    /* Freeze First Column (Property Labels) */
+    .data-grid-table td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background-color: #212529 !important; /* Solid background prevents text bleed */
+        white-space: nowrap;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        /* box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);  */
+        /* Visual shadow separator */
+    }
+
+    /* Ensure full header banner stays elevated above sticky cells */
+    .data-grid-table th.table-header {
+        position: sticky;
+        left: 0;
+        z-index: 6;
+        background-color: #6e050e !important;
+    }
+
+    /* Prevent SMILES code block from forcing extra-wide layout without wrapping */
+    .data-grid-table td:last-child {
+        min-width: 250px;
+    }
+
+    /* ==========================================================================
+       1. About Platform Container Setup (Clean Transparent Layout)
+       ========================================================================== */
+    .about-platform-section {
+        color: #ffffff;
+        padding: 20px 0;
+        width: 100%;
+    }
+
+    .about-title {
+        font-size: clamp(2rem, 3.5vw, 3rem);
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #e5e2e2;
+        text-shadow: -2px -1px 0 #020202, 2px -1px 0 #ffffff, -2px 1px 0 #cdb6b6, 2px 1px 0 #ffffff;
+        letter-spacing: 2.5px;
+    }
+
+    .about-description {
+        font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.6;
+        max-width: 1200px;
+        margin-bottom: 35px;
+    }
+
+    /* ==========================================================================
+       2. 8 Pill-Card Navigation Row
+       ========================================================================== */
+    .pill-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 30px;
+        width: 100%;
+        margin-top: -2rem;
+    }
+
+    .feature-pill-card {
+        background: radial-gradient(#0d1622, #000000c9);
+        border: 2px solid #625b5c;
+        border-bottom-left-radius: 40px;
+        padding: 14px 10px;
+        color: #ffffff;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 75px;
+        line-height: 1.25;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+        border-bottom-right-radius: 40px;
+        border-top-color: currentcolor;
+    }
+
+    .feature-pill-card:hover {
+        background: #09101a;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.404);
+        color: white;
+        border: 2PX solid ffffffa6;
+    }
+
+    /* Active Highlighted Pill State */
+    .feature-pill-card.active {
+        background: linear-gradient(135deg, #b30c1b 0%, #6e050e 100%);
+        border-color: #ffffffa6;
+        box-shadow: 0 0 20px rgba(179, 12, 27, 0.6);
+        transform: scale(1.03);
+    }
+
+    /* ==========================================================================
+       3. Information Display Panel
+       ========================================================================== */
+    .info-display-panel {
+        background: #09101a;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 32px;
+        padding: 35px;
+        min-height: 420px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Desktop Column Sizing: Image takes 40%, Content takes 60% */
+    @media (min-width: 992px) {
+        .diagram-col-40 {
+            flex: 0 0 40% !important;
+            max-width: 40% !important;
+        }
+        .content-col-60 {
+            flex: 0 0 60% !important;
+            max-width: 60% !important;
+        }
+    }
+
+    .diagram-img-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .diagram-img-wrapper img {
+        width: 100%;
+        max-width: 360px;
+        height: auto;
+        border-radius: 50%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Dynamic Content Container */
+    .dynamic-content-box {
+        padding-left: 20px;
+    }
+
+    .content-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 15px;
+        padding: 0.5rem;
+        margin-right: 0.5rem;
+        width: fit-content;
+        border-bottom: 5px solid #6e050e;
+
+    }
+
+    .content-body {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.7;
+    }
+
+    .feature-list {
+        margin-top: 15px;
+        padding-left: 20px;
+    }
+
+    .feature-list li {
+        margin-bottom: 8px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Responsive Mobile Tweaks */
+    @media (max-width: 991.98px) {
+        .pill-cards-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .info-display-panel {
+            padding: 24px;
+        }
+        .dynamic-content-box {
+            padding-left: 0;
+            margin-top: 25px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pill-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+     /* ==========================================================================
+    Molecular Info Card Container Styling 
+    ========================================================================== */
+    .mol-info-card-container {
+        background: rgba(13, 22, 34, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .bg-danger-subtle {
+        background-color: rgba(179, 12, 27, 0.2) !important;
+    }
+
+    .text-danger-light {
+        color: #6e050e !important;
+    }
+
+    .fs-7 {
+        font-size: 0.75rem;
+    }
+
+    .tracking-wider {
+        letter-spacing: 1px;
+    }
+
+    /* Individual Data Metric Box */
+    .info-data-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 14px 18px;
+        transition: all 0.25s ease-in-out;
+    }
+
+    .info-data-box:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(179, 12, 27, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .info-label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: rgb(255 255 255 / 78%);
+        margin-bottom: 6px;
+        text-decoration-line: underline;
+    }
+
+    .info-value {
+        font-size: 0.98rem;
+        line-height: 1.5;
+    }
+
+    /* CHEMBL Badge Widget */
+    .chembl-pill-badge {
+        background: rgb(0, 0, 0);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        padding: 6px 14px;
+        border-radius: 10px;
+        text-align: right;
+    }
+
+    /* New CSS for 1st Section */
+    .compound-card{
+        background: #09101a73;
+        border:1px solid rgba(255,255,255,.08);
+        border-radius:22px;
+        padding:35px;
+        color:white;
+        box-shadow: 0 25px 60px rgba(0,0,0,.35);
+    }
+
+
+    /* Naming Section Header  */
+
+    .compound-header{
+        display:flex;
+        justify-content:space-between;
+        /* justify-content: space-around; */
+        align-items:flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .compound-header h1{
+        margin:0;
+        font-size:42px;
+        font-weight:700;
+        letter-spacing:1px;
+        width: 85%;
+        word-wrap: anywhere;
+    }
+
+    .iupac-subtitle{
+        margin-top:8px;
+        color:#8fa3b7;
+        font-size:18px;
+    }
+
+    /* CHEMBL Badge */
+
+    .chembl-badge{
+        padding:10px 18px;
+        border-radius:30px;
+        background:#1a2431;
+        border:1px solid rgba(255,193,7,.45);
+        color:#ffc107;
+        font-weight:600;
+        letter-spacing:.5px;
+    }
+
+    /* Information */
+
+    .info-grid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        /* margin-bottom: 35px; */
+        padding: 3% 3%;
+        background: #09101a91;
+        border-radius: 24px;
+        border: 2px solid #ffffff17;
+        box-shadow: 0px 28px 52px #200000ab;
+    }
+
+    .info-item{
+        display:flex;
+        flex-direction:column;
+    }
+
+    /* Synonyms */
+
+    .synonyms-section{
+        border-top:1px solid rgba(255,255,255,.08);
+        padding-top:28px;
+    }
+
+    .synonyms-section h3{
+        margin-bottom:18px;
+        font-size:18px;
+        color:white;
+    }
+
+    .synonyms{
+        display:flex;
+        flex-wrap:wrap;
+        gap:12px;
+    }
+
+    .chip{
+        padding:9px 15px;
+        border-radius:40px;
+        background:#1a2431;
+        border:1px solid rgba(255,255,255,.08);
+        color:#cfd8e3;
+        font-size:14px;
+        transition:.25s;
+        cursor:pointer;
+    }
+
+    .chip:hover{
+        background:#ffc107;
+        color:#111;
+        transform:translateY(-2px);
+    }
+
+    .more-synonyms{
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        background: #0f151d;
+        color: #d8dee8;
+        border: 1px solid #0aff005c;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        transition: 0.25s;
+        cursor: default;
+    }
+
+    .more-synonyms:hover{
+        background:#0aff005c;
+        color: white;
+        transform:translateY(-2px);
+    }
+
+    /* Mobile CSS for Section 1*/
+
+    /* Compound Card  */
+
+    .compound-card {
+        width: 100%;
+        background: linear-gradient(145deg, #141b24, #0d131d);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 32px;
+        color: #fff;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        box-sizing: border-box;
+    }
+
+    /* Header */
+
+    .compound-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .compound-header h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        font-weight: 700;
+        line-height: 1.15;
+        word-break: break-word;
+    }
+
+    .iupac-subtitle {
+        margin-top: 6px;
+        color: #9caec2;
+        font-size: 1rem;
+    }
+
+    .chembl-badge {
+        background: rgba(255,193,7,0.12);
+        color: #FFC107;
+        border: 1px solid rgba(255,193,7,0.4);
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* Information Grid  */
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px 40px;
+        margin-bottom: 35px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .label {
+        color: #fff8d7d9;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        margin-bottom: 8px;
+        text-decoration-color: #c1bfbf;
+        text-decoration-line: underline;
+    }
+
+    .value {
+        color: #fff;
+        font-size: 1.15rem;
+        font-weight: 600;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .value.inactive {
+        color: #59d5ff;
+    }
+
+    /* Synonyms  */
+
+    .synonyms-section {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 24px;
+    }
+
+    .synonyms-section h3 {
+        margin: 0 0 18px;
+        font-size: 1.1rem;
+    }
+
+    .synonyms {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        background: #1a2431;
+        color: #d8dee8;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 999px;
+        font-size: 0.9rem;
+        transition: 0.25s;
+        cursor: default;
+    }
+
+    .chip:hover {
+        background: #FFC107;
+        color: #111;
+        transform: translateY(-2px);
+    }
+
+    .show-more-btn {
+        background: transparent;
+        color: #FFC107;
+        border: 1px solid rgba(255,193,7,0.35);
+        border-radius: 999px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+    .show-more-btn:hover {
+        background: rgba(255,193,7,0.15);
+    }
+
+    .no-data {
+        color: #8f98a5;
+        font-style: italic;
+    }
+
+    /* Tablet */
+
+    @media (max-width: 992px) {
+
+        .compound-card {
+            padding: 26px;
+        }
+
+        .compound-header h1 {
+            font-size: 2rem;
+        }
+
+        .info-grid {
+            gap: 24px;
+        }
+
+    }
+
+    /* Mobile  */
+
+    @media (max-width: 768px) {
+
+        .compound-card {
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .compound-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .compound-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .iupac-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .chembl-badge {
+            font-size: 0.8rem;
+            padding: 8px 14px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .value {
+            font-size: 1.05rem;
+        }
+
+        .synonyms {
+            gap: 8px;
+        }
+
+        .chip,
+        .show-more-btn {
+            font-size: 0.82rem;
+            padding: 7px 12px;
+        }
+    }
+
+    /* Small Phones */
+
+    @media (max-width: 480px) {
+
+        .compound-card {
+            padding: 16px;
+        }
+
+        .compound-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .iupac-subtitle {
+            font-size: 0.85rem;
+        }
+
+        .label {
+            font-size: 0.68rem;
+        }
+
+        .value {
+            font-size: 1rem;
+        }
+
+        .chip,
+        .show-more-btn {
+            /* width: 100%; */
+            justify-content: center;
+            text-align: center;
+        }
+
+    }
+
+</style>
+
+<!-- ================= HERO SEARCH SECTION ================= -->
+<main class="row align-items-center gy-4" style="margin-top: 1rem;">
+    <div class="col-lg-8"> 
+        <h1 class="hero-title">Do you know<br>your Molecule?</h1>
+        
+        <form method="POST" action="/">
+            <div class="search-container-bar">
+                <input type="text" name="smiles" class="search-input-field" id="smiles"
+                       placeholder="Enter the Canonical SMILES" 
+                       value="{{ request.form.get('smiles', '') }}" required>
+                <button type="button" id="drawBtnHome" class="draw-btn" style="background: transparent; border: none; padding: 1px 6px;">
+                    <!-- Draw Molecule Button -->
+                    <svg class="svg-draw-pencil" fill="#ffffff" height="28" width="30" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                        viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+                    <path d="M70.2,337.4l104.4,104.4L441.5,175L337,70.5L70.2,337.4z M0.6,499.8c-2.3,9.3,2.3,13.9,11.6,11.6L151.4,465L47,360.6
+                        L0.6,499.8z M487.9,24.1c-46.3-46.4-92.8-11.6-92.8-11.6c-7.6,5.8-34.8,34.8-34.8,34.8l104.4,104.4c0,0,28.9-27.2,34.8-34.8
+                        C499.5,116.9,534.3,70.6,487.9,24.1z"/>
+                    </svg>
+                </button>
+                <button type="button" onclick="document.getElementById('smiles').value = ''" style="background: transparent; border: none;" >
+                    <!-- Delete input button -->
+                    <span class="btn-text">
+                        <i class="fas fa-search btn-icon">
+                            <svg id="svg-delete" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0,0,256,256">
+                            <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path transform="translate(24.00059,-9.94113) rotate(45.001)" d="M21.5,4.5h5.001v39h-5.001z"></path><path transform="translate(57.94113,24.00474) rotate(135.008)" d="M21.5,4.5h5v39.001h-5z"></path></g></g>
+                            </svg>
+                        </i>
+                    </span>
+                </button>
+                <button type="submit" class="submit-action-btn">
+                    <!-- SUbmit button -->
+                    <span class="btn-text">Explore without Coding</span>                    
+                    <i class="fas fa-search btn-icon" style="margin-right: -20px; margin-left: -20px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0,0,256,256">
+                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" 
+                        stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" 
+                        text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M21,3c-9.37891,0 -17,7.62109 -17,17c0,9.37891 7.62109,17 17,17c3.71094,0 7.14063,-1.19531 9.9375,-3.21875l13.15625,13.125l2.8125,-2.8125l-13,-13.03125c2.55469,-2.97656 4.09375,-6.83984 4.09375,-11.0625c0,-9.37891 -7.62109,-17 -17,-17zM21,5c8.29688,0 15,6.70313 15,15c0,8.29688 -6.70312,15 -15,15c-8.29687,0 -15,-6.70312 -15,-15c0,-8.29687 6.70313,-15 15,-15z"></path></g></g>
+                        </svg>
+                    </i>
+                </button>
+            </div>
+        </form>
+
+        {% if error %}
+        <!-- <div class="alert alert-danger mt-4 bg-danger text-white border-0 rounded-4 p-3" role="alert">
+            ⚠️ {{ error }}
+        </div> -->
+        <button onclick="this.style.display='none'" class = "if-error" role="alert">
+            ⚠️ {{ error }}
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4 text-center">
+        {% if data %}
+            <div class="rounded p-2 text-center mobile-3d pc-3d">                
+                {% if data.structure3d != None %}
+                    {{ data.structure3d | safe }}
+                {% elif data.structure3d == None %}
+                    <div class="torus-graphic-container">
+                    <div class="torus-fallback-shape">          
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="torus-graphic-container">
+            <div class="torus-fallback-shape">
+        </div>
+        {% endif %}
+    </div>
+
+</main>
+
+<!-- ================= Naming and characteristics Section ================= -->
+{% if data %}
+{% if data.structure3d != None  %}
+    <section class="results-panel" style="padding: 0px; /*justify-self: center;*/ margin-top: 0rem;">
+{% else %}
+    <section class="results-panel" style="padding: 0px;  /*justify-self: center;*/">
+{% endif %}
+        <div class="compound-card">
+            <div class="compound-header">
+                <div style="width: -webkit-fill-available; word-wrap: anywhere;">
+                    <h1>
+                        {% if data.compound_name and data.compound_name != "No preferred name found" %}
+                            {{ data.compound_name }}
+                        {% elif data.iupac_name and data.iupac_name != "No preferred IUPAC name found" %}
+                            {{ data.iupac_name }}
+                        {% else %}
+                            Molecular Information
+                        {% endif %}
+                    </h1>
+                    <p class="iupac-subtitle">{{ data.iupac_name if data.iupac_name }}</p>
+                </div>
+
+                <span class="chembl-badge">
+                    {% if data.predicted_chembl_id and data.predicted_chembl_id != "NA" %}
+                    {{ data.predicted_chembl_id }}
+                    {% endif %}
+                </span>
+
+            </div>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+                    <span class="label">Compound Name</span>
+                    <span class="value">{{ data.compound_name if data.compound_name }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">IUPAC Name</span>
+                    <span class="value"> {{ data.iupac_name if data.iupac_name }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Molecule Parent</span>
+                    <span class="value"> {{ data.describe_molecule_parent if data.describe_molecule_parent }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Principal Characteristic</span>
+                    <span class="value inactive">
+                        {{ data.describe_molecule_features if data.describe_molecule_features }}
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="synonyms-section">
+
+                <h3>Common Names & Synonyms</h3>
+
+                <div class="synonyms">
+                    {% if data.all_synonyms %}
+                        {% for name in data.all_synonyms[:21] %}
+                            <span class="chip">{{ name }}</span>                                                       
+                        {% endfor %}                        
+                            {% if data.all_synonyms|length > 21 %}
+                            <span class="more-synonyms"> 
+                                {{ data.all_synonyms|length - 21 }} more Synonyms found 
+                            </span>
+                            {% endif %}                        
+                    {% else %}
+                        <span class="no-data">
+                            No common synonyms listed
+                        </span>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+</section>
+<br>
+
+<!-- Descriptors and Visual Section -->
+<section class="results-panel" style="padding: 0px; margin-top: 1.5rem;">
+    <div class="row g-4 align-items-stretch" style="padding: 2rem">
+        
+        <!-- 2D Structure Card Column -->
+        <div class="col-12 col-lg-4 col-xl-4">
+            <div class="svg-card-container shadow-lg">
+                <h3 class="svg-main-conta">2D Structure</h3>
+                <div class="svg-canvas-box">
+                    {{ data.svg | safe }}
+                </div>
+                <table style="width: stretch; margin: 0.50rem 0.315rem;">
+                    <tbody>
+                        <tr>
+                            <td><h3 class="svg-main-conta-text">Molecule Name: </h3></td>
+                            <td><h3 class="svg-main-conta-text">{{ data.compound_name }}</h3></td>
+                        </tr>
+                        <tr>
+                            <td><h3 class="svg-main-conta-text" style="border-bottom-left-radius: 16px;">CHEMBL ID: </h3></td>
+                            <td><h3 class="svg-main-conta-text" style="border-bottom-right-radius: 16px;">{{ data.predicted_chembl_id }}</h3></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Computed Descriptors Table Column -->
+        <div class="col-12 col-lg-8 col-xl-8">
+            <div class="table-responsive rounded-4 shadow-lg h-100">
+                <table class="table table-dark table-borderless data-grid-table align-middle h-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="2" class="table-header">
+                                <h4 class="m-0 fs-5">Computed Descriptors Pipeline</h4>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        <tr>
+                            <td class="tablecol1width">Canonical Target:</td>
+                            <td><code class="text-warning text-break fs-6">{{ data.smiles }}</code></td>
+                        </tr>
+                        <tr>
+                            <td>Elemental Formula:</td>
+                            <td>{{ data.formula }}</td>
+                        </tr>
+                        <tr>
+                            <td>Molecular Weight (MW):</td>
+                            <td>{{ data.mw }} g/mol</td>
+                        </tr>
+                        <tr>
+                            <td>Computed LogP Index:</td>
+                            <td>{{ data.logp }}</td>
+                        </tr>
+                        <tr>
+                            <td>TPSA Metric (Å²):</td>
+                            <td>{{ data.tpsa }} Å²</td>
+                        </tr>
+                        <tr>
+                            <td>Rotatable Free Bonds:</td>
+                            <td>{{ data.rotatable_bonds }}</td>
+                        </tr>
+                        <tr>
+                            <td>Lipinski Rule Condition:</td>
+                            <td>
+                                {% if data.lipinski == 'Pass' %}
+                                    <span class="badge bg-success px-3 py-2 rounded-pill fs-6">Pass</span>
+                                {% else %}
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill fs-6">{{ data.lipinski }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section><br>
+
+
+{% endif %}
+
+
+<!-- features Cards -->
+<div class="about-platform-section">
+    
+    <!-- Title and Description (Direct on Page Background) -->
+     <div class="info-display-panel row align-items-center m-0" style="min-height: fit-content;">
+        <h2 class="about-title">What is ChemSmileAI?</h2>
+        <p class="about-description">
+            ChemSmileAI is a web-app focussed on providing accessibility to chemical information and RDKit based internal computations. Providing search on the basis of Molecule Name, Molecule Structure (SMILES), CHEMBL ID, and Draw Feature.
+        </p>
+    </div>
+
+    <!-- 8 Interactive Pill Cards -->
+    <div class="pill-cards-grid">
+        <div class="feature-pill-card active" onclick="showCardInfo(0)">Molecule<br>Analysis</div>
+        <div class="feature-pill-card" onclick="showCardInfo(1)">Molecule<br>Similarity Search<br>Engine</div>
+        <div class="feature-pill-card" onclick="showCardInfo(2)">Molecule<br>Comparison</div>
+        <div class="feature-pill-card" onclick="showCardInfo(3)">Molecule<br>Sketching</div>
+        <div class="feature-pill-card" onclick="showCardInfo(4)">Delete/Replace<br>Fragment</div>
+        <div class="feature-pill-card" onclick="showCardInfo(5)">Molecular<br>Fingerprint</div>
+        <div class="feature-pill-card" onclick="showCardInfo(6)">Molecular<br>Descriptors</div>
+        <div class="feature-pill-card" onclick="showCardInfo(7)">2D and 3D<br>Structures</div>
+    </div>
+
+    <!-- Information Display Box -->
+    <div class="info-display-panel row align-items-center m-0">
+        
+        <!-- Left Column: Image taking exactly 40% width on Desktop -->
+        <div class="col-12 diagram-col-40">
+            <div class="diagram-img-wrapper">
+                <!-- Replace 'your-image-path.png' with your actual image route or URL -->
+                <img src="/static/images/ChemSmileAI-Home-features.png" alt="ChemSmileAI Architecture Diagram">
+            </div>
+        </div>
+
+        <!-- Right Column: Interactive Details Content taking 60% width on Desktop -->
+        <div class="col-12 content-col-60">
+            <div class="dynamic-content-box" id="infoContentBox">
+                <!-- Content updates dynamically via JS -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="ketcherModal" class="ketcher-modal">
+    <div class="ketcher-window">
+        <div class="ketcher-header">
+            <h2>Draw Molecule</h2>
+            <button type = "submit" id="closeKetcher">✖</button>
+              
+        </div>
+
+        <iframe
+            id="ketcherFrame"
+            src="{{ url_for('static', filename='ketcher/index.html') }}">
+        </iframe>
+
+        <div class="ketcher-footer">
+            <button type = "submit" id="useMolecule" onclick="sendSmiles()">
+                Use Molecule
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const ketcherModal = document.getElementById("ketcherModal");
+    const drawBtn = document.getElementById("drawBtnHome");
+    const closeBtn = document.getElementById("closeKetcher");
+
+    drawBtn.addEventListener("click", function (e) {
+        e.preventDefault();      // remove if drawBtn is type="button"
+        console.log("Opening Ketcher");
+        ketcherModal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", function () {
+        console.log("Close button clicked");
+        ketcherModal.style.display = "none";
+    });
+
+    window.addEventListener("click", function (event) {
+        if (event.target === ketcherModal) {
+            console.log("Close by clicking outside");
+            ketcherModal.style.display = "none";
+        }
+    });
+
+    async function sendSmiles() {
+    const frame = document.getElementById("ketcherFrame");
+    const smiles = await frame.contentWindow.ketcher.getSmiles();
+
+    document.querySelector('input[name="smiles"]').value = smiles;
+    console.log("Smiles sent to the form textbox:", smiles);
+    ketcherModal.style.display = "none";
+
+    // Automatic Form Submit
+    // document.querySelector("form").submit();
+
+    // Sends smiles to Flask via JS function and it receives via route
+    await fetch("/receive_smiles_for_home", {
+    method: "POST",
+    headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            smiles: smiles
+        })
+    });
+    }
+</script>
+
+<!-- INTERACTIVE CARD SWITCHING SCRIPT -->
+<script>
+    const cardData = [
+        {
+            title: "Molecule Analysis",
+            description: "Molecular properties are the distinct characteristics of a molecule that define its chemical, physical, and structural behavior, excluding pharmacological or biological effects. It Molecular Property is a set of information about a molecule's name, smiles, formula, and other properties that determines how a molecule behaves and interacts with its environment.",
+            features: [
+                "Compound names, IUPAC Names and Chembl ID ",
+                "Lipinski Rule of 5 boundary verification",
+                "Fingerprint details with onbits",
+                "Atom and Bond analysis details",
+                "Substructure search and Delete/Replace Fragment",
+                "Functional group detection",
+                "Molecular complexity values (BertzCT, Balaban J index and AvgIpc)",
+                "2D and 3D structure view",
+                "Molecular Descriptors calculations of 0D, 1D, 2D and 3D",
+                "Scaffold Analysis with Murcko SMILES and Generic SMILES",
+                "Tool to download all data in a variety of formats"
+            ]
+        },
+        {
+            title: "Molecule Similarity Search Engine",
+            description: "Search molecules to get all the similar molecules from millions of molecules. Identify your query molecule and the similar chemical structures matching your query for all the CHEMBL listed molecules.",
+            features: [
+                "User specific Similarity threshold feature",
+                "Tanimoto similarity score metrics",
+                "Searcher millions of molecules instaneously",
+                "Support for Morgan fingerprint algorithm",
+                "Fast query execution with SVG and tabular similar molecules data for better understanding"
+            ]
+        },
+        {
+            title: "Molecule Comparison",
+            description: "Side-by-side comparative analysis of two chemical structures to evaluate details such as the molecular properties, similarities and differences.",
+            features: [
+                "Comparative Molecular Descriptors comparison table",
+                "SVG view for visual comparison",
+                "Comparative Fingerprint comparison table",
+                "Comparative Tanimoto Similarity score and analysis",
+                "Comparative complexity comparison table",
+                "Comparative Substructure Search table",
+                "LogP and TPSA delta calculation"
+            ]
+        },
+        {
+            title: "Molecule Sketching",
+            description: "Interactive 2D structure editor allowing to draw custom molecular structures directly in the browser and output SMILES or Molfile data.",
+            features: [
+                "Real-time SMILES string generation",
+                "Custom functional group insertion",
+                "Clean-up 2D coordinate generation",
+                "Use SMILES string directly to view and manipulate the structure"
+            ]
+        },
+        {
+            title: "Delete / Replace Fragment",
+            description: "Perform Substructure search in a molecule. Easily delete unwanted fragments or swap chemical core groups based on input SMARTS/SMILES.",
+            features: [
+                "Substructure search mapping with highlight",
+                "Fragment deletion tool",
+                "Fragment replacement tool"
+            ]
+        },
+        {
+            title: "Molecular Fingerprint",
+            description: "Convert SMILES into bits vectors and structural representations used for machine learning models and similarity calculations.",
+            features: [
+                "Morgan Fingerprints (ECFP4: radius of 2)",
+                "Length of onbits",
+                "Index of onbits"
+            ]
+        },
+        {
+            title: "Molecular Descriptors",
+            description: "Calculate over 35+ physicochemical properties including molecular weight, hydrogen bond donors/acceptors, surface area, refractivity, and many more",
+            features: [
+                "0D, 1D, 2D and 3D descriptors",
+                "Commonly used descriptors are also available"
+            ]
+        },
+        {
+            title: "2D and 3D Structures",
+            description: "Generate high-resolution vector 2D SVG diagrams and 3D spatial conformers optimized with ETKDG and MMFF force field calculations.",
+            features: [
+                "SVG/PNG image export for 2D structures",
+                "Interactive 3D conformer viewer",
+                "Energy minimization via MMFF force field"
+            ]
+        }
+    ];
+
+    function showCardInfo(index) {
+        const cards = document.querySelectorAll('.feature-pill-card');
+        cards.forEach((card, idx) => {
+            if (idx === index) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        const data = cardData[index];
+        const contentBox = document.getElementById('infoContentBox');
+        
+        let featuresHtml = '';
+        if (data.features && data.features.length > 0) {
+            featuresHtml = '<ul class="feature-list">';
+            data.features.forEach(feat => {
+                featuresHtml += `<li>${feat}</li>`;
+            });
+            featuresHtml += '</ul>';
+        }
+
+        contentBox.innerHTML = `
+            <h3 class="content-title">${data.title}</h3>
+            <p class="content-body">${data.description}</p>
+            ${featuresHtml}
+        `;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        showCardInfo(0);
+    });
+</script>
+
+
+{% endblock %}

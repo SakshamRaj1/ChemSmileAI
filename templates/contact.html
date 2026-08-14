@@ -1,0 +1,1602 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+
+/* =========================================================
+   CONTACT PAGE
+   ========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    background:#0a0f14;
+    color:#edf0f2;
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.contact-page{
+    width:min(1180px, calc(100% - 40px));
+    margin:0 auto;
+    padding:70px 0 100px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.contact-hero{
+    position:relative;
+    overflow:hidden;
+    padding:45px 42px;
+    margin-bottom:22px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:24px;
+
+    background:
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(190,25,45,.12),
+            transparent 32%
+        ),
+        linear-gradient(
+            145deg,
+            #111922,
+            #0c1218
+        );
+}
+
+.contact-hero::after{
+    content:"";
+    position:absolute;
+    width:280px;
+    height:280px;
+    right:-120px;
+    bottom:-150px;
+
+    border:1px solid rgba(210,50,70,.12);
+    border-radius:50%;
+}
+
+.contact-label{
+    display:inline-block;
+    margin-bottom:10px;
+
+    color:#dc4053;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:2px;
+}
+
+.contact-hero h1{
+    max-width:720px;
+    margin:0;
+
+    font-size:clamp(30px,4vw,48px);
+    line-height:1.08;
+    letter-spacing:-1.5px;
+}
+
+.contact-hero p{
+    max-width:670px;
+    margin:16px 0 0;
+
+    color:#84909b;
+    font-size:14px;
+    line-height:1.7;
+}
+
+
+/* =========================================================
+   QUICK CONTACT STRIP
+   ========================================================= */
+
+.contact-strip{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:22px;
+}
+
+.contact-strip-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    min-height:68px;
+    padding:12px 15px;
+
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:14px;
+
+    background:#111820;
+
+    transition:.2s ease;
+}
+
+.contact-strip-item:hover{
+    border-color:rgba(211,55,75,.3);
+    background:#141c24;
+    transform:translateY(-2px);
+}
+
+.strip-icon{
+    width:36px;
+    height:36px;
+
+    display:grid;
+    place-items:center;
+
+    flex-shrink:0;
+
+    border-radius:9px;
+
+    color:#db4254;
+    background:rgba(184,14,32,.10);
+    border:1px solid rgba(213,58,74,.15);
+}
+
+.strip-text small{
+    display:block;
+    margin-bottom:3px;
+
+    color:#697682;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.strip-text span{
+    color:#c8cdd1;
+    font-size:11px;
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.contact-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);
+    gap:22px;
+    align-items:start;
+}
+
+
+/* =========================================================
+   FORM CARD
+   ========================================================= */
+
+.contact-form-card{
+    padding:27px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #121a22,
+            #0d141b
+        );
+}
+
+.card-heading{
+    margin-bottom:22px;
+}
+
+.card-heading span{
+    color:#d43a4c;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1.6px;
+}
+
+.card-heading h2{
+    margin:6px 0 5px;
+
+    font-size:21px;
+    letter-spacing:-.3px;
+}
+
+.card-heading p{
+    margin:0;
+
+    color:#74808b;
+    font-size:11px;
+    line-height:1.6;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:13px;
+}
+
+.form-group{
+    margin-bottom:14px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:7px;
+
+    color:#aeb6bd;
+    font-size:10px;
+    font-weight:700;
+}
+
+.form-group label span{
+    color:#65717c;
+    font-weight:400;
+}
+
+.form-control{
+    width:100%;
+    padding:11px 12px;
+
+    outline:none;
+
+    color:#e7eaed;
+    font:inherit;
+    font-size:11px;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:9px;
+
+    background:#0a1016;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.form-control::placeholder{
+    color:#4f5b66;
+}
+
+.form-control:focus{
+    border-color:rgba(215,58,78,.65);
+
+    box-shadow:
+        0 0 0 3px rgba(213,58,74,.08);
+
+    background:#0c131a;
+}
+
+textarea.form-control{
+    min-height:130px;
+    resize:vertical;
+}
+
+
+/* =========================================================
+   ENQUIRY TYPES
+   ========================================================= */
+
+.enquiry-options{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+.enquiry-option{
+    position:relative;
+}
+
+.enquiry-option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.enquiry-option label{
+    display:block;
+    padding:10px 11px;
+
+    color:#89949e;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.02);
+
+    cursor:pointer;
+
+    transition:.2s ease;
+}
+
+.enquiry-option label strong{
+    display:block;
+    margin-bottom:3px;
+
+    color:#cbd0d4;
+    font-size:10px;
+}
+
+.enquiry-option label span{
+    color:#596570;
+    font-size:8px;
+}
+
+.enquiry-option input:checked + label{
+    color:#e9ecef;
+
+    border-color:rgba(213,58,74,.55);
+
+    background:rgba(184,14,32,.08);
+
+    box-shadow:
+        inset 3px 0 #c92135;
+}
+
+.enquiry-option input:checked + label strong{
+    color:#ef626f;
+}
+
+
+/* =========================================================
+   SUBMIT
+   ========================================================= */
+
+.form-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+
+    margin-top:4px;
+}
+
+.form-note{
+    color:#596570;
+    font-size:9px;
+    line-height:1.5;
+}
+
+.submit-btn{
+    border:0;
+    padding:11px 18px;
+
+    border-radius:9px;
+
+    color:#fff;
+    background:#b80e20;
+
+    font:inherit;
+    font-size:10px;
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+}
+
+.submit-btn:hover{
+    background:#cf1d34;
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(184,14,32,.22);
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.contact-side{
+    display:grid;
+    gap:12px;
+}
+
+.side-card{
+    padding:20px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:17px;
+
+    background:#111820;
+}
+
+.side-label{
+    color:#d43a4c;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1.5px;
+}
+
+.side-card h3{
+    margin:7px 0 7px;
+
+    color:#e1e4e7;
+    font-size:15px;
+}
+
+.side-card p{
+    margin:0;
+
+    color:#707c87;
+    font-size:10px;
+    line-height:1.65;
+}
+
+
+/* =========================================================
+   RESEARCH TOPICS
+   ========================================================= */
+
+.topic-list{
+    display:grid;
+    gap:7px;
+    margin-top:14px;
+}
+
+.topic{
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    padding:8px 9px;
+
+    border-radius:8px;
+
+    background:rgba(255,255,255,.025);
+
+    color:#9da6ad;
+    font-size:9px;
+}
+
+.topic::before{
+    content:"";
+    width:5px;
+    height:5px;
+
+    flex-shrink:0;
+
+    border-radius:50%;
+    background:#d43a4c;
+
+    box-shadow:0 0 8px rgba(212,58,76,.5);
+}
+
+
+/* =========================================================
+   RESPONSE CARD
+   ========================================================= */
+
+.response-card{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+
+    padding:17px;
+
+    border:1px solid rgba(213,58,74,.12);
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(184,14,32,.07),
+            rgba(255,255,255,.015)
+        );
+}
+
+.response-icon{
+    width:32px;
+    height:32px;
+
+    display:grid;
+    place-items:center;
+
+    flex-shrink:0;
+
+    border-radius:8px;
+
+    color:#dc4355;
+    background:rgba(184,14,32,.11);
+}
+
+.response-card strong{
+    display:block;
+    margin-bottom:4px;
+
+    color:#dfe3e6;
+    font-size:10px;
+}
+
+.response-card span{
+    color:#68747f;
+    font-size:9px;
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:900px){
+
+    .contact-grid{
+        grid-template-columns:1fr;
+    }
+
+    .contact-side{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .response-card{
+        grid-column:1/-1;
+    }
+}
+
+
+@media(max-width:650px){
+
+    .contact-page{
+        width:calc(100% - 26px);
+        padding:35px 0 60px;
+    }
+
+    .contact-hero{
+        padding:30px 22px;
+        border-radius:18px;
+    }
+
+    .contact-strip{
+        grid-template-columns:1fr;
+    }
+
+    .contact-form-card{
+        padding:20px 16px;
+    }
+
+    .form-row{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+    .enquiry-options{
+        grid-template-columns:1fr;
+    }
+
+    .contact-side{
+        grid-template-columns:1fr;
+    }
+
+    .form-bottom{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .submit-btn{
+        width:100%;
+    }
+}
+
+
+@media(max-width:350px){
+
+    .contact-page{
+        width:calc(100% - 18px);
+    }
+
+    .contact-hero{
+        padding:25px 16px;
+    }
+
+    .contact-hero h1{
+        font-size:28px;
+    }
+
+    .contact-form-card{
+        padding:17px 13px;
+    }
+}
+
+
+/* =========================================================
+   LARGE SCREENS
+   ========================================================= */
+
+@media(min-width:1600px){
+
+    .contact-page{
+        max-width:1280px;
+    }
+
+    .contact-hero{
+        padding:55px;
+    }
+}
+
+/* =========================================================
+   DEVELOPER / PROJECT TEAM
+   ========================================================= */
+
+.developer-section{
+    margin-top:22px;
+    padding:25px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:20px;
+
+    background:
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(184,14,32,.08),
+            transparent 30%
+        ),
+        linear-gradient(
+            145deg,
+            #121a22,
+            #0d141b
+        );
+}
+
+.developer-heading{
+    margin-bottom:18px;
+}
+
+.developer-heading span{
+    display:block;
+    margin-bottom:6px;
+
+    color:#d43a4c;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1.6px;
+}
+
+.developer-heading h2{
+    margin:0 0 5px;
+
+    color:#e5e8ea;
+    font-size:19px;
+    letter-spacing:-.3px;
+}
+
+.developer-heading p{
+    max-width:650px;
+    margin:0;
+
+    color:#707c87;
+    font-size:10px;
+    line-height:1.6;
+}
+
+
+/* Developer cards */
+
+.developer-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.developer-card{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    padding:17px;
+
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:15px;
+
+    background:rgba(255,255,255,.025);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        background .25s ease;
+}
+
+.developer-card::before{
+    content:"";
+
+    position:absolute;
+    width:110px;
+    height:110px;
+
+    right:-55px;
+    top:-55px;
+
+    border-radius:50%;
+
+    background:rgba(184,14,32,.10);
+    filter:blur(20px);
+
+    transition:.3s ease;
+}
+
+.developer-card:hover{
+    transform:translateY(-3px);
+
+    border-color:rgba(213,58,74,.35);
+
+    background:rgba(184,14,32,.035);
+}
+
+.developer-card:hover::before{
+    transform:scale(1.3);
+    opacity:1;
+}
+
+
+/* Avatar */
+
+.developer-avatar{
+    position:relative;
+    z-index:1;
+
+    width:52px;
+    height:52px;
+
+    display:grid;
+    place-items:center;
+
+    flex-shrink:0;
+
+    border-radius:13px;
+
+    color:#e04a5b;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(184,14,32,.20),
+            rgba(184,14,32,.06)
+        );
+
+    border:1px solid rgba(213,58,74,.22);
+
+    font-size:18px;
+    font-weight:800;
+}
+
+
+/* Developer information */
+
+.developer-info{
+    position:relative;
+    z-index:1;
+
+    min-width:0;
+}
+
+.developer-role{
+    display:block;
+    margin-bottom:4px;
+
+    color:#d43a4c;
+
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+}
+
+.developer-info h3{
+    margin:0 0 4px;
+
+    color:#e1e4e7;
+    font-size:14px;
+}
+
+.developer-info p{
+    margin:0;
+
+    color:#707c87;
+    font-size:9px;
+    line-height:1.5;
+}
+
+
+/* Developer links */
+
+.developer-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+
+    margin-top:9px;
+}
+
+.developer-link{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+
+    padding:5px 8px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:6px;
+
+    color:#89949e;
+
+    background:rgba(255,255,255,.025);
+
+    font-size:8px;
+    text-decoration:none;
+
+    transition:.2s ease;
+}
+
+.developer-link:hover{
+    color:#e04a5b;
+
+    border-color:rgba(213,58,74,.3);
+
+    background:rgba(184,14,32,.08);
+}
+
+
+/* Team footer */
+
+.developer-footer{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    margin-top:15px;
+    padding-top:13px;
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+    color:#596570;
+    font-size:9px;
+}
+
+.developer-footer::before{
+    content:"";
+    width:6px;
+    height:6px;
+
+    flex-shrink:0;
+
+    border-radius:50%;
+
+    background:#d43a4c;
+
+    box-shadow:
+        0 0 9px rgba(212,58,76,.45);
+}
+
+
+/* =========================================================
+   DEVELOPER RESPONSIVE
+   ========================================================= */
+
+@media(max-width:650px){
+
+    .developer-section{
+        padding:20px 16px;
+    }
+
+    .developer-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:350px){
+
+    .developer-card{
+        align-items:flex-start;
+        padding:14px;
+    }
+
+    .developer-avatar{
+        width:44px;
+        height:44px;
+        font-size:15px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<main class="contact-page">
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="contact-hero">
+
+        <span class="contact-label">
+            GET IN TOUCH
+        </span>
+
+        <h1>
+            Let's build better
+            molecular research tools.
+        </h1>
+
+        <p>
+            Have a question about the platform, found an issue
+            in the molecular data, or interested in research
+            collaboration? Send us a message and tell us how
+            we can help.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         QUICK CONTACT
+         ===================================================== -->
+
+    <section class="contact-strip">
+
+        <div class="contact-strip-item">
+
+            <div class="strip-icon">⌬</div>
+
+            <div class="strip-text">
+
+                <small>Research</small>
+
+                <span>
+                    Collaboration & enquiries
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="contact-strip-item">
+
+            <div class="strip-icon">◈</div>
+
+            <div class="strip-text">
+
+                <small>Technical</small>
+
+                <span>
+                    Platform & API support
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="contact-strip-item">
+
+            <div class="strip-icon">✓</div>
+
+            <div class="strip-text">
+
+                <small>Data</small>
+
+                <span>
+                    Report molecular data issues
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <section class="contact-grid">
+
+
+        <!-- =================================================
+             CONTACT FORM
+             ================================================= -->
+
+        <div class="contact-form-card">
+
+            <div class="card-heading">
+
+                <span>CONTACT FORM</span>
+
+                <h2>
+                    Send us a message
+                </h2>
+
+                <p>
+                    Provide enough detail for us to understand
+                    your request and respond appropriately.
+                </p>
+
+            </div>
+
+
+            <form
+                action="/contact"
+                method="POST"
+            >
+
+
+                <!-- Name + Email -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>
+                            Name
+                        </label>
+
+                        <input
+                            class="form-control"
+                            type="text"
+                            name="name"
+                            placeholder="Your name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            class="form-control"
+                            type="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Affiliation -->
+
+                <div class="form-group">
+
+                    <label>
+                        Institution / Affiliation
+                        <span>Optional</span>
+                    </label>
+
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="institution"
+                        placeholder="University, laboratory, organisation..."
+                    >
+
+                </div>
+
+
+                <!-- Enquiry -->
+
+                <div class="form-group">
+
+                    <label>
+                        What can we help with?
+                    </label>
+
+                    <div class="enquiry-options">
+
+
+                        <div class="enquiry-option">
+
+                            <input
+                                id="research"
+                                type="radio"
+                                name="enquiry"
+                                value="Research collaboration"
+                                checked
+                            >
+
+                            <label for="research">
+
+                                <strong>
+                                    Research collaboration
+                                </strong>
+
+                                <span>
+                                    Academic or scientific collaboration
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="enquiry-option">
+
+                            <input
+                                id="technical"
+                                type="radio"
+                                name="enquiry"
+                                value="Technical support"
+                            >
+
+                            <label for="technical">
+
+                                <strong>
+                                    Technical support
+                                </strong>
+
+                                <span>
+                                    Website, API or platform issue
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="enquiry-option">
+
+                            <input
+                                id="data"
+                                type="radio"
+                                name="enquiry"
+                                value="Data issue"
+                            >
+
+                            <label for="data">
+
+                                <strong>
+                                    Molecular data
+                                </strong>
+
+                                <span>
+                                    Report incorrect or missing data
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="enquiry-option">
+
+                            <input
+                                id="feedback"
+                                type="radio"
+                                name="enquiry"
+                                value="Feedback"
+                            >
+
+                            <label for="feedback">
+
+                                <strong>
+                                    Feedback / suggestion
+                                </strong>
+
+                                <span>
+                                    Ideas to improve the platform
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Subject -->
+
+                <div class="form-group">
+
+                    <label>
+                        Subject
+                    </label>
+
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="subject"
+                        placeholder="Briefly describe your enquiry"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Message -->
+
+                <div class="form-group">
+
+                    <label>
+                        Message
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        name="message"
+                        placeholder="Tell us about your question, research idea, issue, or suggestion..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Bottom -->
+
+                <div class="form-bottom">
+
+                    <div class="form-note">
+
+                        Please do not include confidential
+                        patient, clinical, or personally
+                        identifiable information.
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                    >
+                        Send message →
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- =================================================
+             SIDE INFORMATION
+             ================================================= -->
+
+        <aside class="contact-side">
+
+
+            <div class="side-card">
+
+                <span class="side-label">
+                    RESEARCH
+                </span>
+
+                <h3>
+                    Interested in collaboration?
+                </h3>
+
+                <p>
+                    We welcome discussions around cheminformatics,
+                    molecular similarity, compound analysis,
+                    computational chemistry and related research.
+                </p>
+
+
+                <div class="topic-list">
+
+                    <div class="topic">
+                        Molecular similarity
+                    </div>
+
+                    <div class="topic">
+                        Cheminformatics
+                    </div>
+
+                    <div class="topic">
+                        Molecular descriptors
+                    </div>
+
+                    <div class="topic">
+                        Computational chemistry
+                    </div>
+
+                    <div class="topic">
+                        Chemical databases
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="side-card">
+
+                <span class="side-label">
+                    DATA QUALITY
+                </span>
+
+                <h3>
+                    Found something incorrect?
+                </h3>
+
+                <p>
+                    If a compound contains an incorrect name,
+                    SMILES, molecular formula, identifier or
+                    other information, let us know.
+                </p>
+
+                <div class="topic-list">
+
+                    <div class="topic">
+                        Incorrect molecular structure
+                    </div>
+
+                    <div class="topic">
+                        Wrong identifier
+                    </div>
+
+                    <div class="topic">
+                        Missing information
+                    </div>
+
+                </div>
+
+            </div>
+            
+            
+
+            <div class="response-card">
+
+                <div class="response-icon">
+                    ↗
+                </div>
+
+                <div>
+
+                    <strong>
+                        Before submitting
+                    </strong>
+
+                    <span>
+                        For technical issues, include the compound
+                        name, search input and a short description
+                        of what happened. This helps us reproduce
+                        the problem.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+<!-- =====================================================
+     DEVELOPMENT TEAM
+     ===================================================== -->
+
+<section class="developer-section">
+
+    <div class="developer-heading">
+
+        <span>PROJECT TEAM</span>
+
+        <h2>
+            Meet the developers
+        </h2>
+
+        <p>
+            Molecular Explorer is developed and maintained by
+            a team focused on combining molecular science,
+            cheminformatics and modern computational tools.
+        </p>
+
+    </div>
+
+
+    <div class="developer-grid">
+
+
+        <!-- =================================================
+             DEVELOPER 1
+             ================================================= -->
+
+        <article class="developer-card">
+
+            <div class="developer-avatar">
+                A
+            </div>
+
+            <div class="developer-info">
+
+                <span class="developer-role">
+                    Lead Developer
+                </span>
+
+                <h3>
+                    Developer Name
+                </h3>
+
+                <p>
+                    Responsible for platform architecture,
+                    molecular analysis workflows and
+                    application development.
+                </p>
+
+                <div class="developer-links">
+
+                    <a
+                        href="#"
+                        class="developer-link"
+                    >
+                        GitHub ↗
+                    </a>
+
+                    <a
+                        href="#"
+                        class="developer-link"
+                    >
+                        LinkedIn ↗
+                    </a>
+
+                    <a
+                        href="mailto:developer@example.com"
+                        class="developer-link"
+                    >
+                        Email ↗
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             DEVELOPER 2
+             ================================================= -->
+
+        <article class="developer-card">
+
+            <div class="developer-avatar">
+                B
+            </div>
+
+            <div class="developer-info">
+
+                <span class="developer-role">
+                    Research & Development
+                </span>
+
+                <h3>
+                    Developer Name
+                </h3>
+
+                <p>
+                    Focused on cheminformatics, molecular data,
+                    computational analysis and research-oriented
+                    platform features.
+                </p>
+
+                <div class="developer-links">
+
+                    <a
+                        href="#"
+                        class="developer-link"
+                    >
+                        GitHub ↗
+                    </a>
+
+                    <a
+                        href="#"
+                        class="developer-link"
+                    >
+                        LinkedIn ↗
+                    </a>
+
+                    <a
+                        href="mailto:developer@example.com"
+                        class="developer-link"
+                    >
+                        Email ↗
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+
+    <div class="developer-footer">
+
+        Molecular Explorer · Research-driven molecular
+        analysis and cheminformatics platform
+
+    </div>
+
+</section>
+
+</main>
+
+
+<script>
+
+/*
+   Small interaction:
+   automatically focus the first field when the
+   contact form enters the viewport.
+*/
+
+const firstInput =
+    document.querySelector(
+        '.contact-form-card input[name="name"]'
+    );
+
+if(firstInput){
+
+    const observer =
+        new IntersectionObserver(
+            entries => {
+
+                if(entries[0].isIntersecting){
+
+                    firstInput.focus({
+                        preventScroll:true
+                    });
+
+                    observer.disconnect();
+                }
+
+            },
+            {
+                threshold:.7
+            }
+        );
+
+    observer.observe(firstInput);
+}
+
+</script>
+
+</body>
+
+
+{% endblock %}

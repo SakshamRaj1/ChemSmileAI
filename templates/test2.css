@@ -1,0 +1,272 @@
+<style>
+        /* ==========================================================================
+           1. Global Base Theme
+           ========================================================================== */
+        body {
+            background: radial-gradient(circle at 90% 50%, #11253c 0%, #060d15 70%);
+            background-image: 
+                radial-gradient(at 0% 0%, 11253c 0px, transparent 50%),
+                radial-gradient(at 100% 100%, 060d15 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #ffffff;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* padding-left: 45px; */
+        }
+
+        @media (max-width: 576px) {
+            .container-fluid{
+            padding-left: 1rem;
+            padding-right: 1rem;
+            }
+        }
+
+        /* ==========================================================================
+           2. Top Navbar Styling
+           ========================================================================== */
+        .custom-navbar {
+            background: rgba(13, 22, 34, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 15px auto;
+            padding: 10px 24px;
+            width: 95%;
+            max-width: 1400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 1030;
+        }
+
+        .navbar-brand-logo {
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 800;
+            background: linear-gradient(142deg, #ffffff 10%, #b30c1b 95%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-link-btn {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 12px;
+            transition: all 0.25s ease-in-out;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .nav-link-btn:hover, 
+        .nav-link-btn.active,
+        .show > .nav-link-btn {
+            color: #ffffff !important;
+            background: rgba(179, 12, 27, 0.4);
+            box-shadow: 0 0 15px rgba(179, 12, 27, 0.3);
+        }
+
+        /* Desktop Dropdown Menus */
+        /* ==========================================================================
+        Custom Dropdown Menu: Scrollable but Hidden Scrollbar
+        ========================================================================== */
+        .dropdown-menu{
+            width: max-content;
+        }
+        
+        .custom-dropdown-menu {
+            display: none !important;
+            position: static !important;
+            transform: none !important;
+            background: rgba(13, 22, 34, 0.98) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px !important;
+            margin: 6px 0 10px 12px !important;
+            padding: 6px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+            width: calc(100% - 12px) !important;
+        }
+
+        .custom-dropdown-menu.show {
+            display: block !important;
+        }
+
+        /* Hide scrollbar for Chrome, Safari, Edge, and Opera */
+        .custom-dropdown-menu::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        .dropdown-item-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
+            white-space: normal;
+        }
+
+        .dropdown-item-link:hover {
+            color: #ffffff !important;
+            background: rgba(179, 12, 27, 0.6);
+            transform: translateX(4px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar-toggler-custom {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ==========================================================================
+           3. Full Height Mobile Left Sidebar Offcanvas
+           ========================================================================== */
+        @media (max-width: 991.98px) {
+            .offcanvas-mobile-sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                width: 300px !important;
+                max-width: 85vw !important;
+                background: #080e17 !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+                z-index: 2000 !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8) !important;
+            }
+
+            .offcanvas-header {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 1.2rem 1.5rem;
+            }
+
+            .offcanvas-body {
+                padding: 1.2rem;
+                overflow-y: auto;
+            }
+
+            .nav-link-btn {
+                padding: 12px 14px !important;
+                margin-bottom: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                text-align: left;
+            }
+        }
+
+        footer {
+            margin-top: auto;
+            background: rgba(6, 12, 20, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .search-input-field:focus,
+        .subsruct-search-input-field:-webkit-autofill:focus {
+            background-color: transparent !important;
+            color: #ffffff !important;
+            outline: none; /* Removes default browser focus ring if it clashes */
+        }
+        /* Override Browser Autofill Styles permanently */
+        .search-input-field:-webkit-autofill,
+        .search-input-field:-webkit-autofill:hover,
+        .search-input-field:-webkit-autofill:focus,
+        .search-input-field:-webkit-autofill:active {
+            /* Changes the text color back to white inside autofill */
+            -webkit-text-fill-color: #ffffff !important;
+
+            /* Forces the background to stay transparent using a massive transition delay */
+            transition: background-color 50000s ease-in-out 0s !important;
+
+            /* Optional: Matches the caret (cursor) color */
+            caret-color: #ffffff;
+        }
+
+        /* Override Browser Autofill Styles permanently */
+        .subsruct-search-input-field:-webkit-autofill,
+        .subsruct-search-input-field:-webkit-autofill:hover,
+        .subsruct-search-input-field:-webkit-autofill:focus,
+        .subsruct-search-input-field:-webkit-autofill:active {
+            /* Changes the text color back to white inside autofill */
+            -webkit-text-fill-color: #ffffff !important;
+
+            /* Forces the background to stay transparent using a massive transition delay */
+            transition: background-color 50000s ease-in-out 0s;
+
+            /* Optional: Matches the caret (cursor) color */
+            caret-color: #ffffff;
+        }
+
+        .container-fluid{
+            padding-left: 7%;
+            padding-right: 7%;
+        }
+
+        /* ==========================================================================
+        Desktop Navbar & Hover Positioning Fixes (>= 992px)
+        ========================================================================== */
+        @media (min-width: 992px) {
+            .nav-item-wrapper {
+                position: static !important;
+            }
+
+            /* Hide submenus by default on mobile */
+            .offcanvas-mobile-sidebar .custom-dropdown-menu {
+                display: none !important;
+                position: static !important;
+                transform: none !important;
+                background: rgba(255, 255, 255, 0.05) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 12px !important;
+                margin: 6px 0 10px 10px !important;
+                padding: 6px !important;
+                box-shadow: none !important;
+                width: calc(100% - 10px) !important;
+            }
+
+            /* Force display when toggled via click */
+            .offcanvas-mobile-sidebar .custom-dropdown-menu.mobile-open {
+                display: block !important;
+            }
+        }
+            .nav-item-wrapper:hover .custom-dropdown-menu {
+                display: block !important;
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                margin-top: 8px !important;
+                z-index: 1050 !important;
+                min-width: 240px;
+                animation: fadeIn 0.2s ease-in-out;
+            }
+        }
+
+        /* Base Dropdown Styling */
+        .custom-dropdown-menu {
+            background: rgba(13, 22, 34, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            max-height: 75vh;
+            overflow-y: auto;
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+
+        .custom-dropdown-menu::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome/Safari/Edge */
+        }
