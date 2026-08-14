@@ -24,6 +24,7 @@ from download_section import download_data_csv, download_data_sdf, download_data
 from download_section import save_as_2d_sdf, save_as_2d_mol, save_as_2d_mol2, download_pdf, download_svg, download_png
 from download_section import save_as_3d_sdf, save_as_3d_mol, save_as_3d_mol2, save_as_json, save_as_html
 
+from pathlib import Path
 import gdown
 
 # gdown.download(
@@ -69,7 +70,10 @@ fpe = FPSim2Engine('molecules_library.h5')
 
 # Load the source CSV metadata file
 # Preserving the natural integer row index matching the database matrix
-df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
+
+BASE_DIR = Path(__file__).resolve().parent
+csv_path = BASE_DIR / "chembl_smiles_prefname_synonyms.csv"
+df_metadata = pd.read_csv(r'csv_path', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
 print("Search engine is hot and ready.")
 
@@ -80,62 +84,6 @@ print("ChemSmileAI is working for you!")
 #
 # < - - - - - - -- - - - - - - - - - - - - - ChemSmileAI Home Page - - - - - - - - - - - - - - - - - - - - - - - >
 #
-
-# def structure3d(smiles):
-#     """Generates a 3D Ball and Stick py3Dmol HTML string with transparent background and rotation."""
-#     if not smiles:
-#         return None
-#     try:
-#         mol = Chem.MolFromSmiles(smiles)
-#         if mol is None or mol.GetNumAtoms() == 0:
-#             return None
-
-#         mol = Chem.AddHs(mol)
-#         if mol.GetNumAtoms() == 0:
-#             return None
-
-#         # Use ETKDGv3 for modern 3D coordinate generation
-#         embed_success = AllChem.EmbedMolecule(mol, AllChem.ETKDGv3())
-#         if embed_success != 0:
-#             embed_success = AllChem.EmbedMolecule(mol, useRandomCoords=True)
-
-#         if embed_success != 0:
-#             return None
-
-#         AllChem.MMFFOptimizeMolecule(mol)
-#         mol_block = Chem.MolToMolBlock(mol)
-
-#         viewer = py3Dmol.view(300, 300)
-#         viewer.addModel(mol_block, 'mol')
-        
-#         viewer.setBackgroundColor('black', 0) # Alpha 0 creates full transparency
-        
-#         viewer.setStyle({'stick': {'radius': 0.15}, 'sphere': {'scale': 0.25}})
-#         viewer.zoomTo()
-
-#         atom_count = mol.GetNumAtoms()
-
-#         viewer.zoomTo() 
-
-#         # Relative scale multiplier based on atom size
-#         if atom_count <= 10:
-#             viewer.zoom(3.5)   # Zooms way in for tiny molecules (e.g. Water, Ethanol)
-#         elif 10 < atom_count <= 20:
-#             viewer.zoom(1.8)   # Moderately close
-#         elif 20 < atom_count <= 30:
-#             viewer.zoom(1.2)   # Slightly closer than standard auto-zoom
-#         elif 30 < atom_count <= 40:
-#             viewer.zoom(0.9)   # Slightly zoomed out to prevent clipping
-#         else:
-#             viewer.zoom(0.6)   # Well zoomed out for larger chains
-
-#         viewer.spin('y', 0.5) 
-        
-#         return viewer._make_html()
-#     except Exception as e:
-#         print(f"Error generating 3D molecule: {e}")
-#         return None
-    
 
 def structure3d(smiles):
     if not smiles:
