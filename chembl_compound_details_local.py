@@ -2,7 +2,10 @@ import csv
 import pandas as pd
 from rdkit import Chem
 
-df_metadata = pd.read_csv(r'D:\ChemSmileAI\chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
+BASE_DIR = Path(__file__).resolve().parent
+csv_path = BASE_DIR / "chembl_smiles_prefname_synonyms.csv"
+df_metadata = pd.read_csv(r'csv_path', dtype = {"pref_name": "string", "all_synonyms": "string"})
+
 # df_metadata = df_metadata.where(pd.notna(df_metadata), None)
 
 def get_chemblid_from_smiles_locally(smiles):
