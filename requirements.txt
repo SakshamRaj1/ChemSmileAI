@@ -1,10 +1,8 @@
-flask
-flask_caching
+Flask
+Flask-Caching
 rdkit
 py3Dmol
 FPSim2
-csv
-json
 pandas
 numpy
 requests
