@@ -4,6 +4,7 @@ rdkit==2026.3.3
 py3Dmol==2.5.5
 FPSim2==0.7.4
 openclatura==0.2.0
+openbabel==3.2.1
 pandas==3.0.3
 numpy==2.5.0
 requests==2.34.2
