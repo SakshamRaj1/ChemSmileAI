@@ -3,7 +3,6 @@ flask_caching
 rdkit
 py3Dmol
 FPSim2
-os
 csv
 json
 pandas
