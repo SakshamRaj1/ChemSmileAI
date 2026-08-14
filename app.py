@@ -16,8 +16,6 @@ import pandas as pd
 import numpy as np
 from FPSim2 import FPSim2Engine
 
-from chembl_compound_details_local import get_all_details_from_smiles_locally, get_pref_name_from_smiles_locally
-
 from mol_desc_text import describe_molecule
 from predict_iupac_by_smiles import predict_iupac_name_by_smiles
 from download_section import download_data_csv, download_data_sdf, download_data_mol, download_data_mol2
@@ -27,19 +25,6 @@ from download_section import save_as_3d_sdf, save_as_3d_mol, save_as_3d_mol2, sa
 from pathlib import Path
 import gdown
 
-# gdown.download(
-#     "https://drive.google.com/file/d/1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT/",
-#     "chembl_smiles_prefname_synonyms.csv",
-#     quiet=False
-# )
-
-# gdown.download(
-#     "https://drive.google.com/file/d/1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe/",
-#     "molecules_library.h5",
-#     quiet=False
-# )
-
-
 file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
 output_path1 = 'chembl_smiles_prefname_synonyms.csv'
 file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
@@ -47,6 +32,8 @@ output_path2 = 'molecules_library.h5'
 
 gdown.download(id=file_id1, output=output_path1, quiet=False)
 gdown.download(id=file_id2, output=output_path2, quiet=False)
+
+from chembl_compound_details_local import get_all_details_from_smiles_locally, get_pref_name_from_smiles_locally
 
 # https://www.ebi.ac.uk/chembl/api/data/status.json 
 RDLogger.DisableLog('rdApp.*') 
@@ -62,22 +49,20 @@ print("ChemSmileAI is launching!")
 # Configure simple in-memory cache
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 3600})
 
-
 # --- 1. PRELOAD DATA AT STARTUP (<1 second) ---
 print("Initializing Instant Fingerprint Search Engine...")
 # Load the pre-compiled binary database file
 fpe = FPSim2Engine('molecules_library.h5')
+# using hardware-accelerated FPSim2 matrix screening
 
 # Load the source CSV metadata file
 # Preserving the natural integer row index matching the database matrix
-
 df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
 print("Search engine is hot and ready.")
 
 print("ChemSmileAI is working for you!")
 
-# using hardware-accelerated FPSim2 matrix screening
 
 #
 # < - - - - - - -- - - - - - - - - - - - - - ChemSmileAI Home Page - - - - - - - - - - - - - - - - - - - - - - - >
