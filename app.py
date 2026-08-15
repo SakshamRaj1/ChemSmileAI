@@ -27,11 +27,11 @@ import gdown
 
 # file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
 # output_path1 = 'chembl_smiles_prefname_synonyms.csv'
-file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
-output_path2 = 'molecules_library.h5'
+# file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
+# output_path2 = 'molecules_library.h5'
 
 # gdown.download(id=file_id1, output=output_path1, quiet=False)
-gdown.download(id=file_id2, output=output_path2, quiet=False)
+# gdown.download(id=file_id2, output=output_path2, quiet=False)
 
 # from chembl_compound_details_local import get_all_details_from_smiles_locally, get_pref_name_from_smiles_locally
 
@@ -52,12 +52,15 @@ cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT':
 # --- 1. PRELOAD DATA AT STARTUP (<1 second) ---
 print("Initializing Instant Fingerprint Search Engine...")
 # Load the pre-compiled binary database file
-fpe = FPSim2Engine('molecules_library.h5')
+
+# fpe = FPSim2Engine('molecules_library.h5')
+
 # using hardware-accelerated FPSim2 matrix screening
 
 # Load the source CSV metadata file
 # Preserving the natural integer row index matching the database matrix
-df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
+
+# df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
 print("Search engine is hot and ready.")
 
