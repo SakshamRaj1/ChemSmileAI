@@ -50,7 +50,7 @@
         --border: rgba(255,255,255,.08);
 
         --text: #f1f3f5;
-        --muted: #7e8a96;
+        --muted: #acb8c5;
         --muted-2: #596570;
     }
 
@@ -559,7 +559,7 @@
     .workflow-step p {
         margin: 0;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.6;
     }
 
@@ -1434,14 +1434,13 @@
         <h2>
             Molecule Similarity Search Engine
         </h2>
-
         <p>
-
+            A search engine that computes similarity of a molecule to result 
+            in all molecules that are similar to it with a Similarity score.
         </p>
-
     </div>
 
-    <div class="workflow">
+    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
         
         <article class="workflow-step">
             <div class="step-icon">1</div>
@@ -1449,7 +1448,7 @@
                 Find a compound
             </h3>
             <p>
-                Search using SMILES or draw the structure if incase SMILES is not known. 
+                Search using SMILES or CHEMBL ID using specific Similarity Threshold. 
             </p>
 
         </article>
@@ -1460,7 +1459,130 @@
                 Input validated
             </h3>
             <p>
-                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+                Checks whether the input SMILES or CHEMBL ID is valid or not 
+                using RDKit and dataset. Proceedd to next step, else raises 
+                error in case of wromg input.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Extracts information and Canonicalize 
+            </h3>
+            <p>
+                Extracts the target molecule's positional index as target_int_id 
+                and other details. Incase the input the SMILES, CHEMBL ID will be searhced
+                and vice-versa.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Determine computational resources
+            </h3>
+            <p>
+                Calculates the number of worker processes/threads using approximately 
+                half of the available logical CPU cores
+            </p>
+        </article>
+    </div>
+
+    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+        <article class="workflow-step">
+            <div class="step-icon">5</div>
+            <h3>
+                FPSim2 similarity search
+            </h3>
+            <p>
+                Searches the indexed molecular fingerprint .h5 database using: 
+                <strong>popcount</strong>, canonical query SMILES, specified Tanimoto threshold, and 
+                calculated number of workers.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">6</div>
+            <h3>
+                Process the similarity matches
+            </h3>
+            <p>
+                Iterates through each FPSim2 result, extracts the index 
+                and round the similarity score to 6 decimal places. 
+                Removes Self-Similarity from appearing in the final result.
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">7</div>
+            <h3>
+                SVG Genaration
+
+            </h3>
+            <p>
+               Uses each FPSim2 index to retrieve the corresponding 
+               CHEMBL ID and Canonical SMILES. 
+               Generates an SVG representation of each similar molecule using 
+
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">8</div>
+            <h3>
+                Final Result
+
+            </h3>
+            <p>
+               Sorts all matches in descending order of Tanimoto similarity, 
+               placing the most structurally similar molecules first. The route renders 
+               the Similarity Engine Results in a structured tabular format.
+
+            </p>
+
+        </article>
+
+    </div>
+
+
+    <!-- 3. Molecule Comparison -->
+     
+    <div class="section-heading">
+
+        <h2>
+            Molecule Comparison
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Inputs 
+            </h3>
+            <p>
+                Two separate SMILES inputs are taken to perform comparison
+            </p>
+
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Input validation
+            </h3>
+            <p>
+                Checks whether the input SMILES are valid or not using 
+                RDKit, proceeds else error raised.
             </p>
         </article>
 
@@ -1470,8 +1592,10 @@
                 Computation of Results
             </h3>
             <p>
-                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
-                Functions are called for computing all the 12 major functions from route. 
+                Fetches Molecule Name and shows a maximum of 15 common names
+                 from local lookup function, predicts IUPAC Name from Openclatura. 
+                For computing the results the 7 major functions from route are called. 
+                Chirality is also considered while calculating fingerprint of radius = 3.
                 Everything is computed at once, so that all information is provided for the ease of user.
             </p>
         </article>
@@ -1482,19 +1606,8 @@
                 Result displayed
             </h3>
             <p>
-                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+                Jinja template renders everything on the frontend in structured comparison tabule form.
             </p>
-        </article>
-
-        <article class="workflow-step">
-            <div class="step-icon">5</div>
-            <h3>
-                Download Panel
-            </h3>
-            <p>
-                Loads the Download Panel with 9 file formats for the ease of research.
-            </p>
-
         </article>
 
     </div>
@@ -1513,7 +1626,7 @@
 
     </div>
 
-    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="workflow">
         
         <article class="workflow-step">
             <div class="step-icon">1</div>
@@ -1570,15 +1683,13 @@
         </article>
 
     </div>
-
-
-
-    <!-- 1. Molecule Analysis -->
+    
+    <!-- 5. Delete / Replace Fragment -->
      
     <div class="section-heading">
 
         <h2>
-            Molecule Analysis and Molecule Information
+            Delete / Replace Fragment
         </h2>
 
         <p>
@@ -1592,127 +1703,65 @@
         <article class="workflow-step">
             <div class="step-icon">1</div>
             <h3>
-                Find a compound
+                Substructure Search
             </h3>
             <p>
-                Search using SMILES or draw the structure if incase SMILES is not known. 
+                Enter the SMILES in the search bar and provide a SMARTS 
+                pattern to search for a substructure.
             </p>
-
         </article>
 
         <article class="workflow-step">
             <div class="step-icon">2</div>
             <h3>
-                Input validated
+                Check SMARTS Pattern
             </h3>
             <p>
-                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
+                The SMARTS pattern is converted into a mol object. 
+                If the mol object is invalid, an error is displayed. 
+                Returns the matching substructure SVG with 
+                the matched pattern highlighted. The page also displays 
+                the original SMILES, SMARTS pattern, match status, 
+                substructure count, highlighted atoms, match indices, and 
+                highlighted SVG.
             </p>
         </article>
 
         <article class="workflow-step">
             <div class="step-icon">3</div>
             <h3>
-                Computation of Results
+                Delete or Replace
             </h3>
             <p>
-                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
-                Functions are called for computing all the 12 major functions from route. 
-                Everything is computed at once, so that all information is provided for the ease of user.
+                Delete and Replace options are shown only when the 
+                substructure match is present.
             </p>
         </article>
 
         <article class="workflow-step">
             <div class="step-icon">4</div>
             <h3>
-                Result displayed
+                Delete Fragment
             </h3>
             <p>
-                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
+                Click ‘Delete Fragment’ to remove the matched substructure. 
+                By default, the highlighted SMARTS pattern is used. 
+                The function uses RDkit.
             </p>
         </article>
 
         <article class="workflow-step">
             <div class="step-icon">5</div>
             <h3>
-                Download Panel
+                Replace Fragment
             </h3>
             <p>
-                Loads the Download Panel with 9 file formats for the ease of research.
+                Click ‘Replace Fragment’ to replace the matched substructure. 
+                The replacement pattern can be SMILES or SMARTS, but SMILES is 
+                preferred. Sanitization of new mol is done to fix valence 
+                and implicit hydrogens and prevent chemically incorrect 
+                molecules.
             </p>
-
-        </article>
-
-    </div>
-
-    <!-- 1. Molecule Analysis -->
-     
-    <div class="section-heading">
-
-        <h2>
-            Molecule Analysis and Molecule Information
-        </h2>
-
-        <p>
-
-        </p>
-
-    </div>
-
-    <div class="workflow">
-        
-        <article class="workflow-step">
-            <div class="step-icon">1</div>
-            <h3>
-                Find a compound
-            </h3>
-            <p>
-                Search using SMILES or draw the structure if incase SMILES is not known. 
-            </p>
-
-        </article>
-
-        <article class="workflow-step">
-            <div class="step-icon">2</div>
-            <h3>
-                Input validated
-            </h3>
-            <p>
-                Checks whether the input SMILES is valid or not using RDKit, proceeds else error raised.
-            </p>
-        </article>
-
-        <article class="workflow-step">
-            <div class="step-icon">3</div>
-            <h3>
-                Computation of Results
-            </h3>
-            <p>
-                Fetches Molecule Name from local lookup function, predicts IUPAC Name from Openclatura. 
-                Functions are called for computing all the 12 major functions from route. 
-                Everything is computed at once, so that all information is provided for the ease of user.
-            </p>
-        </article>
-
-        <article class="workflow-step">
-            <div class="step-icon">4</div>
-            <h3>
-                Result displayed
-            </h3>
-            <p>
-                Jinja template renders everything on the frontend in structured tabular form and loads the Download Panel.
-            </p>
-        </article>
-
-        <article class="workflow-step">
-            <div class="step-icon">5</div>
-            <h3>
-                Download Panel
-            </h3>
-            <p>
-                Loads the Download Panel with 9 file formats for the ease of research.
-            </p>
-
         </article>
 
     </div>
