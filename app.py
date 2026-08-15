@@ -210,78 +210,83 @@ def molecule_analysis():
     data = None
     error = None
     
-    # if request.method == "POST":
-    smiles = request.form.get("smiles1", "").strip() or request.args.get("smiles", "").strip()
-    smarts = request.form.get("smarts", "").strip() # Fetch from Substructure search input card
+    try:
+        # if request.method == "POST":
+        smiles = request.form.get("smiles1", "").strip() or request.args.get("smiles", "").strip()
+        smarts = request.form.get("smarts", "").strip() # Fetch from Substructure search input card
 
-    # Checks if SMILES is present.
-    data = cache.get(smiles)
+        # Checks if SMILES is present.
+        data = cache.get(smiles)
 
-    # Smiles drawn on ketcher or typed in searchbar and received after form submission
-    print("Received SMILES after form submission:", smiles)
+        # Smiles drawn on ketcher or typed in searchbar and received after form submission
+        print("Received SMILES after form submission:", smiles)
 
-    if smiles:
-        mol = Chem.MolFromSmiles(smiles)
-        if mol is None:
-            error = "Invalid connection schema. Could not parse structure."
+        if smiles:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is None:
+                error = "Invalid connection schema. Could not parse structure."
+            else:
+                # Substruct search (runs if smarts is provided)
+                substruct_result = substruct_search(mol, smarts) if smarts else {"present": False}
+                compound_name= get_all_details_from_smiles_locally(smiles)
+                predicted_iupac_name = predict_iupac_name_by_smiles(smiles)
+
+                home_name = compound_name['pref_name'] if compound_name['pref_name'] != "No preferred name found" else predicted_iupac_name if predicted_iupac_name != "No preferred IUPAC name found" else "No preferred name found"
+
+                data = {
+                    # Function to display the Molecule's Name on the Molecular ANalysis.html
+                    "home_mol_name" : home_name,
+                    # Calling function for accessing the sub-functions
+                    # 1. Molecular Property
+                    "molecular_property" : molecular_property(mol, compound_name, predicted_iupac_name),
+                    # 2. Lipinski Property of 5
+                    "lipinski5": lipinski_5(mol),
+                    #3. Molecular Fingerprint
+                    "morganfp": morgan_fp(mol),
+                    #4. Atom Analysis
+                    "atom_analysis": atom_analysis(mol),
+                    #5. Bond Analysis
+                    "bond_analysis": bond_analysis(mol),
+                    # 6. Substruct Search
+                    "substruct_search": substruct_result,
+                    # "delete_fragment": delete_substruct_fragment,
+                    # "replace_fragment": replace_substruct_fragment, 
+                    # 7. identify Groups
+                    "identify_groups": identify_groups(mol),
+                    # 8. Molecular Complexity
+                    "molecular_complexity": molecular_complexity(mol),
+                    # 9. 2D Structure - SVG Image
+                    "svg": render_molecule_svg(smiles),
+                    # 10. 3D Structure
+                    "html_3d": generate_3d_html(smiles),
+                    #11. Molecular Descriptors
+                    "molecular_descriptors": molecular_descriptors(mol),
+                    #11. Molecular Scaffold Analysis
+                    "scaffold_analysis": scaffold_analysis(mol)
+                }
+
+                cache.set(smiles, data) # Caching 'data' so that other routes can use it
+                
+                # Save JSON cache for exports
+                json_filename = f"cache_{hash(smiles)}.json"
+                json_filename
+                with open(json_filename, "w", encoding="utf-8") as f:
+                    json.dump(data, f)
+
+                # Store active SMILES & cache file in session
+                session["cached_json_file"] = json_filename
+                session["active_smiles"] = smiles
+
+                # 2. REDIRECT to GET request (Clears the POST payload!)
+                # return redirect(url_for("molecule_analysis"))
+                
         else:
-            # Substruct search (runs if smarts is provided)
-            substruct_result = substruct_search(mol, smarts) if smarts else {"present": False}
-            compound_name= get_all_details_from_smiles_locally(smiles)
-            predicted_iupac_name = predict_iupac_name_by_smiles(smiles)
+            print("Smiles Input Error: Please submit a valid SMILES structure above to query properties.")
 
-            home_name = compound_name['pref_name'] if compound_name['pref_name'] != "No preferred name found" else predicted_iupac_name if predicted_iupac_name != "No preferred IUPAC name found" else "No preferred name found"
-
-            data = {
-                # Function to display the Molecule's Name on the Molecular ANalysis.html
-                "home_mol_name" : home_name,
-                # Calling function for accessing the sub-functions
-                # 1. Molecular Property
-                "molecular_property" : molecular_property(mol, compound_name, predicted_iupac_name),
-                # 2. Lipinski Property of 5
-                "lipinski5": lipinski_5(mol),
-                #3. Molecular Fingerprint
-                "morganfp": morgan_fp(mol),
-                #4. Atom Analysis
-                "atom_analysis": atom_analysis(mol),
-                #5. Bond Analysis
-                "bond_analysis": bond_analysis(mol),
-                # 6. Substruct Search
-                "substruct_search": substruct_result,
-                # "delete_fragment": delete_substruct_fragment,
-                # "replace_fragment": replace_substruct_fragment, 
-                # 7. identify Groups
-                "identify_groups": identify_groups(mol),
-                # 8. Molecular Complexity
-                "molecular_complexity": molecular_complexity(mol),
-                # 9. 2D Structure - SVG Image
-                "svg": render_molecule_svg(smiles),
-                # 10. 3D Structure
-                "html_3d": generate_3d_html(smiles),
-                #11. Molecular Descriptors
-                "molecular_descriptors": molecular_descriptors(mol),
-                #11. Molecular Scaffold Analysis
-                "scaffold_analysis": scaffold_analysis(mol)
-            }
-
-            cache.set(smiles, data) # Caching 'data' so that other routes can use it
-            
-            # Save JSON cache for exports
-            json_filename = f"cache_{hash(smiles)}.json"
-            json_filename
-            with open(json_filename, "w", encoding="utf-8") as f:
-                json.dump(data, f)
-
-            # Store active SMILES & cache file in session
-            session["cached_json_file"] = json_filename
-            session["active_smiles"] = smiles
-
-            # 2. REDIRECT to GET request (Clears the POST payload!)
-            # return redirect(url_for("molecule_analysis"))
-            
-    else:
-        print("Smiles Input Error: Please submit a valid SMILES structure above to query properties.")
-
+    except:
+        error = "⚠️ Encountered error while processing. Please try again!"
+        return render_template("molecule_analysis.html", data=data, error=error)
+    
     return render_template("molecule_analysis.html", data=data, error=error)
 
 
