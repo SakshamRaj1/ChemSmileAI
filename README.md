@@ -7,7 +7,8 @@ ChemSmileAI is a web-based computational cheminformatics platform designed to pr
 The Backend Data Files and Codes are available on Github but are commented in the source code due to Memory limitations of the Deployment Services by Render.
 
 ---
-<img width="1902" height="903" alt="image" src="https://github.com/user-attachments/assets/536bc829-8442-46b5-ba12-2358e88ee4f1" />
+<img width="1878" height="896" alt="image" src="https://github.com/user-attachments/assets/e1fb31b9-bace-4945-80da-1e8e692b6bce" />
+
 
 ## System Overview & Architecture
 
@@ -45,27 +46,19 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
 * Highlighted SVG, new SMILES are generated as well.
   <img width="1902" height="1080" alt="image" src="https://github.com/user-attachments/assets/87b81903-ba92-4e73-9ccf-1d9741941af5" />
-  
-  <img width="1307" height="570" alt="image" src="https://github.com/user-attachments/assets/cff8afa8-9cae-46c5-a0b9-6a8844d853b4" />
 
 
 ### 6. Molecule Fingerprint
 * Represent molecular structures as fingerprints into 2048 bits. Using Morgan Fingerprints (ECFP4: radius of 2): Length of onbits and Index of onbits are computed.
-  <img width="1059" height="743" alt="image" src="https://github.com/user-attachments/assets/9fb2e7ff-7fa2-4012-b876-f13969a2d8b9" />
 
 
 ### 7. Molecular Descriptors
 * Calculate over 35+ descriptors (1D, 1D, 2D and 3D descriptors) including molecular weight, hydrogen bond donors/acceptors, surface area, refractivity, and many more. Examine molecular descriptors.
-  <img width="1904" height="1079" alt="image" src="https://github.com/user-attachments/assets/e76169b1-b800-40b0-8c05-bf319985e01a" />
-  
-  <img width="1904" height="1080" alt="image" src="https://github.com/user-attachments/assets/5f80a3f3-ca68-4f58-a445-8121360a16e7" />
-
 
 
 ### 8. 2D & 3D Conformer Generation
 * Generate high-resolution vector 2D SVG publication-ready diagrams and 3D spatial conformers optimized with ETKDG and MMFF force field calculations.
 * SVG/PNG image export for 2D structures and Interactive 3D conformer viewer.
-  <img width="1903" height="1080" alt="image" src="https://github.com/user-attachments/assets/eb4c185b-eece-4013-99d7-b047c67173c7" />
 
 
 ### 9. Download Feature
