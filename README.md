@@ -16,19 +16,25 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 ## Core Capabilities
 
 ### 1. Molecule Analysis and Information
-* Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted using RDKit and see the visual representation. Molecules information such as Name, COmmon Name, IUPAC Name and CHEMBL ID are also listed. It consists of 12 main functions that contributes to the analysis capabilities.
+* Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted using RDKit and see the visual representation.
+* Molecules information such as Name, Common Name, IUPAC Name and CHEMBL ID are also listed.
+* It consists of 12 main functions that contributes to the analysis capabilities.
 
 ### 2. Molecule Similarity Search Engine
-* Find similar compounds from millions of compounds with related structural patterns as of query molecule using POPCOUNT and investigate how closely molecules resemble one another. Quick similarity search from millions of moleculas an get SMILES, CHEMBL ID, Tanimoto Similarity Score, 2D SVG as well.
+* Find similar compounds from millions of compounds with related structural patterns as of query molecule using POPCOUNT and investigate how closely molecules resemble one another.
+* Quick similarity search from millions of moleculas an get SMILES, CHEMBL ID, Tanimoto Similarity Score, 2D SVG as well.
 
 ### 3. Molecule Comparison
 * Compare two molecules side by side to evaluate the molecular properties and identify differences or similarities in their structures, descriptors, fingerprints, substructure and other properties. Molecules' information such as Name, Common Name, IUPAC Name and CHEMBL ID are also listed.
 
 ### 4. Molecule Sketching
-* Interactive 2D structure (Ketcher editor) with a variety of built in features to draw custom molecular structures directly in the browser and output SMILES, MOL or other format data. Use SMILES string directly to view and manipulate the structure.
+* Interactive 2D structure (Ketcher editor) with a variety of built in features to draw custom molecular structures directly in the browser and output SMILES, MOL or other format data.
+* Use SMILES string directly to view and manipulate the structure.
 
 ### 5. Delete/Replace Fragment (Substructure Analysis)
-* Investigate shared structural fragments based on input SMILES. Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES. Highlighted SVG, new SMILES are generated as well.
+* Investigate shared structural fragments based on input SMILES.
+* Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
+* Highlighted SVG, new SMILES are generated as well.
 
 ### 6. Molecule Fingerprint
 * Represent molecular structures as fingerprints into 2048 bits. Using Morgan Fingerprints (ECFP4: radius of 2): Length of onbits and Index of onbits are computed.
@@ -37,7 +43,8 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Calculate over 35+ descriptors (1D, 1D, 2D and 3D descriptors) including molecular weight, hydrogen bond donors/acceptors, surface area, refractivity, and many more. Examine molecular descriptors.
 
 ### 8. 2D & 3D Conformer Generation
-* Generate high-resolution vector 2D SVG publication-ready diagrams and 3D spatial conformers optimized with ETKDG and MMFF force field calculations. SVG/PNG image export for 2D structures and Interactive 3D conformer viewer.
+* Generate high-resolution vector 2D SVG publication-ready diagrams and 3D spatial conformers optimized with ETKDG and MMFF force field calculations.
+* SVG/PNG image export for 2D structures and Interactive 3D conformer viewer.
 
 ### 9. Download Feature
 * Access to 9 file formats for ease of information of a molecule. SDF, MOL, MOL2, PDF, SVG, PNG, HTML/JS, CSV, and JSON
