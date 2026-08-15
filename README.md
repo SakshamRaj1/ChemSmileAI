@@ -2,6 +2,8 @@
 
 ChemSmileAI is a web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
 
+**Live Deployment:** [Visit Here]([https://your-deployment-link.co](https://chemsmileai.onrender.com/)
+**The Backend Data Files and Codes are available on Github but commented in the source code due to Memory limitations of the Deployment Services by Render.
 ---
 
 ## System Overview & Architecture
@@ -62,6 +64,8 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 
 ### Step 1: Clone the Repository
 ```
+# The Backend Data Files and Codes are available on Github but commented in the source code due to Memory limitations of the Deployment Services by Render.
+# Oncle cloned, check for comments at the top of .py files "Uncomment the below lines if cloning!" and uncomment them bofore proceeding to Step 2
 https://github.com/SakshamRaj1/ChemSmileAI.git
 cd ChemSmileAI
 ```
