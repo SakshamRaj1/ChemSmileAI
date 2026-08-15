@@ -45,6 +45,7 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
 * Highlighted SVG, new SMILES are generated as well.
   <img width="1902" height="1080" alt="image" src="https://github.com/user-attachments/assets/87b81903-ba92-4e73-9ccf-1d9741941af5" />
+  
   <img width="1307" height="570" alt="image" src="https://github.com/user-attachments/assets/cff8afa8-9cae-46c5-a0b9-6a8844d853b4" />
 
 
@@ -56,6 +57,7 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 ### 7. Molecular Descriptors
 * Calculate over 35+ descriptors (1D, 1D, 2D and 3D descriptors) including molecular weight, hydrogen bond donors/acceptors, surface area, refractivity, and many more. Examine molecular descriptors.
   <img width="1904" height="1079" alt="image" src="https://github.com/user-attachments/assets/e76169b1-b800-40b0-8c05-bf319985e01a" />
+  
   <img width="1904" height="1080" alt="image" src="https://github.com/user-attachments/assets/5f80a3f3-ca68-4f58-a445-8121360a16e7" />
 
 
