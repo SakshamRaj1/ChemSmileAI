@@ -15,8 +15,8 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 
 ## Core Capabilities
 
-### 1.Molecule Analysis and Information
-* Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted using RDKit and see the visual representation. Molecules information such as Name, COmmon Name, IUPAC Name and CHEMBL ID are also listed.
+### 1. Molecule Analysis and Information
+* Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted using RDKit and see the visual representation. Molecules information such as Name, COmmon Name, IUPAC Name and CHEMBL ID are also listed. It consists of 12 main functions that contributes to the analysis capabilities.
 
 ### 2. Molecule Similarity Search Engine
 * Find similar compounds from millions of compounds with related structural patterns as of query molecule using POPCOUNT and investigate how closely molecules resemble one another. Quick similarity search from millions of moleculas an get SMILES, CHEMBL ID, Tanimoto Similarity Score, 2D SVG as well.
