@@ -2,9 +2,9 @@ import csv
 import pandas as pd
 from rdkit import Chem
 
-df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
+# Uncomment the line below if you clone!
+# df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
-# df_metadata = df_metadata.where(pd.notna(df_metadata), None)
 
 def get_chemblid_from_smiles_locally(smiles):
     # Check if the SMILES exists in the local DataFrame and retrieve the 
