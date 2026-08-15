@@ -101,6 +101,6 @@ pip install -r requirements.txt
 flask run --host=127.0.0.1 --port=8000
 ```
 ### Step 5: Access ChemSmileAI locally on your system
-
+```
 Open http://127.0.0.1:8000 (depending on your local setup)
-
+```
