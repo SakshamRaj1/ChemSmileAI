@@ -52,7 +52,7 @@ print("ChemSmileAI is launching!")
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 3600})
 
 # --- 1. PRELOAD DATA AT STARTUP (<1 second) ---
-print("Initializing Instant Fingerprint Search Engine..."
+# print("Initializing Instant Fingerprint Search Engine...")
       
 # Load the pre-compiled binary database file
 # using hardware-accelerated FPSim2 matrix screening
@@ -66,9 +66,9 @@ print("Initializing Instant Fingerprint Search Engine..."
 # Uncomment the below lines if cloning!
 # df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
-print("Search engine is hot and ready.")
+# print("Search engine is hot and ready.")
 
-print("ChemSmileAI is working for you!")
+print("ChemSmileAI is working for you without backend!")
 
 
 #
