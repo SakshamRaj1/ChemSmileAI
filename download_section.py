@@ -25,7 +25,7 @@
 
 from flask import send_file
 from openbabel import openbabel
-# import cairosvg
+import cairosvg
 import csv
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
