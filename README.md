@@ -9,7 +9,6 @@ ChemSmileAI is a web-based computational cheminformatics platform designed to pr
 The application is structured as a full-stack cheminformatics pipeline that integrates client-side interactive drawing engines with server-side chemical algorithms and property calculators.
 
 
-
 ## Core Capabilities
 
 ### 1. Molecular Property Computation & Descriptor Pipeline
@@ -43,28 +42,6 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * **Chemical Editor:** Ketcher Interactive Drawing Canvas
 * **Frontend Architecture:** HTML5, CSS3 (Glassmorphism UI, Responsive CSS Grid & Flexbox), Bootstrap 5, JavaScript (ES6)
 * **Deployment Target:** Render Cloud Application Platform
-
----
-
-[ Client Interface / Ketcher Sketcher / Search Input ]
-│
-▼ (HTTP GET / POST)
-[ Flask Application Route Handlers ]
-│
-┌────────────────┴────────────────┐
-▼                                 ▼
-[ RDKit Cheminformatics Engine ]  [ Local Metadata Store / Cache ]
-
-Descriptors (MW, LogP, TPSA)    - Compound Name & Synonyms
-
-Fingerprints (Morgan, MACCS)    - IUPAC & ChEMBL Identifiers
-
-2D Depiction (SVG)              - Molecule Parent Entities
-
-Substructure Search & Replace
-│
-▼
-[ Server-Side Jinja2 HTML / SVG Rendering ]
 
 ---
 
