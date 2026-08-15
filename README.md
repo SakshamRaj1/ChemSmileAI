@@ -21,23 +21,27 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Analyse the molecular structures and inspect how atoms, bonds, and functional groups are arranged, how the fingerprint, complexities, Scaffold Analysis convey, with detailed informatics calculated/predicted using RDKit and see the visual representation.
 * Molecules information such as Name, Common Name, IUPAC Name and CHEMBL ID are also listed.
 * It consists of 12 main functions that contributes to the analysis capabilities.
+  
   <img width="1883" height="949" alt="image" src="https://github.com/user-attachments/assets/55f8b11d-faf0-429c-946a-8a976e69d400" />
 
 
 ### 2. Molecule Similarity Search Engine
 * Find similar compounds from millions of compounds with related structural patterns as of query molecule using POPCOUNT and investigate how closely molecules resemble one another.
 * Quick similarity search from millions of moleculas an get SMILES, CHEMBL ID, Tanimoto Similarity Score, 2D SVG as well.
+  
   <img width="1904" height="1080" alt="image" src="https://github.com/user-attachments/assets/94ca57df-dec3-4809-b43c-a3aeb522efb6" />
 
 
 ### 3. Molecule Comparison
 * Compare two molecules side by side using 31 functions/properties to evaluate the molecular properties and identify differences or similarities in their structures, descriptors, fingerprints, substructure and other properties. Molecules' information such as Name, Common Name, IUPAC Name and CHEMBL ID are also listed.
+  
   <img width="1904" height="1080" alt="image" src="https://github.com/user-attachments/assets/3fbd73ee-9e9b-4458-9ece-8504a93de2af" />
 
 
 ### 4. Molecule Sketching
 * Interactive 2D structure (Ketcher editor) with a variety of built in features to draw custom molecular structures directly in the browser and output SMILES, MOL or other format data.
 * Use SMILES string directly to view and manipulate the structure.
+  
   <img width="1896" height="944" alt="image" src="https://github.com/user-attachments/assets/baab6b96-7b22-4c0d-90ab-f487d27753b8" />
 
 
@@ -45,6 +49,7 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Investigate shared structural fragments based on input SMILES.
 * Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
 * Highlighted SVG, new SMILES are generated as well.
+  
   <img width="1902" height="1080" alt="image" src="https://github.com/user-attachments/assets/87b81903-ba92-4e73-9ccf-1d9741941af5" />
 
 
