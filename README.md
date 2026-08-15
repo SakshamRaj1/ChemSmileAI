@@ -104,7 +104,7 @@ cd ChemSmileAI
 ### Step 2: Set Up a Virtual Environment
 ## Using Conda
 ```
-conda create -n chemsmile python=3.10
+conda create -n chemsmile python=3.13.9
 conda activate chemsmile
 
 # Or using standard venv
