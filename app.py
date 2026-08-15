@@ -179,7 +179,7 @@ def index():
         return render_template("index.html", data=data, error=error)
     
     except:
-        error = "Please provide a valid molecular token identifier."
+        error = "Encountered error while processing. Please try again!"
         return render_template("index.html", data=data, error=error)
 
     return render_template("index.html", data=data, error=error)
