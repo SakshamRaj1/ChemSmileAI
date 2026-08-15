@@ -25,6 +25,8 @@ from download_section import save_as_3d_sdf, save_as_3d_mol, save_as_3d_mol2, sa
 from pathlib import Path
 import gdown
 
+# Uncomment the below lines if cloning!
+
 # file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
 # output_path1 = 'chembl_smiles_prefname_synonyms.csv'
 # file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
@@ -50,16 +52,18 @@ print("ChemSmileAI is launching!")
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 3600})
 
 # --- 1. PRELOAD DATA AT STARTUP (<1 second) ---
-print("Initializing Instant Fingerprint Search Engine...")
+print("Initializing Instant Fingerprint Search Engine..."
+      
 # Load the pre-compiled binary database file
-
-# fpe = FPSim2Engine('molecules_library.h5')
-
 # using hardware-accelerated FPSim2 matrix screening
 
+# Uncomment the below lines if cloning!
+# fpe = FPSim2Engine('molecules_library.h5')
+      
 # Load the source CSV metadata file
 # Preserving the natural integer row index matching the database matrix
 
+# Uncomment the below lines if cloning!
 # df_metadata = pd.read_csv(r'chembl_smiles_prefname_synonyms.csv', dtype = {"pref_name": "string", "all_synonyms": "string"})
 
 print("Search engine is hot and ready.")
