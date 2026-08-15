@@ -137,44 +137,50 @@ def structure3d(smiles):
 def index():
     data = None
     error = None
-    
-    if request.method == "POST":
-        smiles = request.form.get("smiles", "").strip() or request.args.get("smiles", "").strip()
-        print("Home page received input:", smiles)
-        if smiles:
-            mol = Chem.MolFromSmiles(smiles)
-            if mol is None:
-                error = "Invalid connection schema. Could not parse structure."
-                print(error)
-                error = "Invalid SMILES"
-            else:
-                predicted_iupac = predict_iupac_name_by_smiles(smiles)
-                compound_details = get_all_details_from_smiles_locally(smiles)
-                all_synonyms = compound_details['all_synonyms']
-                compound_details['all_synonyms'] = [name.strip() for name in all_synonyms.split(",") if name.strip()]
-                describe_molecule_text = describe_molecule(smiles)
-                atom_count = mol.GetNumAtoms()
-                structure3dim = structure3d(smiles) if atom_count <= 30 else None
 
-                data = {
-                    "svg": render_molecule_svg(smiles),
-                    "compound_name": compound_details['pref_name'],
-                    "all_synonyms": compound_details['all_synonyms'],
-                    "predicted_chembl_id": compound_details['chemblid'],        
-                    "structure3d": structure3dim,
-                    "smiles": Chem.MolToSmiles(mol, canonical=True),
-                    "formula": rdMolDescriptors.CalcMolFormula(mol),
-                    "mw": round(Descriptors.MolWt(mol), 2),
-                    "logp": round(Crippen.MolLogP(mol), 2),
-                    "tpsa": round(rdMolDescriptors.CalcTPSA(mol), 2),
-                    "rotatable_bonds": rdMolDescriptors.CalcNumRotatableBonds(mol),
-                    "lipinski": compute_lipinski(mol), 
-                    "iupac_name": predicted_iupac, #later I will use describe_molecule_text to fetch iupac also
-                    "describe_molecule_parent": describe_molecule_text['parent'],
-                    "describe_molecule_features": describe_molecule_text['principal_feature']
-                }
-        else:
-            error = "Please provide a valid molecular token identifier."
+    try:
+        if request.method == "POST":
+            smiles = request.form.get("smiles", "").strip() or request.args.get("smiles", "").strip()
+            print("Home page received input:", smiles)
+            if smiles:
+                mol = Chem.MolFromSmiles(smiles)
+                if mol is None:
+                    error = "Invalid connection schema. Could not parse structure."
+                    print(error)
+                    error = "Invalid SMILES"
+                else:
+                    predicted_iupac = predict_iupac_name_by_smiles(smiles)
+                    compound_details = get_all_details_from_smiles_locally(smiles)
+                    all_synonyms = compound_details['all_synonyms']
+                    compound_details['all_synonyms'] = [name.strip() for name in all_synonyms.split(",") if name.strip()]
+                    describe_molecule_text = describe_molecule(smiles)
+                    atom_count = mol.GetNumAtoms()
+                    structure3dim = structure3d(smiles) if atom_count <= 30 else None
+    
+                    data = {
+                        "svg": render_molecule_svg(smiles),
+                        "compound_name": compound_details['pref_name'],
+                        "all_synonyms": compound_details['all_synonyms'],
+                        "predicted_chembl_id": compound_details['chemblid'],        
+                        "structure3d": structure3dim,
+                        "smiles": Chem.MolToSmiles(mol, canonical=True),
+                        "formula": rdMolDescriptors.CalcMolFormula(mol),
+                        "mw": round(Descriptors.MolWt(mol), 2),
+                        "logp": round(Crippen.MolLogP(mol), 2),
+                        "tpsa": round(rdMolDescriptors.CalcTPSA(mol), 2),
+                        "rotatable_bonds": rdMolDescriptors.CalcNumRotatableBonds(mol),
+                        "lipinski": compute_lipinski(mol), 
+                        "iupac_name": predicted_iupac, #later I will use describe_molecule_text to fetch iupac also
+                        "describe_molecule_parent": describe_molecule_text['parent'],
+                        "describe_molecule_features": describe_molecule_text['principal_feature']
+                    }
+            else:
+                error = "Please provide a valid molecular token identifier."
+        return render_template("index.html", data=data, error=error)
+    
+    except:
+        error = "Please provide a valid molecular token identifier."
+        return render_template("index.html", data=data, error=error)
 
     return render_template("index.html", data=data, error=error)
 
