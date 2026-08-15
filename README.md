@@ -1,6 +1,6 @@
 # ChemSmileAI: a web app for Molecular Analysis and Similarity Search Engine
 
-ChemSmileAI is a web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, Molecule Names, ChEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, and structural visualizations.
+ChemSmileAI is a web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
 
 ---
 
