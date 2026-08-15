@@ -35,7 +35,9 @@
         text-decoration: none;
     }
 
-
+    #explore1, #explore2, #explore3, #explore4, #explore5, #explore6, #explore7, #explore8, #explore9{
+        scroll-margin-top: 7.5rem;
+    }
     /* VARIABLES */
 
     :root {
@@ -108,24 +110,6 @@
         content: "";
         position: absolute;
         inset: 0;
-        /* background-image:
-            linear-gradient(
-                rgba(255,255,255,.025) 1px,
-                transparent 1px
-            ),
-            linear-gradient(
-                90deg,
-                rgba(255,255,255,.025) 1px,
-                transparent 1px
-            );
-        background-size: 55px 55px;
-        mask-image:
-            linear-gradient(
-                to right,
-                black,
-                transparent 85%
-            ); */
-
         pointer-events: none;
     }
 
@@ -350,7 +334,7 @@
         border-radius: 24px;
         border: 2px solid #ffffff17;
         box-shadow: 0px 28px 52px #444444ab;
-        margin-top: 2rem;
+        margin-top: 4rem;
     }
 
     .section-label {
@@ -513,6 +497,23 @@
         margin-bottom: 1rem;
     }
 
+    .workflow4 {
+        display: grid;
+        grid-template-columns:
+            repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .workflow3 {
+        display: grid;
+        grid-template-columns:
+            repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
 
     .workflow-step {
         position: relative;
@@ -628,6 +629,7 @@
     }
 
     .data-code {
+        zoom: 1.25;
         width: 85%;
         padding: 20px;
         border:
@@ -654,9 +656,7 @@
     }
 
 
-    /* =========================================================
-    FAQ
-    ========================================================= */
+    /* FAQ */
 
     .faq {
         display: grid;
@@ -769,7 +769,7 @@
                 repeat(2, 1fr);
         }
 
-        .workflow {
+        .workflow, .workflow3, .workflow4 {
             grid-template-columns:
                 repeat(2, 1fr);
         }
@@ -834,7 +834,7 @@
         }
 
         .feature-grid,
-        .workflow {
+        .workflow, .workflow3, .workflow4 {
             grid-template-columns: 1fr;
         }
 
@@ -869,12 +869,12 @@
         }
 
         .about-hero {
-            margin-top: 0.5%;
+            margin-top: 1.5%;
             zoom: 0.7;
         }
 
         .hero-title, .hero-title span {
-            font-size: 28px;
+            font-size: 42px;
             letter-spacing: 1px;
             line-height: normal;
         }
@@ -883,13 +883,20 @@
             max-width: 650px;
             margin: 32px 0 42px;
             color: #ffffff;
-            font-size: clamp(14px, 1.2vw, 17px);
+            font-size: clamp(20px, 1.2vw, 17px);
             line-height: 1.75;
             background: #00000014;
             border: 1px solid rgba(255, 255, 255, .07);
             border-radius: 15px;
             padding: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-btn.primary {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 10px 30px rgba(212, 58, 76, .18);
+            font-size: 17px;
         }
 
         .hero-btn {
@@ -913,6 +920,16 @@
             border: 1px solid #b30c1bc9;
             background: rgb(0 0 0 / 36%);
             color: #fef9f9;
+            font-size: 17px;
+        }
+
+        .section-heading {
+            margin-bottom: 1rem;
+            padding: 1rem 2rem;
+            background: #09101a91;
+            border-radius: 24px;
+            border: 2px solid #ffffff17;
+            box-shadow: 0px 28px 52px #444444ab;
         }
     }
 
@@ -954,6 +971,57 @@
 
     }
 
+    @media (max-width: 360px) {
+        .hero-description {
+            max-width: 650px;
+            margin: 42px 0 42px;
+            color: #ffffff;
+            font-size: 24px;
+            line-height: 1.75;
+            background: #00000014;
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+            zoom: 1.1;
+        }
+
+        .hero-btn.primary {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 10px 30px rgba(212, 58, 76, .18);
+            font-size: 18px;
+        }
+
+        .hero-btn.secondary {
+            border: 1px solid #b30c1bc9;
+            background: rgb(0 0 0 / 36%);
+            color: #fef9f9;
+            font-size: 18px;
+        }
+
+        .about-hero {
+            margin-top: 7.5%;
+            zoom: 0.5;
+        }
+
+        .section-heading {
+            margin-bottom: 1rem;
+            padding: 1rem 2rem;
+            background: #09101a91;
+            border-radius: 24px;
+            border: 2px solid #ffffff17;
+            box-shadow: 0px 28px 52px #444444ab;
+        }
+    }
+
+
 </style>
 
 </head>
@@ -963,9 +1031,7 @@
 <main class="about-page">
 
 
-<!-- =====================================================
-     HERO
-===================================================== -->
+<!-- HERO -->
 
 <section class="about-hero">
 
@@ -1066,7 +1132,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore1"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1088,7 +1154,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore2"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1110,7 +1176,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore3"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1132,7 +1198,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore4"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1153,7 +1219,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore5"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1174,7 +1240,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore6"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1196,7 +1262,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore7"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1218,7 +1284,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="#explore8"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1238,7 +1304,7 @@
             </p>
 
             <div class="hero-actions">
-                <a href="/"
+                <a href="/analysis"
                 class="hero-btn primary">
                     Explore it →
                 </a>
@@ -1357,7 +1423,7 @@
 
     <!-- 1. Molecule Analysis -->
      
-    <div class="section-heading">
+    <div class="section-heading" id="explore1">
 
         <h2>
             Molecule Analysis and Molecule Information
@@ -1429,7 +1495,7 @@
 
     <!-- 2. Molecule Similarity Search Engine -->
      
-    <div class="section-heading">
+    <div class="section-heading" id="explore2">
 
         <h2>
             Molecule Similarity Search Engine
@@ -1440,7 +1506,7 @@
         </p>
     </div>
 
-    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="workflow workflow4">
         
         <article class="workflow-step">
             <div class="step-icon">1</div>
@@ -1489,7 +1555,7 @@
         </article>
     </div>
 
-    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="workflow workflow4">
         <article class="workflow-step">
             <div class="step-icon">5</div>
             <h3>
@@ -1550,7 +1616,7 @@
 
     <!-- 3. Molecule Comparison -->
      
-    <div class="section-heading">
+    <div class="section-heading" id="explore3">
 
         <h2>
             Molecule Comparison
@@ -1562,7 +1628,7 @@
 
     </div>
 
-    <div class="workflow" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="workflow workflow4">
         
         <article class="workflow-step">
             <div class="step-icon">1</div>
@@ -1614,7 +1680,7 @@
 
     <!-- 4. Molecule Sketching -->
      
-    <div class="section-heading">
+    <div class="section-heading" id="explore1">
 
         <h2>
             Molecule Sketching
@@ -1686,7 +1752,7 @@
     
     <!-- 5. Delete / Replace Fragment -->
      
-    <div class="section-heading">
+    <div class="section-heading" id="explore5">
 
         <h2>
             Delete / Replace Fragment
@@ -1766,15 +1832,181 @@
 
     </div>
 
+    <!-- 6. Molecule Fingerprint -->
+     
+    <div class="section-heading" id="explore6">
+
+        <h2>
+            Molecule Fingerprint
+        </h2>
+
+        <p>
+
+        </p>
+
+    </div>
+
+    <div class="workflow workflow4">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Input and Validation
+            </h3>
+            <p>
+                The SMILES entered in the search bar is checked using RDKit whether it has a valid mol object or not.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Fingerprint Calculation
+            </h3>
+            <p>
+                Every mol object has a unique fingerprint (0/1) bits. A Morgan Fingerprint with nBits=2048, radius = 2 checks structural neighborhoods up to two bonds away from each atom. 
+                The fingerprint also contains the stereochemical configurations i.e., information about chirality. 
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Onbits and Index  
+            </h3>
+            <p>
+                The bits with value = 1 are onbits, its index is provided.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Result
+            </h3>
+            <p>
+                2048 bits Fingerprint, number and index of onbits are provided in structured format.
+            </p>
+        </article>
+
+    </div>
+
+    <!-- 7. Molecular Descriptors -->
+     
+    <div class="section-heading" id="explore7">
+
+        <h2>
+            Molecular Descriptors
+        </h2>
+
+        <p>
+            
+        </p>
+
+    </div>
+
+    <div class="workflow workflow3">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Input and Validation
+            </h3>
+            <p>
+                The SMILES entered in the search bar is checked using RDKit whether it has a valid mol object or not.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                Descriptors Classify
+            </h3>
+            <p>
+                Classifies the descriptors into 0D, 1D, 2D, and 3D, calculates a total of 38 unique descriptors. 
+ 
+            </p>
+        </article>
+
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                Result
+            </h3>
+            <p>
+                These descriptors provide several crucial information about a molecule in 2D as well as 3D coordinates.
+            </p>
+        </article>
+
+    </div>
+
+    <!-- 8. 2D and 3D Structures -->
+     
+    <div class="section-heading" id="explore8">
+
+        <h2>
+            2D and 3D Structures
+        </h2>
+
+        <p>
+            
+        </p>
+
+    </div>
+
+    <div class="workflow workflow4">
+        
+        <article class="workflow-step">
+            <div class="step-icon">1</div>
+            <h3>
+                Input and Validation
+            </h3>
+            <p>
+                The SMILES entered in the search bar is checked using RDKit whether it has a valid mol object or not.
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">2</div>
+            <h3>
+                2D SVG
+            </h3>
+            <p>
+                Computing 2D coordinates and then drawing 2D SVG for staying sharp and clear. Extracted the svg from Drawing Text. This is then safely rendered to the frontend.
+            </p>
+        </article>
+
+
+        <article class="workflow-step">
+            <div class="step-icon">3</div>
+            <h3>
+                3D Conformer
+            </h3>
+            <p>
+                3D embedding using ETKDGv3. If embedding fails, Random Coords are used. The molecule is then optimized using MMFF , or UFF 
+                 if MMFF does not have the necessary parameters for all atoms and atom pairs in the molecule. Using the generated 3D coordinates, 
+                  Ball-and-Stick 3D model is generated
+            </p>
+        </article>
+
+        <article class="workflow-step">
+            <div class="step-icon">4</div>
+            <h3>
+                Safely Rendered
+            </h3>
+            <p>
+                This is then safely rendered to the frontend.
+            </p>
+        </article>
+
+    </div>
 
 
 </section>
 
 
-
-<!-- =====================================================
-     DATA PANEL
-===================================================== -->
+<!-- DATA PANEL-->
 
 <section class="about-section">
 
@@ -1794,7 +2026,7 @@
             <p>
                 A molecule can be represented in several ways.
                 Structural strings, molecular descriptors,
-                fingerprints and identifiers each provide a
+                fingerprints, InChI and identifiers each provide a
                 different perspective on the same chemical entity.
             </p>
 
@@ -1825,6 +2057,14 @@
                     Substructures
                 </span>
 
+                <span class="data-tag">
+                    InChI
+                </span>
+
+                <span class="data-tag">
+                    SDF
+                </span>
+
             </div>
 
         </div>
@@ -1846,7 +2086,7 @@
 
                 <div>
                     <span class="key">structure</span>:
-                    <span class="value">"CC(=O)NC1=..."</span>
+                    <span class="value">"CC(=O)Nc1ccc(O)cc1"</span>
                 </div>
 
                 <div>
@@ -1856,7 +2096,7 @@
 
                 <div>
                     <span class="key">similarity</span>:
-                    <span class="value">"0.87"</span>
+                    <span class="value">"0.95"</span>
                 </div>
 
             </div>
@@ -1866,132 +2106,6 @@
     </div>
 
 </section>
-
-
-
-<!-- =====================================================
-     FAQ
-===================================================== -->
-
-<section class="about-section">
-
-    <div class="section-heading">
-
-        <span class="section-label">
-            FAQ
-        </span>
-
-        <h2>
-            Questions about the platform.
-        </h2>
-
-    </div>
-
-
-    <div class="faq">
-
-
-        <div class="faq-item">
-
-            <button class="faq-question">
-
-                What is this platform designed for?
-
-                <span>+</span>
-
-            </button>
-
-            <div class="faq-answer">
-
-                <p>
-                    It provides an interactive environment for
-                    searching, viewing, comparing and exploring
-                    molecular information and structural
-                    relationships.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="faq-item">
-
-            <button class="faq-question">
-
-                What is molecular similarity?
-
-                <span>+</span>
-
-            </button>
-
-            <div class="faq-answer">
-
-                <p>
-                    Molecular similarity describes how closely
-                    two compounds resemble each other according
-                    to a selected structural or fingerprint-based
-                    comparison method.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="faq-item">
-
-            <button class="faq-question">
-
-                What are molecular fingerprints?
-
-                <span>+</span>
-
-            </button>
-
-            <div class="faq-answer">
-
-                <p>
-                    Molecular fingerprints encode structural
-                    features of a molecule into a computational
-                    representation that can be used for tasks
-                    such as similarity searching.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="faq-item">
-
-            <button class="faq-question">
-
-                Can I compare two molecules?
-
-                <span>+</span>
-
-            </button>
-
-            <div class="faq-answer">
-
-                <p>
-                    Yes. The comparison interface allows two
-                    molecular structures to be examined side by
-                    side along with their relevant molecular
-                    information.
-                </p>
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
 
 <!-- CTA -->
 
@@ -2002,11 +2116,11 @@
     </h2>
 
     <p>
-        Start with a compound name or molecular structure and
+        Start with a molecular structure and
         discover the information behind it.
     </p>
 
-    <a href="/similarity"
+    <a href="/analysis"
        class="hero-btn primary">
         Start exploring →
     </a>
@@ -2016,54 +2130,6 @@
 
 </main>
 
-
-
-<script>
-
-
-document.querySelectorAll(".faq-question").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        const item = button.parentElement;
-        const answer = item.querySelector(".faq-answer");
-
-        /* Close other answers */
-
-        document.querySelectorAll(".faq-item").forEach(other => {
-
-            if (other !== item) {
-
-                other.classList.remove("active");
-
-                other.querySelector(".faq-answer")
-                    .style.maxHeight = null;
-
-            }
-
-        });
-
-
-        /* Toggle current */
-
-        item.classList.toggle("active");
-
-        if (item.classList.contains("active")) {
-
-            answer.style.maxHeight =
-                answer.scrollHeight + "px";
-
-        } else {
-
-            answer.style.maxHeight = null;
-
-        }
-
-    });
-
-});
-
-</script>
 
 </body>
 
