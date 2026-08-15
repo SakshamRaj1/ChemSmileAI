@@ -62,7 +62,7 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 
 ### Step 1: Clone the Repository
 ```
-git clone [https://github.com/SakshamRaj1/ChemSmileAI.git](https://github.com/SakshamRaj1/ChemSmileAI.git)
+https://github.com/SakshamRaj1/ChemSmileAI.git
 cd ChemSmileAI
 ```
 
@@ -78,14 +78,16 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```
 
 
-Step 3: Install Dependencies
+### Step 3: Install Dependencies
 ```
 pip install -r requirements.txt
 ```
 
-Step 4: Run the Application
+### Step 4: Run the Application
 ```
 flask run --host=127.0.0.1 --port=8000
 ```
+### Step 5: Access ChemSmileAI locally on your system
+
 Open http://127.0.0.1:8000 (depending on your local setup)
 
