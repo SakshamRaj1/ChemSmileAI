@@ -25,15 +25,15 @@ from download_section import save_as_3d_sdf, save_as_3d_mol, save_as_3d_mol2, sa
 from pathlib import Path
 import gdown
 
-# file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
-# output_path1 = 'chembl_smiles_prefname_synonyms.csv'
-# file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
-# output_path2 = 'molecules_library.h5'
+file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
+output_path1 = 'chembl_smiles_prefname_synonyms.csv'
+file_id2 = '1oBadN_FES73IIPKpJTYOVfBXvlBDxhGe'
+output_path2 = 'molecules_library.h5'
 
-# gdown.download(id=file_id1, output=output_path1, quiet=False)
-# gdown.download(id=file_id2, output=output_path2, quiet=False)
+gdown.download(id=file_id1, output=output_path1, quiet=False)
+gdown.download(id=file_id2, output=output_path2, quiet=False)
 
-# from chembl_compound_details_local import get_all_details_from_smiles_locally, get_pref_name_from_smiles_locally
+from chembl_compound_details_local import get_all_details_from_smiles_locally, get_pref_name_from_smiles_locally
 
 # https://www.ebi.ac.uk/chembl/api/data/status.json 
 RDLogger.DisableLog('rdApp.*') 
