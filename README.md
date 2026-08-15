@@ -58,7 +58,7 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * **2D and 3D Structures:** py3Dmol, openbabel, cairosvg
 * **Chemical Editor:** Ketcher Interactive Drawing Canvas
 * **Frontend Architecture:** HTML5, CSS3 (Glassmorphism UI, Responsive CSS Grid & Flexbox), Bootstrap 5, JavaScript (ES6)
-* **Deployment Target:** Render Cloud Application Platform
+* **Current Deployment:** Render Cloud Application Platform (with limitations)
 * **APIs:** No external API or website dependency
 
 
