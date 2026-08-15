@@ -94,7 +94,9 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 ### Step 1: Clone the Repository
 ```
 # The Backend Data Files and Codes are available on Github but commented in the source code due to Memory limitations of the Deployment Services by Render.
-# Oncle cloned, check for comments at the top of .py files "Uncomment the below lines if cloning!" and uncomment them bofore proceeding to Step 2
+# Once cloned, check for comments at the top of .py files "Uncomment the below lines if cloning!" and uncomment them bofore proceeding to Step 2
+```
+```
 https://github.com/SakshamRaj1/ChemSmileAI.git
 cd ChemSmileAI
 ```
