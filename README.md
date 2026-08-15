@@ -43,11 +43,12 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 ## Technical Stack
 
 * **Backend & Web Framework:** Python, Flask, Jinja2 Template Engine
-* **Cheminformatics Core:** RDKit (Python C++ Bindings), FPSim2 Engine, Openclatura
+* **Cheminformatics Core:** RDKit, FPSim2 Engine, Openclatura
 * **2D and 3D Structures:** py3Dmol, openbabel, cairosvg
 * **Chemical Editor:** Ketcher Interactive Drawing Canvas
 * **Frontend Architecture:** HTML5, CSS3 (Glassmorphism UI, Responsive CSS Grid & Flexbox), Bootstrap 5, JavaScript (ES6)
 * **Deployment Target:** Render Cloud Application Platform
+* **APIs:** No external API or website dependency
 
 
 
