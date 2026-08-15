@@ -38,28 +38,48 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 ## Technical Stack
 
 * **Backend & Web Framework:** Python, Flask, Jinja2 Template Engine
-* **Cheminformatics Core:** RDKit (Python C++ Bindings)
+* **Cheminformatics Core:** RDKit (Python C++ Bindings), FPSim2 Engine, Openclatura
+* **2D and 3D Structures:** py3Dmol, openbabel, cairosvg
 * **Chemical Editor:** Ketcher Interactive Drawing Canvas
 * **Frontend Architecture:** HTML5, CSS3 (Glassmorphism UI, Responsive CSS Grid & Flexbox), Bootstrap 5, JavaScript (ES6)
 * **Deployment Target:** Render Cloud Application Platform
 
+
+
 ---
+## Installation & Local Setup
 
-## Repository Structure
+### Prerequisites
+* Python 3.13.9+
+* `pip` package manager
+* Recommended: Conda / Miniconda (for optimal C++ library dependency resolution with RDKit)
 
-ChemSmileAI/
-├── static/
-│   ├── css/               # Glassmorphism themes & responsive stylesheets
-│   ├── js/                # Client-side toggles & drawing canvas scripts
-│   └── images/            # Platform architecture diagrams and static assets
-├── templates/
-│   ├── base.html          # Base structural layout, navigation, & offcanvas sidebar
-│   ├── index.html         # Main dashboard, search bar, & descriptor results
-│   ├── analysis.html      # In-depth property & atom/bond analysis views
-│   ├── similarity.html    # Molecular similarity search engine interface
-│   ├── compare.html       # Side-by-side molecular comparison workflow
-│   ├── about.html         # Project overview & documentation
-│   └── contact.html       # Communication and feedback interface
-├── app.py                 # Flask server, routing definitions, & RDKit processing pipelines
-├── requirements.txt       # Python package dependencies
-└── README.md              # Research & technical documentation
+### Step 1: Clone the Repository
+```
+git clone [https://github.com/SakshamRaj1/ChemSmileAI.git](https://github.com/SakshamRaj1/ChemSmileAI.git)
+cd ChemSmileAI
+```
+
+### Step 2: Set Up a Virtual Environment
+# Using Conda
+```
+conda create -n chemsmile python=3.10
+conda activate chemsmile
+
+# Or using standard venv
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+```
+
+
+Step 3: Install Dependencies
+```
+pip install -r requirements.txt
+```
+
+Step 4: Run the Application
+```
+flask run --host=127.0.0.1 --port=8000
+```
+Open http://127.0.0.1:8000 (depending on your local setup)
+
