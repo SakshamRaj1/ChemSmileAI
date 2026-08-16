@@ -31,7 +31,7 @@ ChemSmileAI is open-sourced web-based computational cheminformatics platform des
 
 The Backend Data Files and Codes are available on Github but are commented in the source code due to Memory limitations of the Deployment Services by Render.
 
----
+
 <img width="1878" height="896" alt="image" src="https://github.com/user-attachments/assets/e1fb31b9-bace-4945-80da-1e8e692b6bce" />
 
 
