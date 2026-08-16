@@ -1172,14 +1172,16 @@
                         </svg>
                     </i>
                 </button>
-            </form>                
+            </form>       
+            
         </div>
-        {% if error %}
-
-        <div class = "if-error" role="alert">
-            ⚠️ Please submit a valid SMILES structure above to query properties.
-        </div>
-        {% endif %}
+            {% if error %}
+    
+            <button onclick="this.style.display='none'" class = "if-error" role="alert">
+                ⚠️ {{ error }}
+            </button>
+            {% endif %}
+        
     </div>
 
     {% if data %}
