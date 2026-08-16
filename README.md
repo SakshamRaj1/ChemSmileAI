@@ -16,7 +16,7 @@
 [![py3Dmol](https://img.shields.io/badge/py3Dmol-2.5.5-009688.svg)](https://3dmol.csb.pitt.edu/)
 [![Openclatura](https://img.shields.io/badge/Openclatura-0.2.0-8E44AD.svg)](#)
 [![CairoSVG](https://img.shields.io/badge/CairoSVG-2.9.0-E05D44.svg)](https://cairosvg.org/)
-[![Ketcher](https://img.shields.io/badge/Editor-Ketcher-007EC6.svg)](https://github.com/epam/ketcher)
+[![Ketcher](https://img.shields.io/badge/Editor-Ketcher-3.17.0-007EC6.svg)](https://github.com/epam/ketcher)
 
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Pandas](https://img.shields.io/badge/Pandas-3.0.3-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
