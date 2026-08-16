@@ -74,8 +74,6 @@ The application is structured as a full-stack cheminformatics pipeline that inte
 * Investigate shared structural fragments based on input SMILES.
 * Easily delete unwanted fragments or replace chemical core groups based on input SMARTS/SMILES.
 * Highlighted SVG, new SMILES are generated as well.
-  
-  <img width="1902" height="1080" alt="image" src="https://github.com/user-attachments/assets/87b81903-ba92-4e73-9ccf-1d9741941af5" />
 
 
 ### 6. Molecule Fingerprint
