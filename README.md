@@ -7,22 +7,16 @@
 [![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?logo=render&logoColor=white)](https://chemsmileai.onrender.com/)
 [![APIs](https://img.shields.io/badge/APIs-None%20(100%25%20Offline%2FLocal)-4c1.svg)](#)
 
-<br/>
-
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![RDKit](https://img.shields.io/badge/RDKit-2026.3.3-3843d0.svg)](https://www.rdkit.org/)
 [![FPSim2](https://img.shields.io/badge/FPSim2-0.7.4-FF6F00.svg)](https://github.com/chembl/FPSim2)
 [![Open Babel](https://img.shields.io/badge/Open_Babel-3.2.1-1B365D.svg)](https://openbabel.org/)
 
-<br/>
-
 [![py3Dmol](https://img.shields.io/badge/py3Dmol-2.5.5-009688.svg)](https://3dmol.csb.pitt.edu/)
 [![Openclatura](https://img.shields.io/badge/Openclatura-0.2.0-8E44AD.svg)](#)
 [![CairoSVG](https://img.shields.io/badge/CairoSVG-2.9.0-E05D44.svg)](https://cairosvg.org/)
 [![Ketcher](https://img.shields.io/badge/Editor-Ketcher-007EC6.svg)](https://lifescience.opensource.epam.com/ketcher/)
-
-<br/>
 
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Pandas](https://img.shields.io/badge/Pandas-3.0.3-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
