@@ -1,0 +1,3 @@
+*.jinja2 linguist-language=Jinja
+*.jinja linguist-language=Jinja
+*.j2 linguist-language=Jinja
