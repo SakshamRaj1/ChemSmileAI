@@ -288,7 +288,7 @@ def molecule_analysis():
             print("Smiles Input Error: Please submit a valid SMILES structure above to query properties.")
 
     except:
-        error = "⚠️ Encountered error while processing. Please try again!"
+        error = "Encountered error while processing. Please try again!"
         return render_template("molecule_analysis.html", data=data, error=error)
     
     return render_template("molecule_analysis.html", data=data, error=error)
