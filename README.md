@@ -16,7 +16,7 @@
 [![py3Dmol](https://img.shields.io/badge/py3Dmol-2.5.5-009688.svg)](https://3dmol.csb.pitt.edu/)
 [![Openclatura](https://img.shields.io/badge/Openclatura-0.2.0-8E44AD.svg)](#)
 [![CairoSVG](https://img.shields.io/badge/CairoSVG-2.9.0-E05D44.svg)](https://cairosvg.org/)
-[![Ketcher](https://img.shields.io/badge/Editor-Ketcher-007EC6.svg)](https://lifescience.opensource.epam.com/ketcher/)
+[![Ketcher](https://img.shields.io/badge/Editor-Ketcher-007EC6.svg)](https://github.com/epam/ketcher)
 
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Pandas](https://img.shields.io/badge/Pandas-3.0.3-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
@@ -25,7 +25,7 @@
 
 </div>
 
-ChemSmileAI is a web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. ChemSmileAI is a research project for researchers, chemists and enthusiasts for providing a streamlined, web-based platform aimed at simplifying access to chemical data and analysis for chemists. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
+ChemSmileAI is open-sourced web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. ChemSmileAI is a research project for researchers, chemists and enthusiasts for providing a streamlined, web-based platform aimed at simplifying access to chemical data and analysis for chemists. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
 
 🌐 **Live Demo:** [Click here to view](https://chemsmileai.onrender.com/)
 
