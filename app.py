@@ -25,7 +25,7 @@ from download_section import save_as_3d_sdf, save_as_3d_mol, save_as_3d_mol2, sa
 from pathlib import Path
 import gdown
 
-# Uncomment the below lines if cloning!
+# Uncomment the below lines if cloning! 
 
 # file_id1 = '1mJkjwsLKaOKHwcRlbmUi0wz2vqjXWJcT'
 # output_path1 = 'chembl_smiles_prefname_synonyms.csv'
