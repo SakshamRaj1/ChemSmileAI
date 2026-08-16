@@ -7,7 +7,7 @@
 [![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?logo=render&logoColor=white)](https://chemsmileai.onrender.com/)
 [![APIs](https://img.shields.io/badge/APIs-None%20(100%25%20Offline%2FLocal)-4c1.svg)](#)
 
-[![Python](https://img.shields.io/badge/Python-3.13.9-000000?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.13.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![RDKit](https://img.shields.io/badge/RDKit-2026.3.3-3843d0.svg)](https://www.rdkit.org/)
 [![FPSim2](https://img.shields.io/badge/FPSim2-0.7.4-FF6F00.svg)](https://github.com/chembl/FPSim2)
