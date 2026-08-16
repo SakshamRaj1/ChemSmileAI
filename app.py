@@ -1198,7 +1198,7 @@ def similarity_search():
         except Exception as e:
             print(f"Search execution failed: {str(e)}")
             print(f"Similarity Search Engine received invalid input:", {clean_str})
-            error = "Invalid Input"
+            error = "Encountered error while processing. Please try again!"
             return render_template("similarity.html", data=data, error=error)
 
     # error = f"{clean_str} is invalid input. Please enter a valid CHEMBL ID or SMILES string."
