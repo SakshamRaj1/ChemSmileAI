@@ -1,5 +1,36 @@
 # ChemSmileAI: a web app for Molecular Analysis and Similarity Search Engine
 
+<div align="center">
+
+[![License](https://img.shields.io/badge/License-MIT%202.0-007EC6.svg)](LICENSE)
+[![Maintained](https://img.shields.io/badge/Maintained%3F-yes-007EC6.svg)](#)
+[![Issues](https://img.shields.io/badge/issues-0%20open-4c1?color=4c1&labelColor=555&style=flat&logoColor=white&cacheSeconds=3600&label=issues&message=0%20open&colorB=4c1)](#)
+[![Contributors](https://img.shields.io/badge/contributors-11-4c1.svg)](#)
+
+<br/>
+
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.10.1-FF6F00?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
+[![Powered by CDK](https://img.shields.io/badge/Powered%20by-CDK-007EC6.svg)](#)
+[![Powered by RDKit](https://img.shields.io/badge/Powered%20by-RDKit-3843d0?logo=molecule&logoColor=white)](https://www.rdkit.org/)
+[![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3.5-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+
+<br/>
+
+[![Dev Build](https://img.shields.io/badge/Dev_Build,_Test_and_Publish-passing-4c1?logo=github&logoColor=white)](#)
+[![Prod Build](https://img.shields.io/badge/Prod_Build,_Test_and_Publish-passing-4c1?logo=github&logoColor=white)](#)
+[![Release Please](https://img.shields.io/badge/release--please--action-passing-4c1?logo=github&logoColor=white)](#)
+
+<br/>
+
+[![Backend FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docs FastAPI](https://img.shields.io/badge/docs-fastapi-007EC6)](#)
+[![Docs](https://img.shields.io/badge/docs-passing-4c1)](#)
+[![Codecov](https://img.shields.io/badge/codecov-94%25-4c1?logo=codecov&logoColor=e05d44)](#)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7745987-007EC6.svg)](https://doi.org/10.5281/zenodo.7745987)
+
+</div>
+
 ChemSmileAI is a web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. ChemSmileAI is a research project for researchers, chemists and enthusiasts for providing a streamlined, web-based platform aimed at simplifying access to chemical data and analysis for chemists. Powered by Python, Flask, and RDKit, the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
 
 🌐 **Live Demo:** [Click here to view](https://chemsmileai.onrender.com/)
