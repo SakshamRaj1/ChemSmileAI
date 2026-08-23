@@ -1,8 +1,75 @@
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Runs automatically every 3 hours and 30 minutes
+#     - cron: '30 */3 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   restart:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Requests
+#         run: pip install requests
+
+#       - name: Restart Studio via Direct Lightning API
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+
+#           user_id = os.environ['LIGHTNING_USER_ID'].strip()
+#           api_key = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           project_id = '01m0pkbwmfh7j075v37y389fsx'
+#           studio_id = '01m0pkexbyeq84az5st8c5xx06'
+
+#           headers = {
+#               'X-Grid-User': user_id,
+#               'X-Grid-Key': api_key,
+#               'Authorization': f'Bearer {api_key}',
+#               'Content-Type': 'application/json'
+#           }
+
+#           base_url = 'https://lightning.ai/api/v1'
+
+#           print(f'Sending STOP request for Studio {studio_id}...')
+#           # Stop endpoint
+#           stop_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop'
+#           r_stop = requests.post(stop_url, headers=headers)
+#           print(f'Stop response: {r_stop.status_code}')
+
+#           print('Waiting 25 seconds for cloud resources to safely release...')
+#           time.sleep(25)
+
+#           print(f'Sending START request for Studio {studio_id}...')
+#           # Start endpoint
+#           start_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start'
+#           r_start = requests.post(start_url, headers=headers)
+#           print(f'Start response: {r_start.status_code}')
+
+#           if r_start.status_code in [200, 201, 202]:
+#               print('Studio successfully restarted and running!')
+#           else:
+#               print(f'Response Body: {r_start.text}')
+#               # Fallback if standard cloudspace endpoint is aliased
+#               r_start_alt = requests.put(start_url, headers=headers)
+#               print(f'Alt start response: {r_start_alt.status_code}')
+#           "
+
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs automatically every 3 hours and 30 minutes
+    # Runs every 3 hours and 30 minutes
     - cron: '30 */3 * * *'
   workflow_dispatch:
 
@@ -15,20 +82,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Requests
-        run: pip install requests
+      - name: Install Dependencies
+        run: pip install requests lightning-sdk
 
-      - name: Restart Studio via Direct Lightning API
+      - name: Restart Studio and Run Startup Script
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           python -c "
           import os, time, requests
+          from lightning_sdk import Studio
 
           user_id = os.environ['LIGHTNING_USER_ID'].strip()
           api_key = os.environ['LIGHTNING_API_KEY'].strip()
-
           project_id = '01m0pkbwmfh7j075v37y389fsx'
           studio_id = '01m0pkexbyeq84az5st8c5xx06'
 
@@ -38,29 +105,21 @@ jobs:
               'Authorization': f'Bearer {api_key}',
               'Content-Type': 'application/json'
           }
-
           base_url = 'https://lightning.ai/api/v1'
 
-          print(f'Sending STOP request for Studio {studio_id}...')
-          # Stop endpoint
-          stop_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop'
-          r_stop = requests.post(stop_url, headers=headers)
-          print(f'Stop response: {r_stop.status_code}')
-
-          print('Waiting 25 seconds for cloud resources to safely release...')
+          print('1. Stopping studio to refresh timer...')
+          requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop', headers=headers)
           time.sleep(25)
 
-          print(f'Sending START request for Studio {studio_id}...')
-          # Start endpoint
-          start_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start'
-          r_start = requests.post(start_url, headers=headers)
-          print(f'Start response: {r_start.status_code}')
+          print('2. Starting studio...')
+          requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
+          time.sleep(30)
 
-          if r_start.status_code in [200, 201, 202]:
-              print('Studio successfully restarted and running!')
-          else:
-              print(f'Response Body: {r_start.text}')
-              # Fallback if standard cloudspace endpoint is aliased
-              r_start_alt = requests.put(start_url, headers=headers)
-              print(f'Alt start response: {r_start_alt.status_code}')
+          print('3. Executing startup script...')
+          try:
+              s = Studio('scratch-studio-devbox')
+              s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
+              print('Services successfully restarted!')
+          except Exception as e:
+              print(f'SDK execution notice: {e}')
           "
