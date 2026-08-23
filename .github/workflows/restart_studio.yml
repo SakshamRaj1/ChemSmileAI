@@ -18,23 +18,24 @@ jobs:
       - name: Install Lightning SDK
         run: pip install lightning-sdk
 
-      - name: Configure Credentials and Restart Studio
+      - name: Authenticate and Restart Studio
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          mkdir -p ~/.lightning
-          cat <<EOF > ~/.lightning/credentials.json
-          {
-            "user_id": "$LIGHTNING_USER_ID",
-            "api_key": "$LIGHTNING_API_KEY"
-          }
-          EOF
-
           python -c "
-          import time
+          import os, time
+          from lightning_sdk.lightning_cloud.login import Auth
           from lightning_sdk import Studio
 
+          user_id = os.environ['LIGHTNING_USER_ID'].strip()
+          api_key = os.environ['LIGHTNING_API_KEY'].strip()
+
+          # 1. Programmatically authenticate and save local config
+          Auth().authenticate(user_id=user_id, api_key=api_key)
+          print('Successfully authenticated with Lightning Cloud!')
+
+          # 2. Target Studio and restart
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='Sakshamraj1')
 
           print('Stopping studio to reset session timer...')
