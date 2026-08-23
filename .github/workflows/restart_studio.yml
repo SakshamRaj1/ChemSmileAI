@@ -2,7 +2,7 @@ name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs every 3 hours and 30 minutes
+    # Runs automatically every 3 hours and 30 minutes
     - cron: '30 */3 * * *'
   workflow_dispatch:
 
@@ -23,18 +23,18 @@ jobs:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # 1. Login using the proper CLI flag
-          lightning login --api-key "${LIGHTNING_API_KEY}"
+          # 1. Initialize Lightning CLI session directly with API key
+          lightning init "${LIGHTNING_API_KEY}"
 
           # 2. Restart the studio
           python -c "
           import time
           from lightning_sdk import Studio
 
-          # The CLI session automatically resolves your active user and teamspace
+          # Target studio using the initialized session context
           s = Studio(name='scratch-studio-devbox')
 
-          print('Stopping studio to reset 4-hour timer...')
+          print('Stopping studio to reset session timer...')
           s.stop()
           time.sleep(25)
 
