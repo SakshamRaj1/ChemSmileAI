@@ -20,8 +20,8 @@ jobs:
 
       - name: Configure Credentials and Restart Studio
         env:
-          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
-          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+          LIGHTNING_USER_ID: "39858048-98f7-4793-bdf6-102f9de9aae4"
+          LIGHTNING_API_KEY: "34dcf359-a102-40c8-a8a0-cd775a9915a8"
         run: |
           # 1. Create the credentials config file directly
           mkdir -p ~/.lightning
