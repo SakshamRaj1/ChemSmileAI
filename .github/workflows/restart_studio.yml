@@ -23,22 +23,55 @@ jobs:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # 1. Initialize Lightning CLI session directly with API key
-          lightning init "${LIGHTNING_API_KEY}"
-
-          # 2. Restart the studio
           python -c "
-          import time
+          import os, time
+          from lightning_sdk.lightning_cloud.login import Auth
+          from lightning_sdk.lightning_cloud.rest_client import LightningClient
           from lightning_sdk import Studio
 
-          # Target studio using the initialized session context
-          s = Studio(name='scratch-studio-devbox')
+          # 1. Set environment auth
+          os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+          os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
-          print('Stopping studio to reset session timer...')
-          s.stop()
-          time.sleep(25)
+          client = LightningClient()
+          
+          # 2. Get the authenticated user identity dynamically
+          user_data = client.projects_service_list_memberships()
+          memberships = user_data.memberships if hasattr(user_data, 'memberships') else []
+          
+          print(f'Found {len(memberships)} project membership(s).')
+          
+          # 3. Locate the studio directly across projects
+          studio_found = None
+          for m in memberships:
+              project_id = m.project_id
+              cloudspaces = client.cloud_space_service_list_cloud_spaces(project_id=project_id)
+              for cs in cloudspaces.cloudspaces:
+                  if cs.name == 'scratch-studio-devbox':
+                      print(f'Found studio scratch-studio-devbox (ID: {cs.id}) in project {project_id}')
+                      studio_found = (project_id, cs.id)
+                      break
+              if studio_found:
+                  break
 
-          print('Starting studio...')
-          s.start()
-          print('Studio successfully restarted and running!')
+          if studio_found:
+              proj_id, cs_id = studio_found
+              print('Stopping studio to reset session timer...')
+              try:
+                  client.cloud_space_service_stop_cloud_space(project_id=proj_id, id=cs_id)
+              except Exception as e:
+                  print(f'Stop signal returned: {e}')
+
+              time.sleep(25)
+
+              print('Starting studio...')
+              client.cloud_space_service_start_cloud_space(project_id=proj_id, id=cs_id)
+              print('Studio successfully restarted and running!')
+          else:
+              # Fallback to standard Studio object
+              s = Studio('scratch-studio-devbox')
+              s.stop()
+              time.sleep(25)
+              s.start()
+              print('Studio restart succeeded via fallback!')
           "
