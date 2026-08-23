@@ -23,16 +23,11 @@ jobs:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          mkdir -p ~/.lightning/lightning-cloud
-          cat <<EOF > ~/.lightning/lightning-cloud/config.json
-          {
-            "user_id": "$LIGHTNING_USER_ID",
-            "api_key": "$LIGHTNING_API_KEY"
-          }
-          EOF
+          export LIGHTNING_USER_ID="${LIGHTNING_USER_ID}"
+          export LIGHTNING_API_KEY="${LIGHTNING_API_KEY}"
 
           python -c "
-          import time
+          import os, time
           from lightning_sdk import Studio
 
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='Sakshamraj1')
