@@ -27,10 +27,11 @@ jobs:
           export LIGHTNING_API_KEY="${LIGHTNING_API_KEY}"
 
           python -c "
-          import os, time
+          import time
           from lightning_sdk import Studio
 
-          s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='Sakshamraj1')
+          # SDK automatically associates default teamspace with authenticated credentials
+          s = Studio(name='scratch-studio-devbox', teamspace='default-project')
 
           print('Stopping studio to reset session timer...')
           s.stop()
@@ -38,5 +39,5 @@ jobs:
 
           print('Starting studio...')
           s.start()
-          print('Studio successfully restarted!')
+          print('Studio successfully restarted and running!')
           "
