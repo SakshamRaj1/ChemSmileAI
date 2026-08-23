@@ -28,14 +28,19 @@ jobs:
 
           python -c "
           import time
-          from lightning_sdk import Studio, Teamspace
+          from lightning_sdk import Studio
+          from lightning_sdk.lightning_cloud.rest_client import LightningClient
 
-          # Fetch all accessible teamspaces for the authenticated account
-          teamspaces = Teamspace.get_all()
-          target_teamspace = next((t for t in teamspaces if t.name == 'default-project'), teamspaces[0])
+          client = LightningClient()
+          user_resp = client.auth_service_get_authenticated_user()
+          print(f'Authenticated as user: {user_resp.username} (ID: {user_resp.id})')
 
-          # Initialize the studio directly within that teamspace
-          s = Studio(name='scratch-studio-devbox', teamspace=target_teamspace)
+          # Initialize using the exact authenticated user context
+          s = Studio(
+              name='scratch-studio-devbox',
+              teamspace='default-project',
+              user=user_resp.username
+          )
 
           print('Stopping studio to reset session timer...')
           s.stop()
