@@ -2,9 +2,9 @@ name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs every 3 hours and 30 minutes
+    # Runs automatically every 3 hours and 30 minutes
     - cron: '30 */3 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
   restart:
@@ -20,19 +20,17 @@ jobs:
 
       - name: Configure Credentials and Restart Studio
         env:
-          LIGHTNING_USER_ID: "39858048-98f7-4793-bdf6-102f9de9aae4"
-          LIGHTNING_API_KEY: "34dcf359-a102-40c8-a8a0-cd775a9915a8"
+          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # 1. Create the credentials config file directly
           mkdir -p ~/.lightning
           cat <<EOF > ~/.lightning/credentials.json
           {
-            "user_id": "39858048-98f7-4793-bdf6-102f9de9aae4",
-            "api_key": "34dcf359-a102-40c8-a8a0-cd775a9915a8"
+            "user_id": "$LIGHTNING_USER_ID",
+            "api_key": "$LIGHTNING_API_KEY"
           }
           EOF
 
-          # 2. Run the restart script
           python -c "
           import time
           from lightning_sdk import Studio
