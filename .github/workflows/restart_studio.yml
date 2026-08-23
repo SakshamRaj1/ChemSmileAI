@@ -1,0 +1,37 @@
+name: Keep Studio Fresh & Free
+
+on:
+  schedule:
+    # Runs every 3 hours and 30 minutes
+    - cron: '30 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Lightning SDK
+        run: pip install lightning-sdk
+
+      - name: Stop and Start Studio
+        env:
+          LIGHTNING_USER_ID: "39858048-98f7-4793-bdf6-102f9de9aae4"
+          LIGHTNING_API_KEY: "34dcf359-a102-40c8-a8a0-cd775a9915a8"
+        run: |
+          python -c "
+          import time
+          from lightning_sdk import Studio
+          
+          s = Studio(name='scratch-studio-devbox', teamspace='default-project')
+          print('Stopping studio to reset session timer...')
+          s.stop()
+          time.sleep(20)
+          print('Starting studio...')
+          s.start()
+          print('Studio successfully restarted!')
+          "
