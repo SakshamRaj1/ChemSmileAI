@@ -18,25 +18,31 @@ jobs:
       - name: Install Lightning SDK
         run: pip install lightning-sdk
 
-      - name: Stop and Start Studio
+      - name: Configure Credentials and Restart Studio
         env:
-          LIGHTNING_USER_ID: "39858048-98f7-4793-bdf6-102f9de9aae4"
-          LIGHTNING_API_KEY: "34dcf359-a102-40c8-a8a0-cd775a9915a8"
+          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # 1. Authenticate Lightning CLI directly
-          lightning login $LIGHTNING_USER_ID $LIGHTNING_API_KEY
-          
-          # 2. Restart Studio targeting the organization
+          # 1. Create the credentials config file directly
+          mkdir -p ~/.lightning
+          cat <<EOF > ~/.lightning/credentials.json
+          {
+            "user_id": "39858048-98f7-4793-bdf6-102f9de9aae4",
+            "api_key": "34dcf359-a102-40c8-a8a0-cd775a9915a8"
+          }
+          EOF
+
+          # 2. Run the restart script
           python -c "
           import time
           from lightning_sdk import Studio
-          
+
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='Sakshamraj1')
-          
+
           print('Stopping studio to reset session timer...')
           s.stop()
           time.sleep(25)
-          
+
           print('Starting studio...')
           s.start()
           print('Studio successfully restarted!')
