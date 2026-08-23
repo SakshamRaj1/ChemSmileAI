@@ -15,63 +15,52 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning SDK
-        run: pip install lightning-sdk
+      - name: Install Requests
+        run: pip install requests
 
-      - name: Restart Studio
+      - name: Restart Studio via Direct Lightning API
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           python -c "
-          import os, time
-          from lightning_sdk.lightning_cloud.login import Auth
-          from lightning_sdk.lightning_cloud.rest_client import LightningClient
-          from lightning_sdk import Studio
+          import os, time, requests
 
-          # 1. Set environment auth
-          os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
-          os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+          user_id = os.environ['LIGHTNING_USER_ID'].strip()
+          api_key = os.environ['LIGHTNING_API_KEY'].strip()
 
-          client = LightningClient()
-          
-          # 2. Get the authenticated user identity dynamically
-          user_data = client.projects_service_list_memberships()
-          memberships = user_data.memberships if hasattr(user_data, 'memberships') else []
-          
-          print(f'Found {len(memberships)} project membership(s).')
-          
-          # 3. Locate the studio directly across projects
-          studio_found = None
-          for m in memberships:
-              project_id = m.project_id
-              cloudspaces = client.cloud_space_service_list_cloud_spaces(project_id=project_id)
-              for cs in cloudspaces.cloudspaces:
-                  if cs.name == 'scratch-studio-devbox':
-                      print(f'Found studio scratch-studio-devbox (ID: {cs.id}) in project {project_id}')
-                      studio_found = (project_id, cs.id)
-                      break
-              if studio_found:
-                  break
+          project_id = '01m0pkbwmfh7j075v37y389fsx'
+          studio_id = '01m0pkexbyeq84az5st8c5xx06'
 
-          if studio_found:
-              proj_id, cs_id = studio_found
-              print('Stopping studio to reset session timer...')
-              try:
-                  client.cloud_space_service_stop_cloud_space(project_id=proj_id, id=cs_id)
-              except Exception as e:
-                  print(f'Stop signal returned: {e}')
+          headers = {
+              'X-Grid-User': user_id,
+              'X-Grid-Key': api_key,
+              'Authorization': f'Bearer {api_key}',
+              'Content-Type': 'application/json'
+          }
 
-              time.sleep(25)
+          base_url = 'https://lightning.ai/api/v1'
 
-              print('Starting studio...')
-              client.cloud_space_service_start_cloud_space(project_id=proj_id, id=cs_id)
+          print(f'Sending STOP request for Studio {studio_id}...')
+          # Stop endpoint
+          stop_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop'
+          r_stop = requests.post(stop_url, headers=headers)
+          print(f'Stop response: {r_stop.status_code}')
+
+          print('Waiting 25 seconds for cloud resources to safely release...')
+          time.sleep(25)
+
+          print(f'Sending START request for Studio {studio_id}...')
+          # Start endpoint
+          start_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start'
+          r_start = requests.post(start_url, headers=headers)
+          print(f'Start response: {r_start.status_code}')
+
+          if r_start.status_code in [200, 201, 202]:
               print('Studio successfully restarted and running!')
           else:
-              # Fallback to standard Studio object
-              s = Studio('scratch-studio-devbox')
-              s.stop()
-              time.sleep(25)
-              s.start()
-              print('Studio restart succeeded via fallback!')
+              print(f'Response Body: {r_start.text}')
+              # Fallback if standard cloudspace endpoint is aliased
+              r_start_alt = requests.put(start_url, headers=headers)
+              print(f'Alt start response: {r_start_alt.status_code}')
           "
