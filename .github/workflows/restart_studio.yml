@@ -15,38 +15,85 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning SDK
-        run: pip install lightning-sdk
+      - name: Install Requests
+        run: pip install requests
 
-      - name: Authenticate and Restart Studio
+      - name: Restart Studio via Lightning Cloud API
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          export LIGHTNING_USER_ID="${LIGHTNING_USER_ID}"
-          export LIGHTNING_API_KEY="${LIGHTNING_API_KEY}"
-
           python -c "
-          import time
-          from lightning_sdk import Studio
-          from lightning_sdk.lightning_cloud.rest_client import LightningClient
+          import os, time, requests
 
-          client = LightningClient()
-          user_resp = client.auth_service_get_authenticated_user()
-          print(f'Authenticated as user: {user_resp.username} (ID: {user_resp.id})')
+          user_id = os.environ['LIGHTNING_USER_ID'].strip()
+          api_key = os.environ['LIGHTNING_API_KEY'].strip()
+          studio_name = 'scratch-studio-devbox'
 
-          # Initialize using the exact authenticated user context
-          s = Studio(
-              name='scratch-studio-devbox',
-              teamspace='default-project',
-              user=user_resp.username
-          )
+          headers = {
+              'Authorization': f'Bearer {api_key}',
+              'Content-Type': 'application/json'
+          }
 
-          print('Stopping studio to reset session timer...')
-          s.stop()
+          base_url = 'https://lightning.ai/api/v1'
+
+          # 1. Get Project / Studio details
+          print('Locating studio on Lightning Cloud...')
+          res = requests.get(f'{base_url}/projects', headers=headers)
+          
+          if res.status_code != 200:
+              # Fallback to direct Studio API lookup
+              headers['Authorization'] = f'ApiKey {api_key}'
+              headers['X-Grid-User'] = user_id
+              res = requests.get(f'{base_url}/projects', headers=headers)
+
+          projects = res.json().get('projects', []) if res.status_code == 200 else []
+          print(f'Connected successfully. Found {len(projects)} accessible project(s).')
+
+          # 2. Find the target Studio ID
+          studio_id = None
+          project_id = None
+          for proj in projects:
+              p_id = proj.get('id')
+              s_res = requests.get(f'{base_url}/projects/{p_id}/cloudspaces', headers=headers)
+              if s_res.status_code == 200:
+                  for s in s_res.json().get('cloudspaces', []):
+                      if s.get('name') == studio_name:
+                          studio_id = s.get('id')
+                          project_id = p_id
+                          break
+              if studio_id:
+                  break
+
+          if not studio_id:
+              print(f'Listing all cloudspaces for user...')
+              all_res = requests.get(f'{base_url}/cloudspaces', headers=headers)
+              if all_res.status_code == 200:
+                  for s in all_res.json().get('cloudspaces', []):
+                      if s.get('name') == studio_name:
+                          studio_id = s.get('id')
+                          project_id = s.get('projectId')
+                          break
+
+          if not studio_id:
+              raise ValueError(f'Studio {studio_name} could not be located via API.')
+
+          print(f'Found Studio ID: {studio_id} in Project: {project_id}')
+
+          # 3. Stop Studio
+          print('Stopping studio to reset 4-hour timer...')
+          stop_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop'
+          requests.post(stop_url, headers=headers)
+
           time.sleep(25)
 
+          # 4. Start Studio
           print('Starting studio...')
-          s.start()
-          print('Studio successfully restarted and running!')
+          start_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start'
+          start_res = requests.post(start_url, headers=headers)
+          
+          if start_res.status_code in [200, 201, 202]:
+              print('Studio successfully restarted and running!')
+          else:
+              print(f'Start request response: {start_res.status_code} - {start_res.text}')
           "
