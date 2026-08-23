@@ -28,10 +28,14 @@ jobs:
 
           python -c "
           import time
-          from lightning_sdk import Studio
+          from lightning_sdk import Studio, Teamspace
 
-          # SDK automatically associates default teamspace with authenticated credentials
-          s = Studio(name='scratch-studio-devbox', teamspace='default-project')
+          # Fetch all accessible teamspaces for the authenticated account
+          teamspaces = Teamspace.get_all()
+          target_teamspace = next((t for t in teamspaces if t.name == 'default-project'), teamspaces[0])
+
+          # Initialize the studio directly within that teamspace
+          s = Studio(name='scratch-studio-devbox', teamspace=target_teamspace)
 
           print('Stopping studio to reset session timer...')
           s.stop()
