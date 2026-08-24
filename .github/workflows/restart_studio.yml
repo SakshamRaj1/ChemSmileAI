@@ -251,6 +251,67 @@
 #           "
 
 
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '30 */3 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   restart:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Requests
+#         run: pip install requests
+
+#       - name: Restart Studio and Execute Services
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+
+#           user_id = os.environ['LIGHTNING_USER_ID'].strip()
+#           api_key = os.environ['LIGHTNING_API_KEY'].strip()
+#           project_id = '01m0pkbwmfh7j075v37y389fsx'
+#           studio_id = '01m0pkexbyeq84az5st8c5xx06'
+
+#           headers = {
+#               'X-Grid-User': user_id,
+#               'X-Grid-Key': api_key,
+#               'Authorization': f'Bearer {api_key}',
+#               'Content-Type': 'application/json'
+#           }
+#           base_url = 'https://lightning.ai/api/v1'
+
+#           print('1. Stopping studio...')
+#           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop', headers=headers)
+#           time.sleep(25)
+
+#           print('2. Starting studio...')
+#           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
+#           time.sleep(35)
+
+#           print('3. Executing on_start.sh via Cloudspace Command API...')
+#           cmd_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/command'
+#           payload = {
+#               'command': 'bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh'
+#           }
+#           res = requests.post(cmd_url, json=payload, headers=headers)
+#           print(f'Execution response status: {res.status_code}, response: {res.text}')
+#           "
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+
 name: Keep Studio Fresh & Free
 
 on:
@@ -270,7 +331,7 @@ jobs:
       - name: Install Requests
         run: pip install requests
 
-      - name: Restart Studio and Execute Services
+      - name: Restart Studio and Enforce Services
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -293,16 +354,28 @@ jobs:
 
           print('1. Stopping studio...')
           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop', headers=headers)
-          time.sleep(25)
+          time.sleep(20)
 
           print('2. Starting studio...')
           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
-          time.sleep(35)
 
-          print('3. Executing on_start.sh via Cloudspace Command API...')
+          # Wait for Studio to reach RUNNING state
+          print('3. Waiting for Studio container to be fully RUNNING...')
+          for _ in range(24):
+              time.sleep(5)
+              res = requests.get(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}', headers=headers)
+              data = res.json()
+              phase = data.get('status', {}).get('phase', '')
+              print(f'   Current studio state: {phase}')
+              if phase in ['RUNNING', 'CLOUDSPACE_PHASE_RUNNING']:
+                  break
+          
+          time.sleep(10)
+
+          print('4. Executing on_start.sh...')
           cmd_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/command'
           payload = {
-              'command': 'bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh'
+              'command': 'nohup bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh </dev/null >/tmp/runner.log 2>&1 &'
           }
           res = requests.post(cmd_url, json=payload, headers=headers)
           print(f'Execution response status: {res.status_code}, response: {res.text}')
