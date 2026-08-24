@@ -111,7 +111,6 @@ name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs every 10 minutes
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
@@ -124,52 +123,38 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning SDK & Requests
-        run: pip install "lightning-sdk" requests
+      - name: Install Lightning SDK
+        run: pip install "lightning-sdk"
 
-      - name: Health Check & Auto Cycle
+      - name: Health Check & Keep Online
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           python -c "
-          import os, time, requests
+          import os, time
           from lightning_sdk import Studio
 
           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
-          domain = 'https://doornail-plant-jazz.ngrok-free.dev'
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
 
-          # 1. Health check external public endpoint
-          is_online = False
-          try:
-              res = requests.get(domain, timeout=8)
-              if res.status_code in [200, 302, 404]:  # If Flask responds
-                  is_online = True
-          except Exception:
-              is_online = False
+          print(f'Current Studio Status: {s.status}')
 
-          print(f'Domain online status: {is_online}')
-
-          # 2. If offline, restart the entire container to get a fresh 4-hour timer
-          if not is_online:
-              print('Domain is down! Power-cycling studio to reset master timer...')
-              try:
-                  s.stop()
-                  time.sleep(25)
-              except Exception as e:
-                  print(f'Stop notice: {e}')
-
-              print('Booting studio...')
+          # Always ensure Studio is in running state
+          if str(s.status).lower() != 'running':
+              print('Studio is stopped. Starting it now...')
               s.start()
               time.sleep(15)
 
-          # 3. Ensure persistent tmux session and services are running
-          print('Dispatching launch script...')
-          s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-          print('Watchdog cycle completed successfully.')
+          # Execute the persistent session script
+          print('Ensuring Flask and Ngrok are running...')
+          try:
+              s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+              print('Services verified and running!')
+          except Exception as e:
+              print(f'Execution retry notice: {e}')
+              s.start()
+              s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
           "
-
-# 
