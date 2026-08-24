@@ -444,5 +444,4 @@ jobs:
           res_cmd = requests.post(cmd_url, json=payload, headers=headers)
           print(f'Command dispatch status: {res_cmd.status_code}')
           print(f'Command response: {res_cmd.text}')
-          "y RUNNING...
-Error: Process completed with exit code 1.
+          "
