@@ -23,9 +23,9 @@ jobs:
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           echo "1. Stopping studio to refresh timer..."
-          lightning stop studio --name scratch-studio-devbox --teamspace default-project || lightning stop studio --name scratch-studio-devbox || true
+          lightning studio stop --name scratch-studio-devbox --teamspace Sakshamraj1/default-project || true
           
           sleep 25
           
           echo "2. Starting studio..."
-          lightning start studio --name scratch-studio-devbox --teamspace default-project || lightning start studio --name scratch-studio-devbox
+          lightning studio start --name scratch-studio-devbox --teamspace Sakshamraj1/default-project
