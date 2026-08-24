@@ -14,20 +14,18 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning CLI & SDK
+      - name: Install Lightning SDK
         run: pip install "lightning-sdk"
 
-      - name: Restart Studio
+      - name: Restart Studio and Keep Online
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # 1. Stop Studio to refresh the 4-hour inactivity timer
-          echo "Stopping studio..."
-          lightning stop studio scratch-studio-devbox --teamspace default-project || lightning stop studio scratch-studio-devbox || true
+          echo "1. Stopping studio to refresh timer..."
+          lightning stop studio --name scratch-studio-devbox --teamspace default-project || lightning stop studio --name scratch-studio-devbox || true
           
-          sleep 20
+          sleep 25
           
-          # 2. Start Studio
-          echo "Starting studio..."
-          lightning start studio scratch-studio-devbox --teamspace default-project || lightning start studio scratch-studio-devbox
+          echo "2. Starting studio..."
+          lightning start studio --name scratch-studio-devbox --teamspace default-project || lightning start studio --name scratch-studio-devbox
