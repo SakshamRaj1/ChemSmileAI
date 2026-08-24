@@ -104,7 +104,8 @@
 #           print('Services verified active!')
 #           "
 
-# -----------------------------------New logic to restart the studio ----------------------------------
+# -----------------------------------New logic to restart the studio -----------------------------------
+# (stop and restart) the studio at a regular interval so the master session timer continuously resets to a fresh 4 hours.
 
 name: Keep Studio Fresh & Free
 
@@ -170,7 +171,5 @@ jobs:
           s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
           print('Watchdog cycle completed successfully.')
           "
-
-# # 
 
 # 
