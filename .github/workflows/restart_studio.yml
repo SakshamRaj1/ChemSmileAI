@@ -492,9 +492,3 @@ jobs:
           print('Executing services in Studio...')
           subprocess.run('lightning run studio --name scratch-studio-devbox \"bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh\"', shell=True)
           print('Done!')
-          "
-          print(f'Command response: {res_cmd.text}')
-
-
-          
-          "
