@@ -17,32 +17,17 @@ jobs:
       - name: Install Lightning CLI & SDK
         run: pip install "lightning-sdk"
 
-      - name: Authenticate and Restart Studio
+      - name: Restart Studio
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          python -c "
-          import os, subprocess, time
-
-          # 1. Authenticate Lightning CLI in the runner
-          user = os.environ['LIGHTNING_USER_ID'].strip()
-          key = os.environ['LIGHTNING_API_KEY'].strip()
-
-          subprocess.run(f'lightning login {user} {key}', shell=True, check=True)
-
-          # 2. Stop Studio to refresh idle timer
-          print('Stopping studio...')
-          subprocess.run('lightning stop studio scratch-studio-devbox', shell=True)
-          time.sleep(20)
-
-          # 3. Start Studio
-          print('Starting studio...')
-          subprocess.run('lightning start studio scratch-studio-devbox', shell=True, check=True)
-          time.sleep(40)
-
-          # 4. Trigger startup script directly inside the live Studio
-          print('Executing services in Studio...')
-          subprocess.run('lightning run studio --name scratch-studio-devbox \"bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh\"', shell=True)
-          print('Done!')
-          "
+          # 1. Stop Studio to refresh the 4-hour inactivity timer
+          echo "Stopping studio..."
+          lightning stop studio scratch-studio-devbox --teamspace default-project || lightning stop studio scratch-studio-devbox || true
+          
+          sleep 20
+          
+          # 2. Start Studio
+          echo "Starting studio..."
+          lightning start studio scratch-studio-devbox --teamspace default-project || lightning start studio scratch-studio-devbox
