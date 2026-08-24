@@ -244,7 +244,7 @@ jobs:
           s = Studio(
               name='scratch-studio-devbox',
               teamspace='default-project',
-              user='Sakshamraj1-34lrc'
+              user='Sakshamraj1'
           )
           s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
           print('Services successfully restarted!')
