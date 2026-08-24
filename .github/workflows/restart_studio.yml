@@ -65,6 +65,8 @@
 #               print(f'Alt start response: {r_start_alt.status_code}')
 #           "
 
+
+# This was working without errros-------------------------------------------------------------------------------------------
 # name: Keep Studio Fresh & Free
 
 # on:
@@ -124,7 +126,8 @@
 #               print(f'SDK execution notice: {e}')
 #           "
 
-# This was working without errros-------------------------------------------------------------------------------------------
+
+
 # name: Keep Studio Fresh & Free
 
 # on:
@@ -241,7 +244,7 @@ jobs:
           s = Studio(
               name='scratch-studio-devbox',
               teamspace='default-project',
-              user='sakshamraj1-34lrc'
+              user='Sakshamraj1-34lrc'
           )
           s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
           print('Services successfully restarted!')
