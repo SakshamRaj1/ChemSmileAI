@@ -1,3 +1,38 @@
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '30 */3 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   restart:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK
+#         run: pip install "lightning-sdk"
+
+#       - name: Restart Studio and Keep Online
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           echo "1. Stopping studio to refresh timer..."
+#           lightning studio stop --name scratch-studio-devbox --teamspace sakshamraj1-34lrc/default-project || true
+          
+#           sleep 25
+          
+#           echo "2. Starting studio..."
+#           lightning studio start --name scratch-studio-devbox --teamspace sakshamraj1-34lrc/default-project
+
+
+
+
 name: Keep Studio Fresh & Free
 
 on:
@@ -17,15 +52,39 @@ jobs:
       - name: Install Lightning SDK
         run: pip install "lightning-sdk"
 
-      - name: Restart Studio and Keep Online
+      - name: Restart Studio and Run App
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          echo "1. Stopping studio to refresh timer..."
-          lightning studio stop --name scratch-studio-devbox --teamspace sakshamraj1-34lrc/default-project || true
-          
-          sleep 25
-          
-          echo "2. Starting studio..."
-          lightning studio start --name scratch-studio-devbox --teamspace sakshamraj1-34lrc/default-project
+          python -c "
+          import os, time
+          from lightning_sdk import Studio
+
+          # Explicitly set auth in environment
+          os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+          os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+          print('1. Connecting to Studio...')
+          s = Studio(
+              name='scratch-studio-devbox',
+              teamspace='default-project',
+              org='sakshamraj1-34lrc'
+          )
+
+          print('2. Stopping studio...')
+          try:
+              s.stop()
+          except Exception as e:
+              print(f'Stop notice: {e}')
+
+          time.sleep(20)
+
+          print('3. Starting studio...')
+          s.start()
+
+          print('4. Executing startup script on Studio...')
+          output = s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
+          print('Run output:', output)
+          print('Services successfully launched!')
+          "
