@@ -55,13 +55,62 @@
 #           print('Services successfully launched!')
 #           "
 
-# ----------------------------- New logic to restart every 10 minutes -----------------------------------------
+# ----------------------------- New logic to restart every 10 minutes -worked but closed after 2 hrs -----------------------------------------
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Run every 10 minutes to prevent the 15-minute idle auto-sleep
+#     - cron: '*/10 * * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK
+#         run: pip install "lightning-sdk"
+
+#       - name: Keep Studio Active
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(
+#               name='scratch-studio-devbox',
+#               teamspace='default-project',
+#               org='sakshamraj1-34lrc'
+#           )
+
+#           # If studio stopped, start it
+#           s.start()
+
+#           # Run the persistent tmux session launcher
+#           print('Ensuring services are active in tmux...')
+#           s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#           print('Services verified active!')
+#           "
+
+# -----------------------------------New logic to restart the studio ----------------------------------
 
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Run every 10 minutes to prevent the 15-minute idle auto-sleep
+    # Runs every 10 minutes
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
@@ -74,35 +123,54 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning SDK
-        run: pip install "lightning-sdk"
+      - name: Install Lightning SDK & Requests
+        run: pip install "lightning-sdk" requests
 
-      - name: Keep Studio Active
+      - name: Health Check & Auto Cycle
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           python -c "
-          import os, time
+          import os, time, requests
           from lightning_sdk import Studio
 
           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
-          s = Studio(
-              name='scratch-studio-devbox',
-              teamspace='default-project',
-              org='sakshamraj1-34lrc'
-          )
+          domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+          s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
 
-          # If studio stopped, start it
-          s.start()
+          # 1. Health check external public endpoint
+          is_online = False
+          try:
+              res = requests.get(domain, timeout=8)
+              if res.status_code in [200, 302, 404]:  # If Flask responds
+                  is_online = True
+          except Exception:
+              is_online = False
 
-          # Run the persistent tmux session launcher
-          print('Ensuring services are active in tmux...')
+          print(f'Domain online status: {is_online}')
+
+          # 2. If offline, restart the entire container to get a fresh 4-hour timer
+          if not is_online:
+              print('Domain is down! Power-cycling studio to reset master timer...')
+              try:
+                  s.stop()
+                  time.sleep(25)
+              except Exception as e:
+                  print(f'Stop notice: {e}')
+
+              print('Booting studio...')
+              s.start()
+              time.sleep(15)
+
+          # 3. Ensure persistent tmux session and services are running
+          print('Dispatching launch script...')
           s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-          print('Services verified active!')
+          print('Watchdog cycle completed successfully.')
           "
 
+# # 
 
 # 
