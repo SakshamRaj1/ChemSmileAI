@@ -384,30 +384,65 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-26s
-Run python -c "
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/requests/models.py", line 1116, in json
-    return complexjson.loads(self.text, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/json/__init__.py", line 346, in loads
-    return _default_decoder.decode(s)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+name: Keep Studio Fresh & Free
 
-During handling of the above exception, another exception occurred:
+on:
+  schedule:
+    - cron: '30 */3 * * *'
+  workflow_dispatch:
 
-Traceback (most recent call last):
-  File "<string>", line 29, in <module>
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/requests/models.py", line 1120, in json
-    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-1. Stopping studio...
-2. Starting studio...
-3. Waiting for Studio container to be fully RUNNING...
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Requests
+        run: pip install requests
+
+      - name: Restart Studio and Launch Services
+        env:
+          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+        run: |
+          python -c "
+          import os, time, requests
+
+          user_id = os.environ['LIGHTNING_USER_ID'].strip()
+          api_key = os.environ['LIGHTNING_API_KEY'].strip()
+          project_id = '01m0pkbwmfh7j075v37y389fsx'
+          studio_id = '01m0pkexbyeq84az5st8c5xx06'
+
+          headers = {
+              'X-Grid-User': user_id,
+              'X-Grid-Key': api_key,
+              'Authorization': f'Bearer {api_key}',
+              'Content-Type': 'application/json'
+          }
+          base_url = 'https://lightning.ai/api/v1'
+
+          print('1. Stopping studio to refresh timer...')
+          res_stop = requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop', headers=headers)
+          print(f'Stop response status: {res_stop.status_code}')
+          time.sleep(20)
+
+          print('2. Starting studio...')
+          res_start = requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
+          print(f'Start response status: {res_start.status_code}')
+
+          print('3. Waiting 45 seconds for Studio container to boot...')
+          time.sleep(45)
+
+          print('4. Executing on_start.sh command...')
+          cmd_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/command'
+          payload = {
+              'command': 'nohup bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh </dev/null >/tmp/runner.log 2>&1 &'
+          }
+          res_cmd = requests.post(cmd_url, json=payload, headers=headers)
+          print(f'Command dispatch status: {res_cmd.status_code}')
+          print(f'Command response: {res_cmd.text}')
+          "y RUNNING...
 Error: Process completed with exit code 1.
