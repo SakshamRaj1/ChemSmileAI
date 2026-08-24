@@ -189,6 +189,68 @@
 #           "
 
 
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '30 */3 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   restart:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Dependencies
+#         run: pip install requests lightning-sdk
+
+#       - name: Restart Studio and Run Startup Script
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           # Ensure the SDK detects authentication credentials from environment
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           project_id = '01m0pkbwmfh7j075v37y389fsx'
+#           studio_id = '01m0pkexbyeq84az5st8c5xx06'
+
+#           headers = {
+#               'X-Grid-User': os.environ['LIGHTNING_USER_ID'],
+#               'X-Grid-Key': os.environ['LIGHTNING_API_KEY'],
+#               'Authorization': f'Bearer {os.environ[\"LIGHTNING_API_KEY\"]}',
+#               'Content-Type': 'application/json'
+#           }
+#           base_url = 'https://lightning.ai/api/v1'
+
+#           print('1. Stopping studio...')
+#           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/stop', headers=headers)
+#           time.sleep(25)
+
+#           print('2. Starting studio...')
+#           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
+#           time.sleep(35)
+
+#           print('3. Executing startup script via SDK...')
+#           s = Studio(
+#               name='scratch-studio-devbox',
+#               teamspace='default-project',
+#               user='Sakshamraj1'
+#           )
+#           s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
+#           print('Services successfully restarted!')
+#           "
+
+
 name: Keep Studio Fresh & Free
 
 on:
@@ -205,29 +267,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
-        run: pip install requests lightning-sdk
+      - name: Install Requests
+        run: pip install requests
 
-      - name: Restart Studio and Run Startup Script
+      - name: Restart Studio and Execute Services
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           python -c "
           import os, time, requests
-          from lightning_sdk import Studio
 
-          # Ensure the SDK detects authentication credentials from environment
-          os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
-          os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
-
+          user_id = os.environ['LIGHTNING_USER_ID'].strip()
+          api_key = os.environ['LIGHTNING_API_KEY'].strip()
           project_id = '01m0pkbwmfh7j075v37y389fsx'
           studio_id = '01m0pkexbyeq84az5st8c5xx06'
 
           headers = {
-              'X-Grid-User': os.environ['LIGHTNING_USER_ID'],
-              'X-Grid-Key': os.environ['LIGHTNING_API_KEY'],
-              'Authorization': f'Bearer {os.environ[\"LIGHTNING_API_KEY\"]}',
+              'X-Grid-User': user_id,
+              'X-Grid-Key': api_key,
+              'Authorization': f'Bearer {api_key}',
               'Content-Type': 'application/json'
           }
           base_url = 'https://lightning.ai/api/v1'
@@ -240,12 +299,11 @@ jobs:
           requests.post(f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/start', headers=headers)
           time.sleep(35)
 
-          print('3. Executing startup script via SDK...')
-          s = Studio(
-              name='scratch-studio-devbox',
-              teamspace='default-project',
-              user='Sakshamraj1'
-          )
-          s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
-          print('Services successfully restarted!')
+          print('3. Executing on_start.sh via Cloudspace Command API...')
+          cmd_url = f'{base_url}/projects/{project_id}/cloudspaces/{studio_id}/command'
+          payload = {
+              'command': 'bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh'
+          }
+          res = requests.post(cmd_url, json=payload, headers=headers)
+          print(f'Execution response status: {res.status_code}, response: {res.text}')
           "
