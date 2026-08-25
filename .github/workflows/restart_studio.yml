@@ -219,11 +219,84 @@
 
 
 # ----------------------Improved version to handle auto restart and avoid System Hangup, restarts every 5 mts---------------------------
+# -------------------It ran till 4hrs, then Lightning Studio forced to SHUT due to fixed 4hrs continue sessions----------------------
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '0 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+
+#           # Loop every 5 minutes for ~5.5 hours
+#           for i in range(66):
+#               print(f'=== Check {i+1}/66 | Studio Status: {s.status} ===')
+
+#               needs_deploy = False
+#               if str(s.status).lower() != 'running':
+#                   print('Studio stopped! Booting instance...')
+#                   s.start()
+#                   time.sleep(45)
+#                   needs_deploy = True
+
+#               # Check if public endpoint is healthy
+#               try:
+#                   res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
+#                   print(f'Public endpoint status: {res.status_code}')
+#                   if res.status_code not in [200, 302, 404]:
+#                       needs_deploy = True
+#               except Exception as e:
+#                   print(f'Ping failed: {e}')
+#                   needs_deploy = True
+
+#               if needs_deploy:
+#                   print('Redeploying services via setsid daemon...')
+#                   output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                   print(output)
+
+#               print('Sleeping 300s (5m)...')
+#               time.sleep(300)
+#           "
+
+
+# ----------------------------------------------------------------------------------Final Logic-------------------------------------------------------------
+
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    # Runs every 10 minutes
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -233,7 +306,6 @@ concurrency:
 jobs:
   keep_alive:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
     steps:
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -243,7 +315,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Persistent Watchdog Loop
+      - name: Watchdog & Auto-Recovery
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -255,34 +327,40 @@ jobs:
           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
+          domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+          
+          # 1. Health check external public endpoint
+          is_healthy = False
+          try:
+              res = requests.get(domain, timeout=8)
+              if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+                  is_healthy = True
+          except Exception:
+              is_healthy = False
+
+          print(f'Public domain reachable: {is_healthy}')
+
+          # 2. Connect to Studio
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+          status = str(s.status).lower()
+          print(f'Current Studio Status: {status}')
 
-          # Loop every 5 minutes for ~5.5 hours
-          for i in range(66):
-              print(f'=== Check {i+1}/66 | Studio Status: {s.status} ===')
-
-              needs_deploy = False
-              if str(s.status).lower() != 'running':
-                  print('Studio stopped! Booting instance...')
-                  s.start()
-                  time.sleep(45)
-                  needs_deploy = True
-
-              # Check if public endpoint is healthy
+          # 3. If down or not healthy, do a full clean reboot to reset the 4hr timer
+          if not is_healthy or status != 'running':
+              print('Restarting Studio to reset master timer and boot services...')
               try:
-                  res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
-                  print(f'Public endpoint status: {res.status_code}')
-                  if res.status_code not in [200, 302, 404]:
-                      needs_deploy = True
+                  s.stop()
+                  time.sleep(20)
               except Exception as e:
-                  print(f'Ping failed: {e}')
-                  needs_deploy = True
+                  print(f'Stop notice: {e}')
 
-              if needs_deploy:
-                  print('Redeploying services via setsid daemon...')
-                  output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                  print(output)
+              s.start()
+              print('Waiting 45s for machine provisioning...')
+              time.sleep(45)
 
-              print('Sleeping 300s (5m)...')
-              time.sleep(300)
+              print('Deploying services...')
+              s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+              print('Services successfully launched!')
+          else:
+              print('Studio is active and domain is responding normally.')
           "
