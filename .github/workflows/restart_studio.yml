@@ -160,18 +160,76 @@
 #               s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
 #           "
 
+# ---------------------------------Github in busy hours will delay cron by 60 mts, so the Studio will sleep------------------
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Runs every 6 minutes
+#     - cron: '*/6 * * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Health Check & Keep Online
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#           print(f'Initial Studio Status: {s.status}')
+
+#           # 1. If Studio is stopped or stopping, start it and wait for full boot
+#           if str(s.status).lower() != 'running':
+#               print('Studio not active. Booting up...')
+#               s.start()
+#               print('Waiting 45s for container initialization...')
+#               time.sleep(45)
+
+#           # 2. Dispatch services and inspect running process table
+#           print('Dispatching services...')
+#           output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#           print('Process table output:\n', output)
+
+#           # 3. Verify Ngrok tunnel is reachable
+#           time.sleep(8)
+#           try:
+#               res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
+#               print(f'Ngrok public endpoint response code: {res.status_code}')
+#           except Exception as e:
+#               print(f'Ngrok check notice: {e}')
+#           "
+
 
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs every 6 minutes
-    - cron: '*/6 * * * *'
+    # Trigger fallback cron hourly
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
   keep_alive:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -181,7 +239,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Health Check & Keep Online
+      - name: Persistent Watchdog Loop (5.5 Hours Active)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -194,25 +252,28 @@ jobs:
           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
-          print(f'Initial Studio Status: {s.status}')
 
-          # 1. If Studio is stopped or stopping, start it and wait for full boot
-          if str(s.status).lower() != 'running':
-              print('Studio not active. Booting up...')
-              s.start()
-              print('Waiting 45s for container initialization...')
-              time.sleep(45)
+          # Loop every 5 minutes for 5.5 hours (GitHub runner max time limit is 6 hours)
+          iterations = 66
+          for i in range(iterations):
+              print(f'=== Check {i+1}/{iterations} | Studio Status: {s.status} ===')
+              
+              if str(s.status).lower() != 'running':
+                  print('Studio stopped! Booting instance...')
+                  s.start()
+                  time.sleep(45)
 
-          # 2. Dispatch services and inspect running process table
-          print('Dispatching services...')
-          output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-          print('Process table output:\n', output)
+              print('Ensuring services are alive...')
+              output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+              print(output)
 
-          # 3. Verify Ngrok tunnel is reachable
-          time.sleep(8)
-          try:
-              res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
-              print(f'Ngrok public endpoint response code: {res.status_code}')
-          except Exception as e:
-              print(f'Ngrok check notice: {e}')
+              # Quick health ping
+              try:
+                  res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
+                  print(f'Public URL check status: {res.status_code}')
+              except Exception as e:
+                  print(f'Ping notice: {e}')
+
+              print('Sleeping 300s (5 minutes) until next cycle...')
+              time.sleep(300)
           "
