@@ -295,8 +295,8 @@ name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Runs every 10 minutes
-    - cron: '*/10 * * * *'
+    # Trigger hourly to roll over to a fresh runner seamlessly
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -306,6 +306,7 @@ concurrency:
 jobs:
   keep_alive:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -315,7 +316,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Watchdog & Auto-Recovery
+      - name: Persistent Watchdog Loop (1-Hour Active Runner)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -328,39 +329,55 @@ jobs:
           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
-          
-          # 1. Health check external public endpoint
-          is_healthy = False
-          try:
-              res = requests.get(domain, timeout=8)
-              if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
-                  is_healthy = True
-          except Exception:
+
+          # Loop every 4 minutes for up to 55 minutes
+          for i in range(14):
+              print(f'=== Check {i+1}/14 at {time.strftime(\"%H:%M:%S\")} ===')
+
+              # 1. Health check external public endpoint
               is_healthy = False
-
-          print(f'Public domain reachable: {is_healthy}')
-
-          # 2. Connect to Studio
-          s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
-          status = str(s.status).lower()
-          print(f'Current Studio Status: {status}')
-
-          # 3. If down or not healthy, do a full clean reboot to reset the 4hr timer
-          if not is_healthy or status != 'running':
-              print('Restarting Studio to reset master timer and boot services...')
               try:
-                  s.stop()
-                  time.sleep(20)
+                  res = requests.get(domain, timeout=8)
+                  if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+                      is_healthy = True
+              except Exception:
+                  is_healthy = False
+
+              print(f'Domain healthy: {is_healthy}')
+
+              # 2. Check Studio state with a fresh connection per tick
+              needs_restart = not is_healthy
+              try:
+                  s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+                  status = str(s.status).lower()
+                  print(f'Studio status: {status}')
+                  if status != 'running':
+                      needs_restart = True
               except Exception as e:
-                  print(f'Stop notice: {e}')
+                  print(f'Studio status check notice: {e}')
+                  needs_restart = True
 
-              s.start()
-              print('Waiting 45s for machine provisioning...')
-              time.sleep(45)
+              # 3. Recover if offline or session hard-limit expired
+              if needs_restart:
+                  print('Recovering studio...')
+                  try:
+                      s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+                      try:
+                          s.stop()
+                          time.sleep(20)
+                      except Exception:
+                          pass
 
-              print('Deploying services...')
-              s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-              print('Services successfully launched!')
-          else:
-              print('Studio is active and domain is responding normally.')
+                      s.start()
+                      print('Waiting 45s for boot...')
+                      time.sleep(45)
+
+                      print('Deploying services...')
+                      s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+                      print('Services online!')
+                  except Exception as err:
+                      print(f'Recovery step warning: {err}')
+
+              print('Sleeping 240s (4m)...')
+              time.sleep(240)
           "
