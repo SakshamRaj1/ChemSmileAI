@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-007EC6.svg)](LICENSE)
 [![Maintained](https://img.shields.io/badge/Maintained%3F-yes-007EC6.svg)](#)
-[![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?logo=render&logoColor=white)](https://chemsmileai.onrender.com/)
+[![Deployment](https://img.shields.io/badge/Deployed%3F-yes-007EC6.svg)](https://doornail-plant-jazz.ngrok-free.dev/)
 [![APIs](https://img.shields.io/badge/APIs-None%20(100%25%20Offline%2FLocal)-4c1.svg)](#)
 
 [![Python](https://img.shields.io/badge/Python-3.13.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
