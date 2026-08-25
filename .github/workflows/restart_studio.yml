@@ -218,11 +218,11 @@
 #           "
 
 
+# ----------------------Improved version to handle auto restart and avoid System Hangup, restarts every 5 mts---------------------------
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Trigger fallback cron hourly
     - cron: '0 * * * *'
   workflow_dispatch:
 
@@ -239,7 +239,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Persistent Watchdog Loop (5.5 Hours Active)
+      - name: Persistent Watchdog Loop
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -253,27 +253,32 @@ jobs:
 
           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
 
-          # Loop every 5 minutes for 5.5 hours (GitHub runner max time limit is 6 hours)
-          iterations = 66
-          for i in range(iterations):
-              print(f'=== Check {i+1}/{iterations} | Studio Status: {s.status} ===')
-              
+          # Loop every 5 minutes for ~5.5 hours
+          for i in range(66):
+              print(f'=== Check {i+1}/66 | Studio Status: {s.status} ===')
+
+              needs_deploy = False
               if str(s.status).lower() != 'running':
                   print('Studio stopped! Booting instance...')
                   s.start()
                   time.sleep(45)
+                  needs_deploy = True
 
-              print('Ensuring services are alive...')
-              output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-              print(output)
-
-              # Quick health ping
+              # Check if public endpoint is healthy
               try:
                   res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
-                  print(f'Public URL check status: {res.status_code}')
+                  print(f'Public endpoint status: {res.status_code}')
+                  if res.status_code not in [200, 302, 404]:
+                      needs_deploy = True
               except Exception as e:
-                  print(f'Ping notice: {e}')
+                  print(f'Ping failed: {e}')
+                  needs_deploy = True
 
-              print('Sleeping 300s (5 minutes) until next cycle...')
+              if needs_deploy:
+                  print('Redeploying services via setsid daemon...')
+                  output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+                  print(output)
+
+              print('Sleeping 300s (5m)...')
               time.sleep(300)
           "
