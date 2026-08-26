@@ -290,13 +290,107 @@
 
 
 # ----------------------------------------------------------------------------------Final Logic-------------------------------------------------------------
+# It worked for 1.5 days continuously but I found the app offline at 4AM on 27 Aug 2027 
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Trigger hourly to roll over to a fresh runner seamlessly
+#     - cron: '0 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop (1-Hour Active Runner)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 4 minutes for up to 55 minutes
+#           for i in range(14):
+#               print(f'=== Check {i+1}/14 at {time.strftime(\"%H:%M:%S\")} ===')
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception:
+#                   is_healthy = False
+
+#               print(f'Domain healthy: {is_healthy}')
+
+#               # 2. Check Studio state with a fresh connection per tick
+#               needs_restart = not is_healthy
+#               try:
+#                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                   status = str(s.status).lower()
+#                   print(f'Studio status: {status}')
+#                   if status != 'running':
+#                       needs_restart = True
+#               except Exception as e:
+#                   print(f'Studio status check notice: {e}')
+#                   needs_restart = True
+
+#               # 3. Recover if offline or session hard-limit expired
+#               if needs_restart:
+#                   print('Recovering studio...')
+#                   try:
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.stop()
+#                           time.sleep(20)
+#                       except Exception:
+#                           pass
+
+#                       s.start()
+#                       print('Waiting 45s for boot...')
+#                       time.sleep(45)
+
+#                       print('Deploying services...')
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!')
+#                   except Exception as err:
+#                       print(f'Recovery step warning: {err}')
+
+#               print('Sleeping 240s (4m)...')
+#               time.sleep(240)
+#           "
+
+# --------------------------------------------------------------------------------------------------------------------------------------------
 
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Trigger hourly to roll over to a fresh runner seamlessly
-    - cron: '0 * * * *'
+    # Trigger frequently so jobs overlap continuously
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -316,7 +410,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Persistent Watchdog Loop (1-Hour Active Runner)
+      - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -330,9 +424,10 @@ jobs:
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
 
-          # Loop every 4 minutes for up to 55 minutes
-          for i in range(14):
-              print(f'=== Check {i+1}/14 at {time.strftime(\"%H:%M:%S\")} ===')
+          # Loop every 4 minutes for up to ~3.5 hours (52 checks)
+          # Covers any extended GitHub queue delays seamlessly
+          for i in range(52):
+              print(f'=== Check {i+1}/52 at {time.strftime(\"%H:%M:%S\")} ===')
 
               # 1. Health check external public endpoint
               is_healthy = False
@@ -345,7 +440,7 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}')
 
-              # 2. Check Studio state with a fresh connection per tick
+              # 2. Check Studio state
               needs_restart = not is_healthy
               try:
                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
@@ -354,10 +449,10 @@ jobs:
                   if status != 'running':
                       needs_restart = True
               except Exception as e:
-                  print(f'Studio status check notice: {e}')
+                  print(f'Studio check note: {e}')
                   needs_restart = True
 
-              # 3. Recover if offline or session hard-limit expired
+              # 3. Recover if down
               if needs_restart:
                   print('Recovering studio...')
                   try:
@@ -376,7 +471,7 @@ jobs:
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
                       print('Services online!')
                   except Exception as err:
-                      print(f'Recovery step warning: {err}')
+                      print(f'Recovery notice: {err}')
 
               print('Sleeping 240s (4m)...')
               time.sleep(240)
