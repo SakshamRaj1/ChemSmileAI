@@ -385,12 +385,17 @@
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+
+#------------------------ Nee approach to work continuously after each cylcle-----------
+
+
 name: Keep Studio Fresh & Free
 
 on:
   schedule:
-    # Trigger frequently so jobs overlap continuously
-    - cron: '*/30 * * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -410,13 +415,15 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
+      - name: Persistent Watchdog Loop with Self-Chaining
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           python -c "
-          import os, time, requests
+          import os, time, requests, subprocess
           from lightning_sdk import Studio
 
           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
@@ -425,7 +432,6 @@ jobs:
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
 
           # Loop every 4 minutes for up to ~3.5 hours (52 checks)
-          # Covers any extended GitHub queue delays seamlessly
           for i in range(52):
               print(f'=== Check {i+1}/52 at {time.strftime(\"%H:%M:%S\")} ===')
 
@@ -475,4 +481,16 @@ jobs:
 
               print('Sleeping 240s (4m)...')
               time.sleep(240)
+
+          # 4. Self-Chaining: Trigger the next runner right before exiting
+          print('Current runner finishing. Triggering successor workflow...')
+          try:
+              token = os.environ.get('GH_TOKEN')
+              repo = os.environ.get('REPO')
+              cmd = f'curl -X POST -H \"Authorization: token {token}\" -H \"Accept: application/vnd.github.v3+json\" https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches -d \"{{\"ref\":\"main\"}}\"'
+              subprocess.run(cmd, shell=True, check=True)
+              print('Successor runner triggered successfully!')
+          except Exception as chain_err:
+              print(f'Self-trigger warning: {chain_err}')
           "
+          
