@@ -561,6 +561,12 @@
 
 
     @media(max-width: 576.99px){
+        large {
+            color: #FFC107;
+            font-size: 1.75rem;
+            word-break: break-all;
+        }
+
         .interactive-card-grid, .analysis-wrapper {
             width: 100%;
         }
@@ -1138,7 +1144,7 @@
         <div class="search-container-bar" style="margin-top: 20px;">
             <form method="POST" action="/molecule_analysis">
                 <input type="text" name="smiles1" class="search-input-field" id = "smiles1" 
-                       placeholder="Enter the Molecular Canonical Smiles or Draw to know ..." 
+                       placeholder="Enter the Molecular Canonical Smiles to know ..." 
                        value="{{ request.form.get('smiles1', '') }}" required>
                     <!-- <button id="drawBtn" class="draw-btn">Draw and Know</button> -->
                      <button type="button" id="drawBtn" class="svg-draw-pencil-button" style="background: transparent; border: none; padding: 1px 6px; margin-right: 0rem;">
@@ -1172,16 +1178,15 @@
                         </svg>
                     </i>
                 </button>
-            </form>       
-            
-        </div>
-            {% if error %}
-    
-            <button onclick="this.style.display='none'" class = "if-error" role="alert">
-                ⚠️ {{ error }}
-            </button>
-            {% endif %}
-        
+            </form> 
+
+    </div>
+        {% if error %}
+
+        <button onclick="this.style.display='none'" class = "if-error" role="alert">
+            ⚠️ {{ error }}
+        </button>
+        {% endif %}
     </div>
 
     {% if data %}
@@ -2646,8 +2651,7 @@
                         <div class="download-section">
                             <h4>Download Data</h4>
                             <button type="submit" name="action" value="data_sdf">SDF</button>
-                            <button type="submit" name="action" value="data_mol">MOL</button>
-                            <!-- <button type="submit" name="action" value="data_mol2">MOL2</button> -->
+                            <button type="submit" name="action" value="data_mol">MOL</button>                            
                             <button type="submit" name="action" value="data_json">JSON</button>
                             <button type="submit" name="action" value="data_csv">CSV</button>
                         </div>
