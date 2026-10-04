@@ -584,7 +584,7 @@
 #               print(f'Self-trigger warning: {chain_err}')
 #           "
           
-
+# ------- September 2026 -------
 # ---------------------------------------------------------------------- New Version (Working and restarting properly. self-healing) -----------------------------------------------------------------------------
 # The Background Thread Accumulation: In your current file, s = Studio(...) is called inside the loop on every check. This creates 50+ background keep-alive 
 # threads (Thread-1, Thread-6, Thread-13, Thread-17...) that run simultaneously and flood your GitHub logs with hundreds of lines of ApiException: 400 errors 
@@ -845,19 +845,42 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Authenticate Lightning CLI
+      # - name: Authenticate Lightning CLI
+      #   env:
+      #     LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+      #     LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+      #   run: |
+      #     # Explicitly configure Lightning CLI authentication on disk
+      #     python -c "
+      #     import os, subprocess
+      #     user_id = os.environ.get('LIGHTNING_USER_ID', '').strip()
+      #     api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+      #     res = subprocess.run(['lightning', 'login', api_key], capture_output=True, text=True)
+      #     print('CLI Login Output:', res.stdout or res.stderr)
+      #     "
+      
+      - name: Authenticate Lightning CLI & Credentials
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          # Explicitly configure Lightning CLI authentication on disk
+          mkdir -p ~/.lightning
           python -c "
-          import os, subprocess
-          user_id = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-          res = subprocess.run(['lightning', 'login', api_key], capture_output=True, text=True)
-          print('CLI Login Output:', res.stdout or res.stderr)
+          import os, json
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+          creds = {
+              'user_id': uid,
+              'api_key': key
+          }
+          path = os.path.expanduser('~/.lightning/credentials.json')
+          with open(path, 'w') as f:
+              json.dump(creds, f)
+          print('Credentials written successfully to', path)
           "
+          # Also run CLI login with credentials
+          lightning login $LIGHTNING_API_KEY || true
 
       - name: Persistent Watchdog Loop (Unbuffered & CLI-Authenticated)
         env:
