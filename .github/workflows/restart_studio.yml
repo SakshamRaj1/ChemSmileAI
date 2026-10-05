@@ -970,35 +970,41 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Lightning SDK & Requests
+      - name: Install Dependencies
         run: pip install "lightning-sdk" requests
 
-      - name: Authenticate Lightning CLI
+      - name: Authenticate Lightning Credentials
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
           mkdir -p ~/.lightning
-          # Write fallback credentials.json with full schema
           python -c "
           import os, json
-          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-          data = {
-              'user_id': uid,
-              'api_key': key,
-              'auth': {'user_id': uid, 'api_key': key}
-          }
-          path = os.path.expanduser('~/.lightning/credentials.json')
-          with open(path, 'w') as f:
-              json.dump(data, f)
-          os.chmod(path, 0o600)
-          print('Base credentials written.')
-          "
-          # Execute official non-interactive CLI login
-          lightning login --api-key "$LIGHTNING_API_KEY" --user-id "$LIGHTNING_USER_ID" || lightning login --api-key "$LIGHTNING_API_KEY" || true
 
-      - name: Persistent Watchdog Loop (Pulse Guard)
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+          # Write all legacy and modern formats required by lightning_cloud
+          creds = {
+              'user_id': uid,
+              'api_key': api_key,
+              'auth': {
+                  'user_id': uid,
+                  'api_key': api_key
+              }
+          }
+          with open(os.path.expanduser('~/.lightning/credentials.json'), 'w') as f:
+              json.dump(creds, f)
+
+          # Also write to ~/.lightning/config.json if referenced
+          with open(os.path.expanduser('~/.lightning/config.json'), 'w') as f:
+              json.dump({'user_id': uid, 'api_key': api_key}, f)
+
+          print('Credential files written successfully.')
+          "
+
+      - name: Persistent Watchdog Loop (Direct SDK Auth)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -1009,24 +1015,43 @@ jobs:
           import os, time, requests, socket
           socket.setdefaulttimeout(20)
 
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+          os.environ['LIGHTNING_USER_ID'] = uid
+          os.environ['LIGHTNING_API_KEY'] = api_key
+
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
           studio_name = 'scratch-studio-devbox'
           teamspace = 'default-project'
           org = 'sakshamraj1-34lrc'
 
           from lightning_sdk import Studio
+          import lightning_sdk
+
+          # 1. Direct programmatic login via SDK client
+          try:
+              if hasattr(lightning_sdk, 'login'):
+                  lightning_sdk.login(api_key=api_key)
+                  print('lightning_sdk.login executed successfully.', flush=True)
+          except Exception as l_err:
+              print(f'SDK login note: {l_err}', flush=True)
+
+          # 2. Reusable Studio instance
+          def get_studio():
+              return Studio(name=studio_name, teamspace=teamspace, org=org)
 
           s = None
           try:
-              s = Studio(name=studio_name, teamspace=teamspace, org=org)
-              print('Connected to Studio client successfully.', flush=True)
+              s = get_studio()
+              print('Studio initialized successfully.', flush=True)
           except Exception as init_err:
-              print(f'Initial Studio connection note: {init_err}', flush=True)
+              print(f'Studio init warning: {init_err}', flush=True)
 
+          # Run 70 checks (3-minute intervals ~ 3.5 hours)
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
-              # 1. Health check external public endpoint
               is_healthy = False
               try:
                   res = requests.get(domain, timeout=8)
@@ -1037,12 +1062,12 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              # 2. Reset 10m idle timer OR Wake up container
               try:
                   if s is None:
-                      s = Studio(name=studio_name, teamspace=teamspace, org=org)
+                      s = get_studio()
 
                   if is_healthy:
+                      # Run heartbeat touch to register activity and reset 10m idle sleep
                       print('Resetting 10m idle timer via studio pulse...', flush=True)
                       try:
                           s.run('touch /tmp/keepalive_pulse')
@@ -1050,21 +1075,21 @@ jobs:
                       except Exception as hb_err:
                           print(f'Pulse note: {hb_err}', flush=True)
                   else:
-                      print('Site is offline. Restoring Studio...', flush=True)
+                      print('Site down. Triggering studio restart...', flush=True)
                       try:
                           s.start()
-                          print('Start dispatched. Waiting 45s for boot...', flush=True)
+                          print('Start sent. Waiting 45s for boot...', flush=True)
                           time.sleep(45)
                       except Exception as start_err:
                           print(f'Start notice: {start_err}', flush=True)
 
                       print('Deploying services...', flush=True)
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                      print('Services online!', flush=True)
+                      print('Services triggered!', flush=True)
 
               except Exception as studio_err:
                   print(f'Studio communication notice: {studio_err}', flush=True)
-                  s = None  # Force reconnection on subsequent check
+                  s = None  # Reset client if session expired
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
@@ -1084,5 +1109,4 @@ jobs:
           except Exception as chain_err:
               print(f'Successor trigger note: {chain_err}', flush=True)
           "
-
-                    
+          
