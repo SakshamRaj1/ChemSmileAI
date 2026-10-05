@@ -943,7 +943,7 @@
 # It uses better logic credential in json format for lightning login
 # Instead of merely pinging the Ngrok URL externally, run a lightweight command via s.run() or send a keep-alive 
 # pulse so Lightning registers actual user activity and resets the 10-minute idle countdown 
-# updated the logic more than 6 times on 5 october 2026
+# updated the logic more than 10 times on 5 october 2026
 
 name: Keep Studio Fresh & Free
 
@@ -973,38 +973,51 @@ jobs:
       - name: Install Dependencies
         run: pip install "lightning-sdk" requests
 
-      - name: Authenticate Lightning Credentials
+      - name: Write Valid Lightning Cloud Credentials
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          mkdir -p ~/.lightning
           python -c "
           import os, json
 
           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
 
-          # Write all legacy and modern formats required by lightning_cloud
-          creds = {
+          lightning_dir = os.path.expanduser('~/.lightning')
+          os.makedirs(lightning_dir, exist_ok=True)
+
+          # Complete internal schema expected by lightning_cloud.login.Auth
+          auth_payload = {
+              'active_user': uid,
+              'users': {
+                  uid: {
+                      'api_key': key,
+                      'user_id': uid
+                  }
+              },
               'user_id': uid,
-              'api_key': api_key,
+              'api_key': key,
               'auth': {
                   'user_id': uid,
-                  'api_key': api_key
+                  'api_key': key
               }
           }
-          with open(os.path.expanduser('~/.lightning/credentials.json'), 'w') as f:
-              json.dump(creds, f)
 
-          # Also write to ~/.lightning/config.json if referenced
-          with open(os.path.expanduser('~/.lightning/config.json'), 'w') as f:
-              json.dump({'user_id': uid, 'api_key': api_key}, f)
+          cred_path = os.path.join(lightning_dir, 'credentials.json')
+          with open(cred_path, 'w') as f:
+              json.dump(auth_payload, f)
+          os.chmod(cred_path, 0o600)
 
-          print('Credential files written successfully.')
+          # Also write config.json for CLI compatibility
+          config_path = os.path.join(lightning_dir, 'config.json')
+          with open(config_path, 'w') as f:
+              json.dump({'active_user': uid, 'api_key': key}, f)
+
+          print('Lightning configuration written successfully.')
           "
 
-      - name: Persistent Watchdog Loop (Direct SDK Auth)
+      - name: Persistent Watchdog Loop (Pulse Guard)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -1016,39 +1029,34 @@ jobs:
           socket.setdefaulttimeout(20)
 
           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
 
+          # Set all known environment variables across Lightning Cloud client versions
           os.environ['LIGHTNING_USER_ID'] = uid
-          os.environ['LIGHTNING_API_KEY'] = api_key
+          os.environ['LIGHTNING_API_KEY'] = key
+          os.environ['LIGHTNING_CLOUD_URL'] = 'https://lightning.ai'
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
-          studio_name = 'scratch-studio-devbox'
-          teamspace = 'default-project'
-          org = 'sakshamraj1-34lrc'
 
           from lightning_sdk import Studio
-          import lightning_sdk
 
-          # 1. Direct programmatic login via SDK client
-          try:
-              if hasattr(lightning_sdk, 'login'):
-                  lightning_sdk.login(api_key=api_key)
-                  print('lightning_sdk.login executed successfully.', flush=True)
-          except Exception as l_err:
-              print(f'SDK login note: {l_err}', flush=True)
-
-          # 2. Reusable Studio instance
-          def get_studio():
-              return Studio(name=studio_name, teamspace=teamspace, org=org)
+          def connect_studio():
+              # Try canonical instantiation, fallback if org/teamspace naming varies
+              try:
+                  return Studio(name='scratch-studio-devbox', teamspace='default-project', user='sakshamraj1-34lrc')
+              except Exception:
+                  try:
+                      return Studio(name='scratch-studio-devbox', teamspace='default-project')
+                  except Exception:
+                      return Studio('scratch-studio-devbox')
 
           s = None
           try:
-              s = get_studio()
-              print('Studio initialized successfully.', flush=True)
-          except Exception as init_err:
-              print(f'Studio init warning: {init_err}', flush=True)
+              s = connect_studio()
+              print(f'Studio client connected! Current state: {s.status}', flush=True)
+          except Exception as e:
+              print(f'Initial connection note: {e}', flush=True)
 
-          # Run 70 checks (3-minute intervals ~ 3.5 hours)
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
@@ -1064,37 +1072,37 @@ jobs:
 
               try:
                   if s is None:
-                      s = get_studio()
+                      s = connect_studio()
 
                   if is_healthy:
-                      # Run heartbeat touch to register activity and reset 10m idle sleep
-                      print('Resetting 10m idle timer via studio pulse...', flush=True)
+                      # Run touch command to generate internal activity and prevent 10m auto-sleep
+                      print('Sending heartbeat command...', flush=True)
                       try:
                           s.run('touch /tmp/keepalive_pulse')
-                          print('Pulse recorded.', flush=True)
+                          print('Heartbeat pulse succeeded.', flush=True)
                       except Exception as hb_err:
                           print(f'Pulse note: {hb_err}', flush=True)
                   else:
-                      print('Site down. Triggering studio restart...', flush=True)
+                      print('Endpoint offline. Starting Studio container...', flush=True)
                       try:
                           s.start()
-                          print('Start sent. Waiting 45s for boot...', flush=True)
+                          print('Start command sent. Waiting 45s for container boot...', flush=True)
                           time.sleep(45)
                       except Exception as start_err:
                           print(f'Start notice: {start_err}', flush=True)
 
-                      print('Deploying services...', flush=True)
+                      print('Deploying services via keep_alive.sh...', flush=True)
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
                       print('Services triggered!', flush=True)
 
               except Exception as studio_err:
-                  print(f'Studio communication notice: {studio_err}', flush=True)
-                  s = None  # Reset client if session expired
+                  print(f'Studio communication note: {studio_err}', flush=True)
+                  s = None  # Reconnect on next check
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
 
-          # 3. Successor Handoff Trigger
+          # Successor Trigger
           print('Runner loop complete. Triggering successor...', flush=True)
           try:
               token = os.environ.get('GH_TOKEN')
@@ -1109,4 +1117,3 @@ jobs:
           except Exception as chain_err:
               print(f'Successor trigger note: {chain_err}', flush=True)
           "
-          
