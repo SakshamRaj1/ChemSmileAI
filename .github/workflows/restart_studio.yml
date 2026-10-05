@@ -940,7 +940,7 @@
 
 # Updated code to tackle the current problem to avoid shutdown and stay 24*7 active
 # it will accept the API Key only if it is available on disk, so that it can restart
-# It uses better logic
+# It uses better logic for lightning login
 
 name: Keep Studio Fresh & Free
 
@@ -970,31 +970,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Write Native Lightning Auth Config
-        env:
-          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
-          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
-        run: |
-          python -c "
-          import os, json
-          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-
-          lightning_dir = os.path.expanduser('~/.lightning')
-          os.makedirs(lightning_dir, exist_ok=True)
-
-          creds = {
-              'user_id': uid,
-              'api_key': key
-          }
-
-          with open(os.path.join(lightning_dir, 'credentials.json'), 'w') as f:
-              json.dump(creds, f)
-
-          print('Wrote credentials successfully.')
-          "
-
-      - name: Persistent Watchdog Loop (Smart Guard)
+      - name: Persistent Watchdog Loop (SDK-Native Auth)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -1005,17 +981,24 @@ jobs:
           import os, time, requests, socket
           socket.setdefaulttimeout(15)
 
-          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-          os.environ['LIGHTNING_USER_ID'] = uid
-          os.environ['LIGHTNING_API_KEY'] = key
+          user_id = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+          import lightning_sdk
+          from lightning_sdk import Studio
+
+          # Perform SDK-native login directly in Python
+          try:
+              lightning_sdk.login(api_key=api_key)
+              print('Native SDK login successful!', flush=True)
+          except Exception as login_err:
+              print(f'Native login notice: {login_err}', flush=True)
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
 
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
-              # 1. Health check external public endpoint
               is_healthy = False
               try:
                   res = requests.get(domain, timeout=8)
@@ -1026,11 +1009,15 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              # 2. ONLY attempt recovery if the public endpoint is ACTUALLY failing
               if not is_healthy:
                   print('Site is offline. Attempting Studio recovery...', flush=True)
                   try:
-                      from lightning_sdk import Studio
+                      # Re-authenticate if session dropped
+                      try:
+                          lightning_sdk.login(api_key=api_key)
+                      except Exception:
+                          pass
+
                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
                       try:
                           s.start()
@@ -1050,7 +1037,6 @@ jobs:
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
 
-          # Self-chain successor
           print('Loop completed. Triggering successor...', flush=True)
           try:
               token = os.environ.get('GH_TOKEN')
