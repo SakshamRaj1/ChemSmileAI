@@ -1016,7 +1016,7 @@ jobs:
 
           print('Lightning configuration written successfully.')
           "
-
+          
       - name: Persistent Watchdog Loop (Pulse Guard)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
@@ -1031,7 +1031,6 @@ jobs:
           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
           key = os.environ.get('LIGHTNING_API_KEY', '').strip()
 
-          # Set all known environment variables across Lightning Cloud client versions
           os.environ['LIGHTNING_USER_ID'] = uid
           os.environ['LIGHTNING_API_KEY'] = key
           os.environ['LIGHTNING_CLOUD_URL'] = 'https://lightning.ai'
@@ -1041,14 +1040,29 @@ jobs:
           from lightning_sdk import Studio
 
           def connect_studio():
-              # Try canonical instantiation, fallback if org/teamspace naming varies
               try:
-                  return Studio(name='scratch-studio-devbox', teamspace='default-project', user='sakshamraj1-34lrc')
-              except Exception:
+                  # Auto-discover studio instance directly from account
+                  studios = Studio.list()
+                  for st in studios:
+                      if getattr(st, 'name', '') == 'scratch-studio-devbox':
+                          return st
+                  if studios:
+                      print(f'Discovered studios on account: {[s.name for s in studios]}', flush=True)
+                      return studios[0]
+              except Exception as list_err:
+                  print(f'Studio.list note: {list_err}', flush=True)
+
+              for call in [
+                  lambda: Studio(name='scratch-studio-devbox'),
+                  lambda: Studio(name='scratch-studio-devbox', teamspace='default-project'),
+                  lambda: Studio(name='scratch-studio-devbox', teamspace='default'),
+                  lambda: Studio('scratch-studio-devbox')
+              ]:
                   try:
-                      return Studio(name='scratch-studio-devbox', teamspace='default-project')
+                      return call()
                   except Exception:
-                      return Studio('scratch-studio-devbox')
+                      continue
+              raise RuntimeError('Unable to resolve Studio instance with provided configurations.')
 
           s = None
           try:
@@ -1066,7 +1080,7 @@ jobs:
                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
                       is_healthy = True
               except Exception as net_err:
-                  print(f'Ping failed: {net_err}', flush=True)
+                  print(f'Ping note: {net_err}', flush=True)
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
@@ -1075,7 +1089,6 @@ jobs:
                       s = connect_studio()
 
                   if is_healthy:
-                      # Run touch command to generate internal activity and prevent 10m auto-sleep
                       print('Sending heartbeat command...', flush=True)
                       try:
                           s.run('touch /tmp/keepalive_pulse')
@@ -1096,13 +1109,12 @@ jobs:
                       print('Services triggered!', flush=True)
 
               except Exception as studio_err:
-                  print(f'Studio communication note: {studio_err}', flush=True)
-                  s = None  # Reconnect on next check
+                  print(f'Studio communication notice: {studio_err}', flush=True)
+                  s = None
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
 
-          # Successor Trigger
           print('Runner loop complete. Triggering successor...', flush=True)
           try:
               token = os.environ.get('GH_TOKEN')
