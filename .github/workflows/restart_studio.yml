@@ -970,24 +970,31 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Authenticate Lightning CLI & Credentials
+      - name: Write Native Lightning Auth Config
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          mkdir -p ~/.lightning
           python -c "
           import os, json
           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
           key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-          creds = {'user_id': uid, 'api_key': key}
-          path = os.path.expanduser('~/.lightning/credentials.json')
-          with open(path, 'w') as f:
+
+          lightning_dir = os.path.expanduser('~/.lightning')
+          os.makedirs(lightning_dir, exist_ok=True)
+
+          creds = {
+              'user_id': uid,
+              'api_key': key
+          }
+
+          with open(os.path.join(lightning_dir, 'credentials.json'), 'w') as f:
               json.dump(creds, f)
-          print('Credentials written successfully to', path)
+
+          print('Wrote credentials successfully.')
           "
 
-      - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
+      - name: Persistent Watchdog Loop (Smart Guard)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -998,12 +1005,13 @@ jobs:
           import os, time, requests, socket
           socket.setdefaulttimeout(15)
 
-          os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
-          os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+          os.environ['LIGHTNING_USER_ID'] = uid
+          os.environ['LIGHTNING_API_KEY'] = key
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
 
-          # Loop every 3 minutes for up to ~3.5 hours (70 checks)
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
@@ -1014,50 +1022,36 @@ jobs:
                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
                       is_healthy = True
               except Exception as net_err:
-                  print(f'Ping notice: {net_err}', flush=True)
+                  print(f'Ping failed: {net_err}', flush=True)
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              # 2. Check Studio state
-              needs_restart = not is_healthy
-              try:
-                  from lightning_sdk import Studio
-                  s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
-                  status = str(s.status).lower()
-                  print(f'Studio status: {status}', flush=True)
-                  if status != 'running':
-                      needs_restart = True
-              except Exception as e:
-                  print(f'Studio check note: {e}', flush=True)
-                  needs_restart = True
-
-              # 3. Recover if down
-              if needs_restart:
-                  print('Recovering studio...', flush=True)
+              # 2. ONLY attempt recovery if the public endpoint is ACTUALLY failing
+              if not is_healthy:
+                  print('Site is offline. Attempting Studio recovery...', flush=True)
                   try:
                       from lightning_sdk import Studio
                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
                       try:
-                          s.stop()
-                          time.sleep(20)
-                      except Exception:
-                          pass
-
-                      s.start()
-                      print('Waiting 45s for boot...', flush=True)
-                      time.sleep(45)
+                          s.start()
+                          print('Sent start command. Waiting 45s for boot...', flush=True)
+                          time.sleep(45)
+                      except Exception as boot_err:
+                          print(f'Start notice: {boot_err}', flush=True)
 
                       print('Deploying services...', flush=True)
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                      print('Services online!', flush=True)
+                      print('Services triggered!', flush=True)
                   except Exception as err:
                       print(f'Recovery notice: {err}', flush=True)
+              else:
+                  print('All systems operational.', flush=True)
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
 
-          # 4. Self-Chaining: Reliably dispatch next workflow
-          print('Current runner finishing. Triggering successor workflow...', flush=True)
+          # Self-chain successor
+          print('Loop completed. Triggering successor...', flush=True)
           try:
               token = os.environ.get('GH_TOKEN')
               repo = os.environ.get('REPO')
@@ -1066,12 +1060,8 @@ jobs:
                   'Authorization': f'token {token}',
                   'Accept': 'application/vnd.github.v3+json'
               }
-              payload = {'ref': 'main'}
-              resp = requests.post(url, headers=headers, json=payload, timeout=10)
-              if resp.status_code == 204:
-                  print('Successor runner triggered successfully (HTTP 204)!', flush=True)
-              else:
-                  print(f'Trigger response ({resp.status_code}): {resp.text}', flush=True)
+              resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+              print(f'Successor response: {resp.status_code}', flush=True)
           except Exception as chain_err:
-              print(f'Self-trigger warning: {chain_err}', flush=True)
+              print(f'Successor trigger note: {chain_err}', flush=True)
           "
