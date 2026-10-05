@@ -943,6 +943,8 @@
 # It uses better logic credential in json format for lightning login
 # Instead of merely pinging the Ngrok URL externally, run a lightweight command via s.run() or send a keep-alive 
 # pulse so Lightning registers actual user activity and resets the 10-minute idle countdown 
+# updated the logic more than 6 times on 5 october 2026
+
 
 name: Keep Studio Fresh & Free
 
@@ -972,7 +974,7 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Configure Lightning Authentication
+      - name: Configure Lightning Credentials
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -982,8 +984,8 @@ jobs:
           import os, json
           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
           key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-          
-          # Exact config structure expected by lightning-sdk / lightning_cloud
+
+          # Format required by lightning CLI and lightning_cloud
           creds = {
               'user_id': uid,
               'api_key': key
@@ -992,10 +994,10 @@ jobs:
           with open(path, 'w') as f:
               json.dump(creds, f)
           os.chmod(path, 0o600)
-          print('Successfully written credentials.json')
+          print('Successfully written ~/.lightning/credentials.json')
           "
 
-      - name: Persistent Watchdog & Keep-Alive Loop
+      - name: Persistent Watchdog Loop (Active Pulse Guard)
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -1021,7 +1023,7 @@ jobs:
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
-              # 1. External HTTP Health Check
+              # 1. Health check external public endpoint
               is_healthy = False
               try:
                   res = requests.get(domain, timeout=8)
@@ -1032,20 +1034,19 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              # 2. Prevent 10m idle sleep OR Recover if down
+              # 2. Reset 10m idle timer OR Wake up container
               try:
                   s = Studio(name=studio_name, teamspace=teamspace, org=org)
-                  
+
                   if is_healthy:
-                      # Reset the 10-minute idle sleep timer by executing an active host touch
-                      print('Sending heartbeat to studio host to reset 10m idle timer...', flush=True)
+                      # Run lightweight touch command to register machine activity
+                      print('Sending heartbeat command to reset 10m idle timer...', flush=True)
                       try:
                           s.run('touch /tmp/keepalive_pulse')
-                          print('Studio heartbeat pulse recorded.', flush=True)
+                          print('Heartbeat sent successfully.', flush=True)
                       except Exception as hb_err:
-                          print(f'Heartbeat pulse notice: {hb_err}', flush=True)
+                          print(f'Heartbeat notice: {hb_err}', flush=True)
                   else:
-                      # Machine went offline; initiate full reboot sequence
                       print('Site is offline. Waking Studio container...', flush=True)
                       try:
                           s.start()
@@ -1056,7 +1057,7 @@ jobs:
 
                       print('Deploying application services...', flush=True)
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                      print('Services triggered successfully!', flush=True)
+                      print('Services online!', flush=True)
 
               except Exception as studio_err:
                   print(f'Studio communication notice: {studio_err}', flush=True)
@@ -1079,5 +1080,6 @@ jobs:
           except Exception as chain_err:
               print(f'Successor trigger note: {chain_err}', flush=True)
           "
+          
 
 
