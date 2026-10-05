@@ -940,7 +940,9 @@
 
 # Updated code to tackle the current problem to avoid shutdown and stay 24*7 active
 # it will accept the API Key only if it is available on disk, so that it can restart
-# It uses better logic for lightning login
+# It uses better logic credential in json format for lightning login
+# Instead of merely pinging the Ngrok URL externally, run a lightweight command via s.run() or send a keep-alive 
+# pulse so Lightning registers actual user activity and resets the 10-minute idle countdown 
 
 name: Keep Studio Fresh & Free
 
@@ -970,7 +972,30 @@ jobs:
       - name: Install Lightning SDK & Requests
         run: pip install "lightning-sdk" requests
 
-      - name: Persistent Watchdog Loop (SDK-Native Auth)
+      - name: Configure Lightning Authentication
+        env:
+          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+        run: |
+          mkdir -p ~/.lightning
+          python -c "
+          import os, json
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+          
+          # Exact config structure expected by lightning-sdk / lightning_cloud
+          creds = {
+              'user_id': uid,
+              'api_key': key
+          }
+          path = os.path.expanduser('~/.lightning/credentials.json')
+          with open(path, 'w') as f:
+              json.dump(creds, f)
+          os.chmod(path, 0o600)
+          print('Successfully written credentials.json')
+          "
+
+      - name: Persistent Watchdog & Keep-Alive Loop
         env:
           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
@@ -981,24 +1006,22 @@ jobs:
           import os, time, requests, socket
           socket.setdefaulttimeout(15)
 
-          user_id = os.environ.get('LIGHTNING_USER_ID', '').strip()
-          api_key = os.environ.get('LIGHTNING_API_KEY', '').strip()
-
-          import lightning_sdk
-          from lightning_sdk import Studio
-
-          # Perform SDK-native login directly in Python
-          try:
-              lightning_sdk.login(api_key=api_key)
-              print('Native SDK login successful!', flush=True)
-          except Exception as login_err:
-              print(f'Native login notice: {login_err}', flush=True)
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+          os.environ['LIGHTNING_USER_ID'] = uid
+          os.environ['LIGHTNING_API_KEY'] = key
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+          studio_name = 'scratch-studio-devbox'
+          teamspace = 'default-project'
+          org = 'sakshamraj1-34lrc'
+
+          from lightning_sdk import Studio
 
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
+              # 1. External HTTP Health Check
               is_healthy = False
               try:
                   res = requests.get(domain, timeout=8)
@@ -1009,35 +1032,40 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              if not is_healthy:
-                  print('Site is offline. Attempting Studio recovery...', flush=True)
-                  try:
-                      # Re-authenticate if session dropped
+              # 2. Prevent 10m idle sleep OR Recover if down
+              try:
+                  s = Studio(name=studio_name, teamspace=teamspace, org=org)
+                  
+                  if is_healthy:
+                      # Reset the 10-minute idle sleep timer by executing an active host touch
+                      print('Sending heartbeat to studio host to reset 10m idle timer...', flush=True)
                       try:
-                          lightning_sdk.login(api_key=api_key)
-                      except Exception:
-                          pass
-
-                      s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+                          s.run('touch /tmp/keepalive_pulse')
+                          print('Studio heartbeat pulse recorded.', flush=True)
+                      except Exception as hb_err:
+                          print(f'Heartbeat pulse notice: {hb_err}', flush=True)
+                  else:
+                      # Machine went offline; initiate full reboot sequence
+                      print('Site is offline. Waking Studio container...', flush=True)
                       try:
                           s.start()
-                          print('Sent start command. Waiting 45s for boot...', flush=True)
+                          print('Start command sent. Waiting 45s for container boot...', flush=True)
                           time.sleep(45)
-                      except Exception as boot_err:
-                          print(f'Start notice: {boot_err}', flush=True)
+                      except Exception as start_err:
+                          print(f'Start notice: {start_err}', flush=True)
 
-                      print('Deploying services...', flush=True)
+                      print('Deploying application services...', flush=True)
                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                      print('Services triggered!', flush=True)
-                  except Exception as err:
-                      print(f'Recovery notice: {err}', flush=True)
-              else:
-                  print('All systems operational.', flush=True)
+                      print('Services triggered successfully!', flush=True)
+
+              except Exception as studio_err:
+                  print(f'Studio communication notice: {studio_err}', flush=True)
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
 
-          print('Loop completed. Triggering successor...', flush=True)
+          # 3. Successor Handoff Trigger
+          print('Runner loop complete. Triggering successor...', flush=True)
           try:
               token = os.environ.get('GH_TOKEN')
               repo = os.environ.get('REPO')
@@ -1051,3 +1079,5 @@ jobs:
           except Exception as chain_err:
               print(f'Successor trigger note: {chain_err}', flush=True)
           "
+
+
