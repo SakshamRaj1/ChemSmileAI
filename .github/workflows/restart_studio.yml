@@ -817,6 +817,7 @@
 # Updated code to tackle the current problem to avoid shutdown and stay 24*7 active
 # it will accept the API Key only if it is available on disk, so that it can restart (this is done)
 # Not able to keept the studio active after 3.5hrs
+# When I tested on 6 Oct 2026, it just worded for 10 minutes only.
 
 name: Keep Studio Fresh & Free
 
