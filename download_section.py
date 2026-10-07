@@ -420,7 +420,8 @@ def save_as_3d_mol2(mol, filename="mol-3d.mol2"):
       conv.SetInAndOutFormats("sdf", "mol2")
       mol = openbabel.OBMol()
       sdf_file = save_as_3d_sdf(mol)
-      conv.ReadFile(mol, sdf_file)
+      sdf_file
+      conv.ReadFile(mol, "mol-3d.sdf")
       conv.WriteFile(mol, "mol-3d.mol2")
       print(f"Molecule data saved as {filename}")
       
@@ -431,6 +432,7 @@ def save_as_3d_mol2(mol, filename="mol-3d.mol2"):
   except Exception as e:
     print(e)
     return str(e), 500
+
 
 # 3D Structure 4(HTML)
 def save_as_html(mol, filename="3D-molecule.html"):
