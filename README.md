@@ -24,6 +24,38 @@
 
 </div>
 
+<div align="center">
+
+🧬 Molecular Search & Visualization Platform
+Offline • Local • Open-Source
+
+<br>
+
+![License](https://img.shields.io/badge/License-MIT-007EC6.svg?style=for-the-badge) ![Maintained](https://img.shields.io/badge/Maintained-Yes-success.svg?style=for-the-badge) ![Deployment](https://img.shields.io/badge/Deployment-Live-brightgreen.svg?style=for-the-badge) ![APIs](https://img.shields.io/badge/APIs-100%25%20Offline%20%2F%20Local-4c1.svg?style=for-the-badge)
+
+<br>
+
+⚙️ Technology Stack
+Core Backend
+
+![Python](https://img.shields.io/badge/Python-3.12.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white)
+
+Cheminformatics & Molecular Processing
+
+![RDKit](https://img.shields.io/badge/RDKit-2026.3.3-3843d0?style=for-the-badge) ![FPSim2](https://img.shields.io/badge/FPSim2-0.7.4-FF6F00?style=for-the-badge) ![Open Babel](https://img.shields.io/badge/Open_Babel-3.2.1-1B365D?style=for-the-badge) ![Openclatura](https://img.shields.io/badge/Openclatura-0.2.0-8E44AD?style=for-the-badge)
+
+Molecular Visualization & Drawing
+
+![py3Dmol](https://img.shields.io/badge/py3Dmol-2.5.5-009688?style=for-the-badge) ![Ketcher](https://img.shields.io/badge/Ketcher-3.17.0-007EC6?style=for-the-badge) ![CairoSVG](https://img.shields.io/badge/CairoSVG-2.9.0-E05D44?style=for-the-badge)
+
+Frontend & Data Processing
+
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white) ![Pandas](https://img.shields.io/badge/Pandas-3.0.3-150458?style=for-the-badge&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/NumPy-2.5.0-013243?style=for-the-badge&logo=numpy&logoColor=white)
+
+Built with Python · Powered by RDKit · Designed for Offline Molecular Research
+
+</div>
+
 ChemSmileAI is open-sourced web-based computational cheminformatics platform designed to provide accessible, code-free chemical analysis, molecular property computation, and structural modification workflows. ChemSmileAI is a research project for researchers, chemists and enthusiasts for providing a streamlined, web-based platform aimed at simplifying access to chemical data and analysis. Powered by Python, Flask, and RDKit the platform translates molecular inputs (SMILES, CHEMBL IDs, or interactive chemical sketches) into standard molecular descriptors, fingerprint representations, structural visualizations, and similarity search from 2.9 million CHEMBL database compounds.
 
 🌐 **Live Demo (Full-Stack):** [ChemSmileAI](https://tinyurl.com/chemsmileai)  
