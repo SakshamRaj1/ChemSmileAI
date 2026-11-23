@@ -497,6 +497,388 @@
         color: white;        
     }
 
+    footer.chemsmile-footer {
+        height: auto !important;
+        min-height: unset !important;
+        width: 100%;
+        flex-shrink: 0;
+        display: block !important;
+        position: relative;
+        margin-top: auto !important;
+        padding: 0 !important;
+
+        color: rgba(255, 255, 255, 0.78) !important;
+
+        background:
+            radial-gradient(
+                ellipse at 10% 100%,
+                rgba(179, 12, 27, 0.10),
+                transparent 45%
+            ),
+            linear-gradient(
+                180deg,
+                rgba(8, 14, 23, 0.96),
+                rgba(4, 8, 14, 0.99)
+            ) !important;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+
+        box-shadow:
+            0 -12px 35px rgba(0, 0, 0, 0.18);
+
+        overflow: hidden;
+    }
+
+    /* Top accent line */
+    footer.chemsmile-footer::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+
+        width: min(500px, 65%);
+        height: 1px;
+
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(179, 12, 27, 0.9),
+            rgba(255, 255, 255, 0.35),
+            rgba(179, 12, 27, 0.9),
+            transparent
+        );
+    }
+
+    /* Footer container: prevent overflow */
+    footer.chemsmile-footer > .container {
+        width: 100%;
+        max-width: 1320px;
+        box-sizing: border-box;
+    }
+
+    /* Brand area */
+    .footer-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+
+        text-decoration: none !important;
+        transition: opacity 0.25s ease;
+    }
+
+    .footer-brand:hover {
+        opacity: 0.85;
+    }
+
+    .footer-brand-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(179, 12, 27, 0.95),
+                rgba(65, 8, 17, 0.95)
+            );
+
+        border: 1px solid rgba(255, 255, 255, 0.14);
+
+        color: white !important;
+
+        font-size: 1.15rem;
+        font-weight: 800;
+
+        box-shadow:
+            0 5px 18px rgba(179, 12, 27, 0.20);
+    }
+
+    .footer-brand-name {
+        color: #ffffff !important;
+
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.45px;
+    }
+
+    /* Description */
+    .footer-description {
+        color: rgba(255, 255, 255, 0.56) !important;
+
+        font-size: 0.83rem;
+        line-height: 1.8;
+
+        max-width: 390px;
+        margin-bottom: 0;
+    }
+
+    /* Technology stack */
+    .footer-tech-stack {
+        color: rgba(255, 255, 255, 0.43) !important;
+
+        font-size: 0.73rem;
+        line-height: 1.8;
+
+        margin-top: 15px;
+    }
+
+    .footer-tech-stack span {
+        display: block;
+
+        color: rgba(255, 255, 255, 0.60);
+
+        font-size: 0.69rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+
+        margin-bottom: 4px;
+    }
+
+    /* Section titles */
+    .footer-heading {
+        color: rgba(255, 255, 255, 0.92) !important;
+
+        font-size: 0.78rem;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 1.15px;
+
+        margin-bottom: 17px;
+        position: relative;
+    }
+
+    /* Small accent under headings */
+    .footer-heading::after {
+        content: "";
+        display: block;
+
+        width: 22px;
+        height: 2px;
+
+        margin-top: 9px;
+
+        background: #b30c1b;
+        border-radius: 2px;
+    }
+
+    /* Link lists */
+    .footer-nav {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+
+        padding: 0;
+        margin: 0;
+
+        list-style: none;
+    }
+
+    .footer-nav li {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Footer links */
+    .footer-nav a {
+        display: inline-flex;
+        align-items: center;
+
+        color: rgba(255, 255, 255, 0.55) !important;
+
+        font-size: 0.81rem;
+        line-height: 1.5;
+
+        text-decoration: none !important;
+
+        transition:
+            color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .footer-nav a:hover {
+        color: #ffffff !important;
+        transform: translateX(4px);
+    }
+
+    /* Developer link */
+    .footer-developer-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+
+        color: #e34b59 !important;
+
+        font-size: 0.88rem;
+        font-weight: 600;
+
+        text-decoration: none !important;
+
+        transition: all 0.2s ease;
+    }
+
+    .footer-developer-link:hover {
+        color: #ff7883 !important;
+        text-decoration: none !important;
+    }
+
+    /* Divider */
+    .footer-divider {
+        width: 100%;
+        height: 1px;
+
+        margin: 28px 0 18px;
+
+        background: linear-gradient(
+            90deg,
+            rgba(179, 12, 27, 0.35),
+            rgba(255, 255, 255, 0.10),
+            rgba(179, 12, 27, 0.15)
+        );
+
+        border: 0;
+    }
+
+    /* Bottom copyright row */
+    .footer-bottom {
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 12px;
+        width: 100%;
+    }
+
+    .footer-copyright {
+        color: rgba(255, 255, 255, 0.45) !important;
+
+        font-size: 0.73rem;
+        line-height: 1.6;
+    }
+
+    .footer-copyright strong {
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-weight: 600;
+    }
+
+    .footer-separator {
+        margin: 0 5px;
+        color: #b30c1b;
+    }
+
+    .footer-disclaimer {
+        color: rgba(255, 255, 255, 0.38) !important;
+
+        font-size: 0.71rem;
+        line-height: 1.6;
+
+        text-align: right;
+        max-width: 500px;
+    }
+
+    /* Keyboard accessibility */
+    .footer-nav a:focus-visible,
+    .footer-brand:focus-visible,
+    .footer-developer-link:focus-visible {
+        outline: 2px solid rgba(179, 12, 27, 0.9);
+        outline-offset: 4px;
+        border-radius: 4px;
+    }
+
+    /* Tablet */
+    @media (max-width: 991.98px) {
+
+        footer.chemsmile-footer > .container {
+            max-width: 100%;
+        }
+
+        .footer-divider {
+            margin-top: 24px;
+        }
+    }
+
+    /* Mobile */
+    @media (max-width: 767.98px) {
+
+        footer.chemsmile-footer {
+            margin-top: 3rem !important;
+        }
+
+        footer.chemsmile-footer > .container {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+
+        .footer-heading {
+            margin-bottom: 14px;
+        }
+
+        .footer-nav {
+            gap: 9px;
+        }
+
+        .footer-divider {
+            margin: 22px 0 16px;
+        }
+
+        .footer-bottom {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+        .footer-disclaimer {
+            text-align: left;
+            max-width: 100%;
+        }
+    }
+
+    /* Small phones */
+    @media (max-width: 400px) {
+
+        footer.chemsmile-footer > .container {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+
+        .footer-brand-name {
+            font-size: 1.12rem;
+        }
+
+        .footer-description {
+            font-size: 0.79rem;
+        }
+
+        .footer-nav a {
+            font-size: 0.77rem;
+        }
+
+        .footer-copyright,
+        .footer-disclaimer {
+            font-size: 0.68rem;
+        }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+
+        .footer-brand,
+        .footer-nav a,
+        .footer-developer-link {
+            transition: none !important;
+        }
+    }
 
 </style>
 
@@ -613,13 +995,163 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="text-center" style="padding: 10px 20px;">
+    <!-- <footer class="text-center" style="padding: 10px 20px;">
         <div class="container">
             <p class="mb-0">&copy; 2026 ChemSmileAI</p>
             <p class="mb-0">A ChemInfomatics Webapp</p>
 
         </div>
-    </footer>
+    </footer> -->
+
+
+<!-- FOOTER -->
+<footer class="chemsmile-footer mt-5">
+
+    <div class="container py-4 py-lg-5">
+
+        <div class="row g-4 g-lg-5">
+
+            <!-- BRAND & DESCRIPTION -->
+            <div class="col-12 col-lg-4">
+
+                <a href="/" class="footer-brand text-decoration-none">
+                    <span class="footer-brand-icon">C</span>
+                    <span class="footer-brand-name">ChemSmileAI</span>
+                </a>
+
+                <p class="footer-description mt-3">
+                    An open-source computational cheminformatics platform
+                    for molecular analysis, chemical similarity searching,
+                    and interactive molecular visualization.
+                </p>
+
+                <p class="footer-tech-stack">
+                    <span>Powered by</span>
+                    RDKit · FPSim2 · Ketcher · py3Dmol · Open Babel
+                </p>
+
+            </div>
+
+
+            <!-- FEATURES -->
+            <div class="col-6 col-lg-3">
+
+                <h6 class="footer-heading">Explore</h6>
+
+                <ul class="footer-nav">
+                    <li>
+                        <a href="/analysis">
+                            Molecule Analysis Engine
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/similarity">
+                            Molecular Similarity Search Engine
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/compare">
+                            Molecular Comparison
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="draw-molecule">
+                            Molecular Sketching
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+
+            <!-- PROJECT LINKS -->
+            <div class="col-6 col-lg-2">
+
+                <h6 class="footer-heading">Resources</h6>
+
+                <ul class="footer-nav">
+                    <li>
+                        <a href="https://github.com/SakshamRaj1/ChemSmileAI"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            GitHub Repository ↗
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://github.com/SakshamRaj1/ChemSmileAI-Mobile/releases/"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Android Application
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://github.com/SakshamRaj1/ChemSmileAI/issues"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Report an Issue
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- DEVELOPER -->
+            <div class="col-12 col-lg-3">
+
+                <h6 class="footer-heading">Developer</h6>
+
+                <p class="footer-description mb-2">
+                    Developed and maintained by
+                </p>
+
+                <a href="https://github.com/SakshamRaj1"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="footer-developer-link">
+                    Saksham Raj ↗
+                </a>
+
+                <p class="footer-description mt-3 mb-0">
+                    Built to make computational chemistry and molecular
+                    exploration more accessible.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- DIVIDER -->
+        <div class="footer-divider"></div>
+
+
+        <!-- FOOTER BOTTOM -->
+        <div class="footer-bottom">
+
+            <div class="footer-copyright">
+                © 2026 <strong>ChemSmileAI</strong>
+                <span class="footer-separator">·</span>
+                Open-source cheminformatics platform
+            </div>
+
+            <div class="footer-disclaimer">
+                For academic and research use.
+                Computational predictions require experimental validation.
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
