@@ -990,7 +990,7 @@
     </header>
 
     <!-- CONTENT -->
-    <div class="container-fluid my-4">
+    <div class="container-fluid my-4" style="min-height: calc(100vh - 60px);">
         {% block content %}{% endblock %}
     </div>
 
@@ -1005,151 +1005,151 @@
 
 
 <!-- FOOTER -->
-<footer class="chemsmile-footer mt-5">
+    <footer class="chemsmile-footer mt-5">
 
-    <div class="container py-4 py-lg-5">
+        <div class="container py-4 py-lg-5">
 
-        <div class="row g-4 g-lg-5">
+            <div class="row g-4 g-lg-5">
 
-            <!-- BRAND & DESCRIPTION -->
-            <div class="col-12 col-lg-4">
+                <!-- BRAND & DESCRIPTION -->
+                <div class="col-12 col-lg-4">
 
-                <a href="/" class="footer-brand text-decoration-none">
-                    <span class="footer-brand-icon">C</span>
-                    <span class="footer-brand-name">ChemSmileAI</span>
-                </a>
+                    <a href="/" class="footer-brand text-decoration-none">
+                        <span class="footer-brand-icon">C</span>
+                        <span class="footer-brand-name">ChemSmileAI</span>
+                    </a>
 
-                <p class="footer-description mt-3">
-                    A computational cheminformatics platform for zero-code unified programmatic access to 
-                    molecular analysis, molecule similarity searching, molecular comparison, and interactive molecular visualization.
-                </p>
+                    <p class="footer-description mt-3">
+                        A computational cheminformatics platform for zero-code unified programmatic access to 
+                        molecular analysis, molecule similarity searching, molecular comparison, and interactive molecular visualization.
+                    </p>
 
-                <p class="footer-tech-stack">
-                    <span>Powered by</span>
-                    RDKit · FPSim2 · Ketcher · py3Dmol · Open Babel · Flask
-                </p>
+                    <p class="footer-tech-stack">
+                        <span>Powered by</span>
+                        RDKit · FPSim2 · Ketcher · py3Dmol · Open Babel · Flask
+                    </p>
+
+                </div>
+
+
+                <!-- FEATURES -->
+                <div class="col-6 col-lg-3">
+
+                    <h6 class="footer-heading">Explore Research Tools</h6>
+
+                    <ul class="footer-nav">
+                        <li>
+                            <a href="/analysis">
+                                Molecule Analysis Engine
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="/similarity">
+                                Molecular Similarity Search Engine
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="/compare">
+                                Molecular Comparison
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="draw-molecule">
+                                Molecular Sketching
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+
+                <!-- PROJECT LINKS -->
+                <div class="col-6 col-lg-2">
+
+                    <h6 class="footer-heading">Resources</h6>
+
+                    <ul class="footer-nav">
+                        <li>
+                            <a href="https://github.com/SakshamRaj1/ChemSmileAI"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                                GitHub Repository ↗
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="https://github.com/SakshamRaj1/ChemSmileAI-Mobile/releases/"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                                Android Integration
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="/contact"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                                Report an Issue
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- DEVELOPER -->
+                <div class="col-12 col-lg-3">
+
+                    <h6 class="footer-heading">Developer</h6>
+
+                    <p class="footer-description mb-2">
+                        Developed and maintained by
+                    </p>
+
+                    <a href="https://github.com/SakshamRaj1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-developer-link">
+                        Saksham Raj ↗
+                    </a>
+
+                    <p class="footer-description mt-3 mb-0">
+                        Built to make computational chemistry and molecular
+                        exploration more accessible.
+                    </p>
+
+                </div>
 
             </div>
 
 
-            <!-- FEATURES -->
-            <div class="col-6 col-lg-3">
-
-                <h6 class="footer-heading">Explore Research Tools</h6>
-
-                <ul class="footer-nav">
-                    <li>
-                        <a href="/analysis">
-                            Molecule Analysis Engine
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/similarity">
-                            Molecular Similarity Search Engine
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/compare">
-                            Molecular Comparison
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="draw-molecule">
-                            Molecular Sketching
-                        </a>
-                    </li>
-                </ul>
-
-            </div>
+            <!-- DIVIDER -->
+            <div class="footer-divider"></div>
 
 
-            <!-- PROJECT LINKS -->
-            <div class="col-6 col-lg-2">
+            <!-- FOOTER BOTTOM -->
+            <div class="footer-bottom">
 
-                <h6 class="footer-heading">Resources</h6>
+                <div class="footer-copyright">
+                    © 2026 <strong>ChemSmileAI</strong>
+                    <span class="footer-separator">·</span>
+                    Open-source cheminformatics platform
+                </div>
 
-                <ul class="footer-nav">
-                    <li>
-                        <a href="https://github.com/SakshamRaj1/ChemSmileAI"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            GitHub Repository ↗
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="https://github.com/SakshamRaj1/ChemSmileAI-Mobile/releases/"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            Android Integration
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/contact"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            Report an Issue
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
-
-            <!-- DEVELOPER -->
-            <div class="col-12 col-lg-3">
-
-                <h6 class="footer-heading">Developer</h6>
-
-                <p class="footer-description mb-2">
-                    Developed and maintained by
-                </p>
-
-                <a href="https://github.com/SakshamRaj1"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="footer-developer-link">
-                    Saksham Raj ↗
-                </a>
-
-                <p class="footer-description mt-3 mb-0">
-                    Built to make computational chemistry and molecular
-                    exploration more accessible.
-                </p>
+                <div class="footer-disclaimer">
+                    For academic and research use.
+                    Computational predictions require experimental validation.
+                </div>
 
             </div>
 
         </div>
 
-
-        <!-- DIVIDER -->
-        <div class="footer-divider"></div>
-
-
-        <!-- FOOTER BOTTOM -->
-        <div class="footer-bottom">
-
-            <div class="footer-copyright">
-                © 2026 <strong>ChemSmileAI</strong>
-                <span class="footer-separator">·</span>
-                Open-source cheminformatics platform
-            </div>
-
-            <div class="footer-disclaimer">
-                For academic and research use.
-                Computational predictions require experimental validation.
-            </div>
-
-        </div>
-
-    </div>
-
-</footer>
+    </footer>
 
 
     <!-- Bootstrap 5 JS Bundle -->
