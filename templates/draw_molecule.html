@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ChemSmileAI | Molecular Editor</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #0b0909;
+            color: white;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 24px;
+            background: #151111;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .editor-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .editor-header span {
+            color: #dc3545;
+        }
+
+        .editor-container {
+            flex: 1;
+            min-height: 0;
+        }
+
+        #ketcherFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .editor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: #151111;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .editor-footer button {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #useMolecule {
+            background: #dc3545;
+            color: white;
+        }
+
+        #useMolecule:hover {
+            background: #b02a37;
+        }
+
+        #backButton {
+            background: #292222;
+            color: white;
+        }
+
+        #smilesOutput {
+            color: #aaa;
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+
+        .logo-style{
+            background: linear-gradient(142deg, #ffffff 10%, #b30c1b 95%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="editor-header">
+        <h2><span class="logo-style">ChemSmileAI</span></h2>
+    </div>
+
+    
+    <div class="editor-container">
+        <iframe
+            id="ketcherFrame"
+            src="{{ url_for('static', filename='ketcher/index.html') }}">
+        </iframe>
+    </div>
+
+    <div class="editor-footer">
+        <button id="backButton" onclick="history.back()">
+            ← Back
+        </button>
+
+        <span id="smilesOutput">Draw or edit a molecule (by Ketcher)</span>
+
+        <button id="useMolecule" onclick="getMoleculeSmiles()">
+            Use Molecule
+        </button>
+    </div>
+
+    <script>
+        async function getMoleculeSmiles() {
+            try {
+                const frame = document.getElementById("ketcherFrame");
+
+                const ketcher = frame.contentWindow.ketcher;
+
+                if (!ketcher) {
+                    alert("Ketcher editor is not ready yet.");
+                    return;
+                }
+
+                const smiles = await ketcher.getSmiles();
+
+                document.getElementById("smilesOutput").textContent = smiles;
+
+                await navigator.clipboard.writeText(smiles);
+
+                alert("SMILES copied successfully!");
+
+            } catch (error) {
+                console.error("Error retrieving SMILES:", error);
+                alert("Unable to retrieve molecule SMILES.");
+            }
+        }
+    </script>
+
+</body>
+</html>
