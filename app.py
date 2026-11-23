@@ -1657,8 +1657,21 @@ def compare_molecules(mol1, mol2):
         "data2": data2
     }
 
+@app.route('/ram-usage')
+def ram_usage():
+    process = psutil.Process(os.getpid())
+    memory = process.memory_info()
+
+    return {
+        'rss_mb': round(memory.rss / (1024 ** 2), 2),
+        'vms_mb': round(memory.vms / (1024 ** 2), 2)
+    }
 
 
+
+@app.route('/draw-molecule')
+def draw_molecule():
+    return render_template('draw_molecule.html')
 
 
 if __name__ == "__main__":
