@@ -99,19 +99,37 @@ jobs:
               time.sleep(180)
           "
 
+      # - name: Save Rotated Refresh Token & Dispatch Circular Successor
+      #   if: always()
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     REPO: ${{ github.repository }}
+      #   run: |
+      #     if [ -f ~/.lightning/login.json ]; then
+      #       gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json
+      #       echo "Rotated LIGHTNING_LOGIN_JSON saved to GitHub Secrets."
+      #     fi
+
+      #     curl -s -X POST \
+      #       -H "Authorization: token $GH_TOKEN" \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       "https://api.github.com/repos/$REPO/actions/workflows/restart_studio.yml/dispatches" \
+      #       -d '{"ref":"main"}'
+      #     echo "Circular successor dispatched."
+
       - name: Save Rotated Refresh Token & Dispatch Circular Successor
         if: always()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+          WORKFLOW_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          if [ -f ~/.lightning/login.json ]; then
-            gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json
-            echo "Rotated LIGHTNING_LOGIN_JSON saved to GitHub Secrets."
+          if [ -f ~/.lightning/login.json ] && [ -n "$GH_TOKEN" ]; then
+            gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json || echo "Secret rotation skipped"
           fi
-
-          curl -s -X POST \
-            -H "Authorization: token $GH_TOKEN" \
+    
+          curl -f -s -X POST \
+            -H "Authorization: token $WORKFLOW_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/restart_studio.yml/dispatches" \
             -d '{"ref":"main"}'
