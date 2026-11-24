@@ -1,0 +1,1296 @@
+# -------------------------Working but Lightning.ai has 10 mts limit if The Studio is inactive, then it SLEEPS----------------------------
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '30 */3 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   restart:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK
+#         run: pip install "lightning-sdk"
+
+#       - name: Restart Studio and Run App
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time
+#           from lightning_sdk import Studio
+
+#           # Explicitly set auth in environment
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           print('1. Connecting to Studio...')
+#           s = Studio(
+#               name='scratch-studio-devbox',
+#               teamspace='default-project',
+#               org='sakshamraj1-34lrc'
+#           )
+
+#           print('2. Stopping studio...')
+#           try:
+#               s.stop()
+#           except Exception as e:
+#               print(f'Stop notice: {e}')
+
+#           time.sleep(20)
+
+#           print('3. Starting studio...')
+#           s.start()
+
+#           print('4. Executing startup script on Studio...')
+#           output = s.run('bash /teamspace/studios/this_studio/.lightning_studio/on_start.sh')
+#           print('Run output:', output)
+#           print('Services successfully launched!')
+#           "
+
+# ----------------------------- New logic to restart every 10 minutes -worked but closed after 2 hrs -----------------------------------------
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Run every 10 minutes to prevent the 15-minute idle auto-sleep
+#     - cron: '*/10 * * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK
+#         run: pip install "lightning-sdk"
+
+#       - name: Keep Studio Active
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(
+#               name='scratch-studio-devbox',
+#               teamspace='default-project',
+#               org='sakshamraj1-34lrc'
+#           )
+
+#           # If studio stopped, start it
+#           s.start()
+
+#           # Run the persistent tmux session launcher
+#           print('Ensuring services are active in tmux...')
+#           s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#           print('Services verified active!')
+#           "
+
+# -----------------------------------New logic to restart the studio -----------------------------------
+# (stop and restart) the studio at a regular interval so the master session timer continuously resets to a fresh 4 hours.
+# ---------------------------Wait time is only 15 sec but Studio takes around a min -------------------------------------
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/10 * * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK
+#         run: pip install "lightning-sdk"
+
+#       - name: Health Check & Keep Online
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+
+#           print(f'Current Studio Status: {s.status}')
+
+#           # Always ensure Studio is in running state
+#           if str(s.status).lower() != 'running':
+#               print('Studio is stopped. Starting it now...')
+#               s.start()
+#               time.sleep(15)
+
+#           # Execute the persistent session script
+#           print('Ensuring Flask and Ngrok are running...')
+#           try:
+#               s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#               print('Services verified and running!')
+#           except Exception as e:
+#               print(f'Execution retry notice: {e}')
+#               s.start()
+#               s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#           "
+
+# ---------------------------------Github in busy hours will delay cron by 60 mts, so the Studio will sleep------------------
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Runs every 6 minutes
+#     - cron: '*/6 * * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Health Check & Keep Online
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#           print(f'Initial Studio Status: {s.status}')
+
+#           # 1. If Studio is stopped or stopping, start it and wait for full boot
+#           if str(s.status).lower() != 'running':
+#               print('Studio not active. Booting up...')
+#               s.start()
+#               print('Waiting 45s for container initialization...')
+#               time.sleep(45)
+
+#           # 2. Dispatch services and inspect running process table
+#           print('Dispatching services...')
+#           output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#           print('Process table output:\n', output)
+
+#           # 3. Verify Ngrok tunnel is reachable
+#           time.sleep(8)
+#           try:
+#               res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
+#               print(f'Ngrok public endpoint response code: {res.status_code}')
+#           except Exception as e:
+#               print(f'Ngrok check notice: {e}')
+#           "
+
+
+# ----------------------Improved version to handle auto restart and avoid System Hangup, restarts every 5 mts---------------------------
+# -------------------It ran till 4hrs, then Lightning Studio forced to SHUT due to fixed 4hrs continue sessions----------------------
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '0 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+
+#           # Loop every 5 minutes for ~5.5 hours
+#           for i in range(66):
+#               print(f'=== Check {i+1}/66 | Studio Status: {s.status} ===')
+
+#               needs_deploy = False
+#               if str(s.status).lower() != 'running':
+#                   print('Studio stopped! Booting instance...')
+#                   s.start()
+#                   time.sleep(45)
+#                   needs_deploy = True
+
+#               # Check if public endpoint is healthy
+#               try:
+#                   res = requests.get('https://doornail-plant-jazz.ngrok-free.dev', timeout=10)
+#                   print(f'Public endpoint status: {res.status_code}')
+#                   if res.status_code not in [200, 302, 404]:
+#                       needs_deploy = True
+#               except Exception as e:
+#                   print(f'Ping failed: {e}')
+#                   needs_deploy = True
+
+#               if needs_deploy:
+#                   print('Redeploying services via setsid daemon...')
+#                   output = s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                   print(output)
+
+#               print('Sleeping 300s (5m)...')
+#               time.sleep(300)
+#           "
+
+
+# ----------------------------------------------------------------------------------Final Logic-------------------------------------------------------------
+# It worked for 1.5 days continuously but I found the app offline at 4AM on 27 Aug 2027 
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Trigger hourly to roll over to a fresh runner seamlessly
+#     - cron: '0 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop (1-Hour Active Runner)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 4 minutes for up to 55 minutes
+#           for i in range(14):
+#               print(f'=== Check {i+1}/14 at {time.strftime(\"%H:%M:%S\")} ===')
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception:
+#                   is_healthy = False
+
+#               print(f'Domain healthy: {is_healthy}')
+
+#               # 2. Check Studio state with a fresh connection per tick
+#               needs_restart = not is_healthy
+#               try:
+#                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                   status = str(s.status).lower()
+#                   print(f'Studio status: {status}')
+#                   if status != 'running':
+#                       needs_restart = True
+#               except Exception as e:
+#                   print(f'Studio status check notice: {e}')
+#                   needs_restart = True
+
+#               # 3. Recover if offline or session hard-limit expired
+#               if needs_restart:
+#                   print('Recovering studio...')
+#                   try:
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.stop()
+#                           time.sleep(20)
+#                       except Exception:
+#                           pass
+
+#                       s.start()
+#                       print('Waiting 45s for boot...')
+#                       time.sleep(45)
+
+#                       print('Deploying services...')
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!')
+#                   except Exception as err:
+#                       print(f'Recovery step warning: {err}')
+
+#               print('Sleeping 240s (4m)...')
+#               time.sleep(240)
+#           "
+
+# --------------------------------------------------------------------------------------------------------------------------------------------
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     # Trigger frequently so jobs overlap continuously
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, time, requests
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 4 minutes for up to ~3.5 hours (52 checks)
+#           # Covers any extended GitHub queue delays seamlessly
+#           for i in range(52):
+#               print(f'=== Check {i+1}/52 at {time.strftime(\"%H:%M:%S\")} ===')
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception:
+#                   is_healthy = False
+
+#               print(f'Domain healthy: {is_healthy}')
+
+#               # 2. Check Studio state
+#               needs_restart = not is_healthy
+#               try:
+#                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                   status = str(s.status).lower()
+#                   print(f'Studio status: {status}')
+#                   if status != 'running':
+#                       needs_restart = True
+#               except Exception as e:
+#                   print(f'Studio check note: {e}')
+#                   needs_restart = True
+
+#               # 3. Recover if down
+#               if needs_restart:
+#                   print('Recovering studio...')
+#                   try:
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.stop()
+#                           time.sleep(20)
+#                       except Exception:
+#                           pass
+
+#                       s.start()
+#                       print('Waiting 45s for boot...')
+#                       time.sleep(45)
+
+#                       print('Deploying services...')
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!')
+#                   except Exception as err:
+#                       print(f'Recovery notice: {err}')
+
+#               print('Sleeping 240s (4m)...')
+#               time.sleep(240)
+#           "
+
+
+#------------------------ Nee approach to work continuously after each cylcle-----------
+#-----------------------------------------This lacked permission to create new workflow read and write -----------------------------
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '0 * * * *'
+#   workflow_dispatch:
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop with Self-Chaining
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -c "
+#           import os, time, requests, subprocess
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 4 minutes for up to ~3.5 hours (52 checks)
+#           for i in range(52):
+#               print(f'=== Check {i+1}/52 at {time.strftime(\"%H:%M:%S\")} ===')
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception:
+#                   is_healthy = False
+
+#               print(f'Domain healthy: {is_healthy}')
+
+#               # 2. Check Studio state
+#               needs_restart = not is_healthy
+#               try:
+#                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                   status = str(s.status).lower()
+#                   print(f'Studio status: {status}')
+#                   if status != 'running':
+#                       needs_restart = True
+#               except Exception as e:
+#                   print(f'Studio check note: {e}')
+#                   needs_restart = True
+
+#               # 3. Recover if down
+#               if needs_restart:
+#                   print('Recovering studio...')
+#                   try:
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.stop()
+#                           time.sleep(20)
+#                       except Exception:
+#                           pass
+
+#                       s.start()
+#                       print('Waiting 45s for boot...')
+#                       time.sleep(45)
+
+#                       print('Deploying services...')
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!')
+#                   except Exception as err:
+#                       print(f'Recovery notice: {err}')
+
+#               print('Sleeping 240s (4m)...')
+#               time.sleep(240)
+
+#           # 4. Self-Chaining: Trigger the next runner right before exiting
+#           print('Current runner finishing. Triggering successor workflow...')
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               cmd = f'curl -X POST -H \"Authorization: token {token}\" -H \"Accept: application/vnd.github.v3+json\" https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches -d \"{{\"ref\":\"main\"}}\"'
+#               subprocess.run(cmd, shell=True, check=True)
+#               print('Successor runner triggered successfully!')
+#           except Exception as chain_err:
+#               print(f'Self-trigger warning: {chain_err}')
+#           "
+          
+# ------- September 2026 -------
+# ---------------------------------------------------------------------- New Version (Working and restarting properly. self-healing) -----------------------------------------------------------------------------
+# The Background Thread Accumulation: In your current file, s = Studio(...) is called inside the loop on every check. This creates 50+ background keep-alive 
+# threads (Thread-1, Thread-6, Thread-13, Thread-17...) that run simultaneously and flood your GitHub logs with hundreds of lines of ApiException: 400 errors 
+# whenever the Studio power-cycles.
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# # Grant token permission to trigger workflow dispatches
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -c "
+#           import os, time, requests, subprocess
+#           from lightning_sdk import Studio
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 4 minutes for up to ~3.5 hours (52 checks)
+#           for i in range(52):
+#               print(f'=== Check {i+1}/52 at {time.strftime(\"%H:%M:%S\")} ===')
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception:
+#                   is_healthy = False
+
+#               print(f'Domain healthy: {is_healthy}')
+
+#               # 2. Check Studio state
+#               needs_restart = not is_healthy
+#               try:
+#                   s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                   status = str(s.status).lower()
+#                   print(f'Studio status: {status}')
+#                   if status != 'running':
+#                       needs_restart = True
+#               except Exception as e:
+#                   print(f'Studio check note: {e}')
+#                   needs_restart = True
+
+#               # 3. Recover if down
+#               if needs_restart:
+#                   print('Recovering studio...')
+#                   try:
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.stop()
+#                           time.sleep(20)
+#                       except Exception:
+#                           pass
+
+#                       s.start()
+#                       print('Waiting 45s for boot...')
+#                       time.sleep(45)
+
+#                       print('Deploying services...')
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!')
+#                   except Exception as err:
+#                       print(f'Recovery notice: {err}')
+
+#               print('Sleeping 240s (4m)...')
+#               time.sleep(240)
+
+#           # 4. Self-Chaining: Reliably dispatch next workflow
+#           print('Current runner finishing. Triggering successor workflow...')
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'Bearer {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               payload = {'ref': 'main'}
+#               resp = requests.post(url, headers=headers, json=payload, timeout=10)
+#               if resp.status_code == 204:
+#                   print('Successor runner triggered successfully (HTTP 204)!')
+#               else:
+#                   print(f'Trigger response ({resp.status_code}): {resp.text}')
+#           except Exception as chain_err:
+#               print(f'Self-trigger warning: {chain_err}')
+#           "
+# 
+
+
+# Updated code to tackle the current problem to shutdown
+# Due to an update in studio, it did not restart due to the way studio handles the api key now
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Persistent Watchdog Loop (3.5 Hours Active Guard)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, time, requests, socket
+#           socket.setdefaulttimeout(15)
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Loop every 3 minutes for up to ~3.5 hours (70 checks) to stay well under 10m idle sleep
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               # 1. Health check external public endpoint
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               # 2. Recover only if down
+#               if not is_healthy:
+#                   print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+#                   try:
+#                       from lightning_sdk import Studio
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.start()
+#                           print('Start signal dispatched. Waiting 45s for boot...', flush=True)
+#                           time.sleep(45)
+#                       except Exception as boot_err:
+#                           print(f'Start call notice: {boot_err}', flush=True)
+
+#                       print('Deploying services...', flush=True)
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services online!', flush=True)
+#                   except Exception as err:
+#                       print(f'Recovery notice: {err}', flush=True)
+#               else:
+#                   print('All systems operational.', flush=True)
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+
+#           # 3. Self-Chaining: Reliably dispatch next workflow
+#           print('Current runner finishing. Triggering successor workflow...', flush=True)
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'Bearer {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               payload = {'ref': 'main'}
+#               resp = requests.post(url, headers=headers, json=payload, timeout=10)
+#               if resp.status_code == 204:
+#                   print('Successor runner triggered successfully (HTTP 204)!', flush=True)
+#               else:
+#                   print(f'Trigger response ({resp.status_code}): {resp.text}', flush=True)
+#           except Exception as chain_err:
+#               print(f'Self-trigger warning: {chain_err}', flush=True)
+#           "
+
+# Updated code to tackle the current problem to avoid shutdown and stay 24*7 active
+# it will accept the API Key only if it is available on disk, so that it can restart (this is done)
+# Not able to keept the studio active after 3.5hrs
+# When I tested on 6 Oct 2026, it just worded for 10 minutes only.
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Lightning SDK & Requests
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Authenticate Lightning CLI & Credentials
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           mkdir -p ~/.lightning
+#           python -c "
+#           import os, json
+#           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+#           key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+#           creds = {
+#               'user_id': uid,
+#               'api_key': key
+#           }
+#           path = os.path.expanduser('~/.lightning/credentials.json')
+#           with open(path, 'w') as f:
+#               json.dump(creds, f)
+#           print('Credentials written successfully to', path)
+#           "
+#           # Also run CLI login with credentials
+#           lightning login $LIGHTNING_API_KEY || true
+
+#       - name: Persistent Watchdog Loop (Unbuffered & CLI-Authenticated)
+#         env:
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, time, requests, socket
+#           socket.setdefaulttimeout(15)
+
+#           os.environ['LIGHTNING_USER_ID'] = os.environ['LIGHTNING_USER_ID'].strip()
+#           os.environ['LIGHTNING_API_KEY'] = os.environ['LIGHTNING_API_KEY'].strip()
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+
+#           # Check every 3 minutes for up to ~3.5 hours (70 checks)
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               if not is_healthy:
+#                   print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+#                   try:
+#                       from lightning_sdk import Studio
+#                       s = Studio(name='scratch-studio-devbox', teamspace='default-project', org='sakshamraj1-34lrc')
+#                       try:
+#                           s.start()
+#                           print('Start command sent. Waiting 45s for boot...', flush=True)
+#                           time.sleep(45)
+#                       except Exception as boot_err:
+#                           print(f'Start call notice: {boot_err}', flush=True)
+
+#                       print('Deploying services via keep_alive.sh...', flush=True)
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services successfully deployed!', flush=True)
+#                   except Exception as err:
+#                       print(f'Recovery notice: {err}', flush=True)
+#               else:
+#                   print('All systems operational.', flush=True)
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+
+#           # Self-chain successor
+#           print('Runner finishing. Dispatching successor...', flush=True)
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'Bearer {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+#               print(f'Successor trigger response: {resp.status_code}', flush=True)
+#           except Exception as chain_err:
+#               print(f'Dispatch notice: {chain_err}', flush=True)
+#           "
+
+# The above code was working well 24*7 until the Lightning Studio had 6 weeks shutdown
+
+####################################################################################
+# New API key used
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Dependencies
+#         run: pip install "lightning-sdk" requests
+
+#       - name: Restore Lightning Session Credentials
+#         env:
+#           LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
+#         run: |
+#           python -c "
+#           import os, json
+
+#           lightning_dir = os.path.expanduser('~/.lightning')
+#           os.makedirs(lightning_dir, exist_ok=True)
+#           cred_path = os.path.join(lightning_dir, 'credentials.json')
+
+#           raw_json = os.environ.get('LIGHTNING_CREDENTIALS_JSON', '').strip()
+#           uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+#           key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+#           if raw_json:
+#               with open(cred_path, 'w') as f:
+#                   f.write(raw_json)
+#               print('Restored credentials.json from LIGHTNING_CREDENTIALS_JSON secret.')
+#           elif uid and key:
+#               payload = {
+#                   'active_user': uid,
+#                   'users': {uid: {'api_key': key, 'user_id': uid}},
+#                   'user_id': uid,
+#                   'api_key': key,
+#                   'auth': {'user_id': uid, 'api_key': key},
+#                   'default_teamspace': 'default-project',
+#                   'teamspace': 'default-project'
+#               }
+#               with open(cred_path, 'w') as f:
+#                   json.dump(payload, f)
+#               print('Built credentials.json from LIGHTNING_USER_ID and LIGHTNING_API_KEY.')
+#           else:
+#               raise RuntimeError('No Lightning credentials found in GitHub Secrets!')
+
+#           os.chmod(cred_path, 0o600)
+#           "
+          
+#       - name: Persistent Watchdog Loop (Pulse Guard)
+#         env:
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, json, time, requests, socket
+#           socket.setdefaulttimeout(20)
+
+#           # Automatically populate env vars from the restored credentials.json
+#           cred_path = os.path.expanduser('~/.lightning/credentials.json')
+#           if os.path.exists(cred_path):
+#               with open(cred_path, 'r') as f:
+#                   creds = json.load(f)
+#               uid = creds.get('user_id') or creds.get('active_user') or ''
+#               key = creds.get('api_key') or ''
+#               if not key and isinstance(creds.get('users'), dict) and uid in creds['users']:
+#                   key = creds['users'][uid].get('api_key', '')
+#               if uid:
+#                   os.environ['LIGHTNING_USER_ID'] = str(uid).strip()
+#               if key:
+#                   os.environ['LIGHTNING_API_KEY'] = str(key).strip()
+#               print(f'Loaded credentials for user_id present: {bool(uid)}, api_key present: {bool(key)}', flush=True)
+
+#           os.environ['LIGHTNING_CLOUD_URL'] = 'https://lightning.ai'
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+#           studio_name = 'scratch-studio-devbox'
+
+#           from lightning_sdk import Studio
+
+#           def connect_studio():
+#               attempts = [
+#                   ('user=Sakshamraj1, teamspace=default-project', lambda: Studio(name=studio_name, teamspace='default-project', user='Sakshamraj1')),
+#                   ('user=sakshamraj1-34lrc, teamspace=default-project', lambda: Studio(name=studio_name, teamspace='default-project', user='sakshamraj1-34lrc')),
+#                   ('teamspace=default-project only', lambda: Studio(name=studio_name, teamspace='default-project')),
+#                   ('teamspace=default only', lambda: Studio(name=studio_name, teamspace='default')),
+#                   ('name only', lambda: Studio(name=studio_name)),
+#               ]
+#               errors = []
+#               for label, fn in attempts:
+#                   try:
+#                       st = fn()
+#                       status = st.status
+#                       print(f'Connected using [{label}] -> status: {status}', flush=True)
+#                       return st
+#                   except Exception as e:
+#                       errors.append(f'{label}: {e}')
+
+#               try:
+#                   studios = Studio.list()
+#                   print(f'Studio.list() found: {[getattr(x, \"name\", str(x)) for x in studios]}', flush=True)
+#                   for st in studios:
+#                       if getattr(st, 'name', '') == studio_name:
+#                           return st
+#               except Exception as list_err:
+#                   errors.append(f'Studio.list(): {list_err}')
+
+#               raise RuntimeError(' | '.join(errors))
+
+#           s = None
+#           try:
+#               s = connect_studio()
+#           except Exception as e:
+#               print(f'Initial connection diagnostics: {e}', flush=True)
+
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               try:
+#                   if s is None:
+#                       s = connect_studio()
+
+#                   if is_healthy:
+#                       print('Sending heartbeat command to reset 10m idle timer...', flush=True)
+#                       try:
+#                           s.run('touch /tmp/keepalive_pulse')
+#                           print('Heartbeat pulse succeeded.', flush=True)
+#                       except Exception as hb_err:
+#                           print(f'Pulse note: {hb_err}', flush=True)
+#                   else:
+#                       print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+#                       try:
+#                           s.start()
+#                           print('Start command sent. Waiting 45s for boot...', flush=True)
+#                           time.sleep(45)
+#                       except Exception as boot_err:
+#                           print(f'Start call notice: {boot_err}', flush=True)
+
+#                       print('Deploying services via keep_alive.sh...', flush=True)
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services successfully deployed!', flush=True)
+#               except Exception as err:
+#                   print(f'Studio communication notice: {err}', flush=True)
+#                   s = None
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+
+#           print('Runner finishing. Dispatching successor...', flush=True)
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'token {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+#               print(f'Successor trigger response: {resp.status_code}', flush=True)
+#           except Exception as chain_err:
+#               print(f'Dispatch notice: {chain_err}', flush=True)
+#           "
+
+# # Unable to resolve studio instance error checking
+
+#####################################################################
+#####################################################################
+
+# Updated code with 'LIGHTNING_CREDENTIALS_JSON'
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Dependencies
+#         run: pip install -U "lightning-sdk" requests
+
+#       - name: Restore Lightning Session Credentials
+#         env:
+#           LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
+#         run: |
+#           python -c "
+#           import os, json
+
+#           raw = os.environ.get('LIGHTNING_CREDENTIALS_JSON', '').strip()
+#           if not raw:
+#               raise RuntimeError('LIGHTNING_CREDENTIALS_JSON secret is empty!')
+
+#           parsed = json.loads(raw)
+#           lightning_dir = os.path.expanduser('~/.lightning')
+#           os.makedirs(lightning_dir, exist_ok=True)
+#           cred_path = os.path.join(lightning_dir, 'credentials.json')
+
+#           with open(cred_path, 'w') as f:
+#               json.dump(parsed, f)
+#           os.chmod(cred_path, 0o600)
+#           print('Restored credentials.json with keys:', list(parsed.keys()))
+#           "
+
+#       - name: Persistent Watchdog Loop (Pulse Guard)
+#         env:
+#           LIGHTNING_CLOUD_URL: https://platform.lightning.ai
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, time, requests, socket
+#           socket.setdefaulttimeout(20)
+
+#           os.environ['LIGHTNING_CLOUD_URL'] = 'https://platform.lightning.ai'
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+#           studio_name = 'scratch-studio-devbox'
+#           teamspace_name = 'default-project'
+#           org_slug = 'sakshamraj1-34lrc'
+
+#           from lightning_sdk import Studio
+
+#           def connect_studio():
+#               attempts = [
+#                   ('org=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)),
+#                   ('user=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, user=org_slug)),
+#                   ('user=sakshamraj1', lambda: Studio(name=studio_name, teamspace=teamspace_name, user='sakshamraj1')),
+#               ]
+#               errors = []
+#               for label, fn in attempts:
+#                   try:
+#                       st = fn()
+#                       status = st.status
+#                       print(f'Connected using [{label}] -> status: {status}', flush=True)
+#                       return st
+#                   except Exception as e:
+#                       errors.append(f'{label}: {e}')
+#               raise RuntimeError(' | '.join(errors))
+
+#           s = None
+#           try:
+#               s = connect_studio()
+#           except Exception as e:
+#               print(f'Initial connection diagnostics: {e}', flush=True)
+
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               try:
+#                   if s is None:
+#                       s = connect_studio()
+
+#                   if is_healthy:
+#                       print('Sending heartbeat command to reset 10m idle timer...', flush=True)
+#                       try:
+#                           s.run('touch /tmp/keepalive_pulse')
+#                           print('Heartbeat pulse succeeded.', flush=True)
+#                       except Exception as hb_err:
+#                           print(f'Pulse note: {hb_err}', flush=True)
+#                   else:
+#                       print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+#                       try:
+#                           s.start()
+#                           print('Start command sent. Waiting 45s for boot...', flush=True)
+#                           time.sleep(45)
+#                       except Exception as boot_err:
+#                           print(f'Start call notice: {boot_err}', flush=True)
+
+#                       print('Deploying services via keep_alive.sh...', flush=True)
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services successfully deployed!', flush=True)
+#               except Exception as err:
+#                   print(f'Studio communication notice: {err}', flush=True)
+#                   s = None
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+
+#           print('Runner finishing. Dispatching successor...', flush=True)
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'token {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+#               print(f'Successor trigger response: {resp.status_code}', flush=True)
+#           except Exception as chain_err:
+#               print(f'Dispatch notice: {chain_err}', flush=True)
+#           "
+
+# The above identified the studio instance error checking
