@@ -972,13 +972,53 @@ jobs:
       - name: Install Dependencies
         run: pip install "lightning-sdk" requests
 
+      # - name: Restore Lightning Session Credentials
+      #   env:
+      #     LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
+      #   run: |
+      #     mkdir -p ~/.lightning
+      #     printf '%s' "$LIGHTNING_CREDENTIALS_JSON" > ~/.lightning/credentials.json
+      #     chmod 600 ~/.lightning/credentials.json
+
       - name: Restore Lightning Session Credentials
         env:
           LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
+          LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+          LIGHTNING_API_KEY: ${{ secrets.LIGHTNING_API_KEY }}
         run: |
-          mkdir -p ~/.lightning
-          printf '%s' "$LIGHTNING_CREDENTIALS_JSON" > ~/.lightning/credentials.json
-          chmod 600 ~/.lightning/credentials.json
+          python -c "
+          import os, json
+
+          lightning_dir = os.path.expanduser('~/.lightning')
+          os.makedirs(lightning_dir, exist_ok=True)
+          cred_path = os.path.join(lightning_dir, 'credentials.json')
+
+          raw_json = os.environ.get('LIGHTNING_CREDENTIALS_JSON', '').strip()
+          uid = os.environ.get('LIGHTNING_USER_ID', '').strip()
+          key = os.environ.get('LIGHTNING_API_KEY', '').strip()
+
+          if raw_json:
+              with open(cred_path, 'w') as f:
+                  f.write(raw_json)
+              print('Restored credentials.json from LIGHTNING_CREDENTIALS_JSON secret.')
+          elif uid and key:
+              payload = {
+                  'active_user': uid,
+                  'users': {uid: {'api_key': key, 'user_id': uid}},
+                  'user_id': uid,
+                  'api_key': key,
+                  'auth': {'user_id': uid, 'api_key': key},
+                  'default_teamspace': 'default-project',
+                  'teamspace': 'default-project'
+              }
+              with open(cred_path, 'w') as f:
+                  json.dump(payload, f)
+              print('Built credentials.json from LIGHTNING_USER_ID and LIGHTNING_API_KEY.')
+          else:
+              raise RuntimeError('No Lightning credentials found in GitHub Secrets!')
+
+          os.chmod(cred_path, 0o600)
+          "
           
       # - name: Persistent Watchdog Loop (Pulse Guard)
       #   env:
