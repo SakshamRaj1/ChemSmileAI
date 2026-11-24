@@ -944,143 +944,140 @@
 ####################################################################################
 # New API key used
 
-# name: Keep Studio Fresh & Free
+name: Keep Studio Fresh & Free
 
-# on:
-#   schedule:
-#     - cron: '*/30 * * * *'
-#   workflow_dispatch:
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
-# permissions:
-#   actions: write
-#   contents: read
+permissions:
+  actions: write
+  contents: read
 
-# concurrency:
-#   group: studio-keep-alive
-#   cancel-in-progress: true
+concurrency:
+  group: studio-keep-alive
+  cancel-in-progress: true
 
-# jobs:
-#   keep_alive:
-#     runs-on: ubuntu-latest
-#     timeout-minutes: 350
-#     steps:
-#       - name: Set up Python
-#         uses: actions/setup-python@v5
-#         with:
-#           python-version: '3.11'
+jobs:
+  keep_alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-#       - name: Install Dependencies
-#         run: pip install "lightning-sdk" requests
+      - name: Install Dependencies
+        run: pip install "lightning-sdk" requests
 
-#       - name: Restore Lightning Session Credentials
-#         env:
-#           LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
-#         run: |
-#           mkdir -p ~/.lightning
-#           printf '%s' "$LIGHTNING_CREDENTIALS_JSON" > ~/.lightning/credentials.json
-#           chmod 600 ~/.lightning/credentials.json
+      - name: Restore Lightning Session Credentials
+        env:
+          LIGHTNING_CREDENTIALS_JSON: ${{ secrets.LIGHTNING_CREDENTIALS_JSON }}
+        run: |
+          mkdir -p ~/.lightning
+          printf '%s' "$LIGHTNING_CREDENTIALS_JSON" > ~/.lightning/credentials.json
+          chmod 600 ~/.lightning/credentials.json
+          
+      # - name: Persistent Watchdog Loop (Pulse Guard)
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     REPO: ${{ github.repository }}
+      #   run: |
+      #     python -u -c "
+      #     import os, time, requests, socket
+      #     socket.setdefaulttimeout(20)
 
-#       - name: Persistent Watchdog Loop (Pulse Guard)
-#         env:
-#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#           REPO: ${{ github.repository }}
-#         run: |
-#           python -u -c "
-#           import os, time, requests, socket
-#           socket.setdefaulttimeout(20)
+      #     os.environ['LIGHTNING_CLOUD_URL'] = 'https://lightning.ai'
 
-#           os.environ['LIGHTNING_CLOUD_URL'] = 'https://lightning.ai'
+      #     domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+      #     studio_name = 'scratch-studio-devbox'
+      #     teamspace_name = 'default-project'
+      #     user_slug = 'Sakshamraj1'
 
-#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
-#           studio_name = 'scratch-studio-devbox'
-#           teamspace_name = 'default-project'
-#           user_slug = 'Sakshamraj1'
+      #     from lightning_sdk import Studio
 
-#           from lightning_sdk import Studio
+      #     def connect_studio():
+      #         for attempt in [
+      #             lambda: Studio(name=studio_name, teamspace=teamspace_name, user=user_slug),
+      #             lambda: Studio(name=studio_name, teamspace=teamspace_name),
+      #             lambda: Studio(name=studio_name, user=user_slug),
+      #             lambda: Studio(name=studio_name)
+      #         ]:
+      #             try:
+      #                 st = attempt()
+      #                 _ = st.status
+      #                 return st
+      #             except Exception:
+      #                 continue
+      #         raise RuntimeError('Unable to resolve Studio instance.')
 
-#           def connect_studio():
-#               for attempt in [
-#                   lambda: Studio(name=studio_name, teamspace=teamspace_name, user=user_slug),
-#                   lambda: Studio(name=studio_name, teamspace=teamspace_name),
-#                   lambda: Studio(name=studio_name, user=user_slug),
-#                   lambda: Studio(name=studio_name)
-#               ]:
-#                   try:
-#                       st = attempt()
-#                       _ = st.status
-#                       return st
-#                   except Exception:
-#                       continue
-#               raise RuntimeError('Unable to resolve Studio instance.')
+      #     s = None
+      #     try:
+      #         s = connect_studio()
+      #         print(f'Studio client connected! Current state: {s.status}', flush=True)
+      #     except Exception as e:
+      #         print(f'Initial connection note: {e}', flush=True)
 
-#           s = None
-#           try:
-#               s = connect_studio()
-#               print(f'Studio client connected! Current state: {s.status}', flush=True)
-#           except Exception as e:
-#               print(f'Initial connection note: {e}', flush=True)
+      #     for i in range(70):
+      #         print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
 
-#           for i in range(70):
-#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+      #         is_healthy = False
+      #         try:
+      #             res = requests.get(domain, timeout=8)
+      #             if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+      #                 is_healthy = True
+      #         except Exception as net_err:
+      #             print(f'Ping failed: {net_err}', flush=True)
 
-#               is_healthy = False
-#               try:
-#                   res = requests.get(domain, timeout=8)
-#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
-#                       is_healthy = True
-#               except Exception as net_err:
-#                   print(f'Ping failed: {net_err}', flush=True)
+      #         print(f'Domain healthy: {is_healthy}', flush=True)
 
-#               print(f'Domain healthy: {is_healthy}', flush=True)
+      #         try:
+      #             if s is None:
+      #                 s = connect_studio()
 
-#               try:
-#                   if s is None:
-#                       s = connect_studio()
+      #             if is_healthy:
+      #                 print('Sending heartbeat command to reset 10m idle timer...', flush=True)
+      #                 try:
+      #                     s.run('touch /tmp/keepalive_pulse')
+      #                     print('Heartbeat pulse succeeded.', flush=True)
+      #                 except Exception as hb_err:
+      #                     print(f'Pulse note: {hb_err}', flush=True)
+      #             else:
+      #                 print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+      #                 try:
+      #                     s.start()
+      #                     print('Start command sent. Waiting 45s for boot...', flush=True)
+      #                     time.sleep(45)
+      #                 except Exception as boot_err:
+      #                     print(f'Start call notice: {boot_err}', flush=True)
 
-#                   if is_healthy:
-#                       print('Sending heartbeat command to reset 10m idle timer...', flush=True)
-#                       try:
-#                           s.run('touch /tmp/keepalive_pulse')
-#                           print('Heartbeat pulse succeeded.', flush=True)
-#                       except Exception as hb_err:
-#                           print(f'Pulse note: {hb_err}', flush=True)
-#                   else:
-#                       print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
-#                       try:
-#                           s.start()
-#                           print('Start command sent. Waiting 45s for boot...', flush=True)
-#                           time.sleep(45)
-#                       except Exception as boot_err:
-#                           print(f'Start call notice: {boot_err}', flush=True)
+      #                 print('Deploying services via keep_alive.sh...', flush=True)
+      #                 s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+      #                 print('Services successfully deployed!', flush=True)
+      #         except Exception as err:
+      #             print(f'Studio communication notice: {err}', flush=True)
+      #             s = None
 
-#                       print('Deploying services via keep_alive.sh...', flush=True)
-#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-#                       print('Services successfully deployed!', flush=True)
-#               except Exception as err:
-#                   print(f'Studio communication notice: {err}', flush=True)
-#                   s = None
+      #         print('Sleeping 180s (3m)...', flush=True)
+      #         time.sleep(180)
 
-#               print('Sleeping 180s (3m)...', flush=True)
-#               time.sleep(180)
-
-#           print('Runner finishing. Dispatching successor...', flush=True)
-#           try:
-#               token = os.environ.get('GH_TOKEN')
-#               repo = os.environ.get('REPO')
-#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
-#               headers = {
-#                   'Authorization': f'token {token}',
-#                   'Accept': 'application/vnd.github.v3+json'
-#               }
-#               resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
-#               print(f'Successor trigger response: {resp.status_code}', flush=True)
-#           except Exception as chain_err:
-#               print(f'Dispatch notice: {chain_err}', flush=True)
-#           "
-
-# Unable to resolve studio instance error checking
-
-- name: Persistent Watchdog Loop (Pulse Guard)
+      #     print('Runner finishing. Dispatching successor...', flush=True)
+      #     try:
+      #         token = os.environ.get('GH_TOKEN')
+      #         repo = os.environ.get('REPO')
+      #         url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+      #         headers = {
+      #             'Authorization': f'token {token}',
+      #             'Accept': 'application/vnd.github.v3+json'
+      #         }
+      #         resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+      #         print(f'Successor trigger response: {resp.status_code}', flush=True)
+      #     except Exception as chain_err:
+      #         print(f'Dispatch notice: {chain_err}', flush=True)
+      #     "
+      - name: Persistent Watchdog Loop (Pulse Guard)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -1203,3 +1200,6 @@
           except Exception as chain_err:
               print(f'Dispatch notice: {chain_err}', flush=True)
           "
+
+# Unable to resolve studio instance error checking
+
