@@ -1,3 +1,151 @@
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: true
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Dependencies
+#         run: pip install -U "lightning-sdk" requests
+
+#       - name: Restore Lightning Auth Token File
+#         env:
+#           LIGHTNING_AUTH_TOKEN: ${{ secrets.LIGHTNING_AUTH_TOKEN }}
+#         run: |
+#           python -c "
+#           import os
+#           token = os.environ.get('LIGHTNING_AUTH_TOKEN', '').strip()
+#           if not token:
+#               raise RuntimeError('LIGHTNING_AUTH_TOKEN secret is empty!')
+
+#           os.makedirs('/tmp/lightning_creds', exist_ok=True)
+#           token_path = '/tmp/lightning_creds/.lightning_auth_token'
+#           with open(token_path, 'w') as f:
+#               f.write(token)
+#           os.chmod(token_path, 0o600)
+#           print('Token file written successfully.')
+#           "
+
+#       - name: Persistent Watchdog Loop (Pulse Guard)
+#         env:
+#           LIGHTNING_CLOUD_URL: https://platform.lightning.ai
+#           LIGHTNING_AUTH_TOKEN: ${{ secrets.LIGHTNING_AUTH_TOKEN }}
+#           LIGHTNING_AUTH_TOKEN_FILE: /tmp/lightning_creds/.lightning_auth_token
+#           LIGHTNING_USER_ID: ${{ secrets.LIGHTNING_USER_ID }}
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, time, requests, socket
+#           socket.setdefaulttimeout(20)
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+#           studio_name = 'scratch-studio-devbox'
+#           teamspace_name = 'default-project'
+#           org_slug = 'sakshamraj1-34lrc'
+
+#           from lightning_sdk import Studio
+
+#           def connect_studio():
+#               attempts = [
+#                   ('org=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)),
+#                   ('user=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, user=org_slug)),
+#                   ('user=sakshamraj1', lambda: Studio(name=studio_name, teamspace=teamspace_name, user='sakshamraj1')),
+#               ]
+#               errors = []
+#               for label, fn in attempts:
+#                   try:
+#                       st = fn()
+#                       status = st.status
+#                       print(f'Connected using [{label}] -> status: {status}', flush=True)
+#                       return st
+#                   except Exception as e:
+#                       errors.append(f'{label}: {e}')
+#               raise RuntimeError(' | '.join(errors))
+
+#           s = None
+#           try:
+#               s = connect_studio()
+#           except Exception as e:
+#               print(f'Initial connection diagnostics: {e}', flush=True)
+
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               is_healthy = False
+#               try:
+#                   res = requests.get(domain, timeout=8)
+#                   if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               try:
+#                   if s is None:
+#                       s = connect_studio()
+
+#                   if is_healthy:
+#                       print('Sending heartbeat command to reset 10m idle timer...', flush=True)
+#                       try:
+#                           s.run('touch /tmp/keepalive_pulse')
+#                           print('Heartbeat pulse succeeded.', flush=True)
+#                       except Exception as hb_err:
+#                           print(f'Pulse note: {hb_err}', flush=True)
+#                   else:
+#                       print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
+#                       try:
+#                           s.start()
+#                           print('Start command sent. Waiting 45s for boot...', flush=True)
+#                           time.sleep(45)
+#                       except Exception as boot_err:
+#                           print(f'Start call notice: {boot_err}', flush=True)
+
+#                       print('Deploying services via keep_alive.sh...', flush=True)
+#                       s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
+#                       print('Services successfully deployed!', flush=True)
+#               except Exception as err:
+#                   print(f'Studio communication notice: {err}', flush=True)
+#                   s = None
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+
+#           print('Runner finishing. Dispatching successor...', flush=True)
+#           try:
+#               token = os.environ.get('GH_TOKEN')
+#               repo = os.environ.get('REPO')
+#               url = f'https://api.github.com/repos/{repo}/actions/workflows/restart_studio.yml/dispatches'
+#               headers = {
+#                   'Authorization': f'token {token}',
+#                   'Accept': 'application/vnd.github.v3+json'
+#               }
+#               resp = requests.post(url, headers=headers, json={'ref': 'main'}, timeout=10)
+#               print(f'Successor trigger response: {resp.status_code}', flush=True)
+#           except Exception as chain_err:
+#               print(f'Dispatch notice: {chain_err}', flush=True)
+#           "
+
+# Working
 name: Keep Studio Fresh & Free
 
 on:
@@ -44,7 +192,7 @@ jobs:
           print('Token file written successfully.')
           "
 
-      - name: Persistent Watchdog Loop (Pulse Guard)
+      - name: Persistent Watchdog Loop (Boot Guard)
         env:
           LIGHTNING_CLOUD_URL: https://platform.lightning.ai
           LIGHTNING_AUTH_TOKEN: ${{ secrets.LIGHTNING_AUTH_TOKEN }}
@@ -65,27 +213,15 @@ jobs:
           from lightning_sdk import Studio
 
           def connect_studio():
-              attempts = [
-                  ('org=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)),
-                  ('user=sakshamraj1-34lrc', lambda: Studio(name=studio_name, teamspace=teamspace_name, user=org_slug)),
-                  ('user=sakshamraj1', lambda: Studio(name=studio_name, teamspace=teamspace_name, user='sakshamraj1')),
-              ]
-              errors = []
-              for label, fn in attempts:
-                  try:
-                      st = fn()
-                      status = st.status
-                      print(f'Connected using [{label}] -> status: {status}', flush=True)
-                      return st
-                  except Exception as e:
-                      errors.append(f'{label}: {e}')
-              raise RuntimeError(' | '.join(errors))
+              st = Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)
+              print(f'Connected -> Studio status: {st.status}', flush=True)
+              return st
 
           s = None
           try:
               s = connect_studio()
           except Exception as e:
-              print(f'Initial connection diagnostics: {e}', flush=True)
+              print(f'Initial connection note: {e}', flush=True)
 
           for i in range(70):
               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
@@ -100,32 +236,19 @@ jobs:
 
               print(f'Domain healthy: {is_healthy}', flush=True)
 
-              try:
-                  if s is None:
-                      s = connect_studio()
-
-                  if is_healthy:
-                      print('Sending heartbeat command to reset 10m idle timer...', flush=True)
-                      try:
-                          s.run('touch /tmp/keepalive_pulse')
-                          print('Heartbeat pulse succeeded.', flush=True)
-                      except Exception as hb_err:
-                          print(f'Pulse note: {hb_err}', flush=True)
-                  else:
-                      print('Site unhealthy or Studio sleeping. Waking up...', flush=True)
-                      try:
-                          s.start()
-                          print('Start command sent. Waiting 45s for boot...', flush=True)
-                          time.sleep(45)
-                      except Exception as boot_err:
-                          print(f'Start call notice: {boot_err}', flush=True)
-
-                      print('Deploying services via keep_alive.sh...', flush=True)
-                      s.run('bash /teamspace/studios/this_studio/keep_alive.sh')
-                      print('Services successfully deployed!', flush=True)
-              except Exception as err:
-                  print(f'Studio communication notice: {err}', flush=True)
-                  s = None
+              if not is_healthy:
+                  print('Endpoint offline or Studio sleeping. Sending start signal...', flush=True)
+                  try:
+                      if s is None:
+                          s = connect_studio()
+                      s.start()
+                      print('Start command sent. Waiting 60s for container boot & .studiorc...', flush=True)
+                      time.sleep(60)
+                  except Exception as err:
+                      print(f'Studio wake notice: {err}', flush=True)
+                      s = None
+              else:
+                  print('Site online and healthy.', flush=True)
 
               print('Sleeping 180s (3m)...', flush=True)
               time.sleep(180)
