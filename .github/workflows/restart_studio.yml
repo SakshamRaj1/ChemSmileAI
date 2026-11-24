@@ -71,8 +71,12 @@ jobs:
 
               is_healthy = False
               try:
-                  res = requests.get(domain, timeout=8)
-                  if res.status_code in [200, 302] and 'ERR_NGROK' not in res.text:
+                  res = requests.get(
+                      domain,
+                      headers={'ngrok-skip-browser-warning': '1'},
+                      timeout=8
+                  )
+                  if res.status_code in [200, 302] and 'ERR_NGROK_3200' not in res.text:
                       is_healthy = True
               except Exception as net_err:
                   print(f'Ping failed: {net_err}', flush=True)
