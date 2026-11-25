@@ -1,8 +1,6 @@
 name: Keep Studio Fresh & Free
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -46,23 +44,37 @@ jobs:
           with open(login_path, 'w') as f:
               json.dump(parsed, f)
           os.chmod(login_path, 0o600)
-          print('Restored file-backed login.json with keys:', list(parsed.keys()))
+          print('Restored login.json successfully.')
           "
 
-      - name: Circular Watchdog Loop (Boot Guard)
+      - name: Circular Watchdog Loop (Boot Guard + Instant Token Persistence)
         env:
           LIGHTNING_CLOUD_URL: https://platform.lightning.ai
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           python -u -c "
-          import os, time, requests, socket
+          import os, time, subprocess, requests, socket
           socket.setdefaulttimeout(20)
 
           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
           studio_name = 'scratch-studio-devbox'
           teamspace_name = 'default-project'
           org_slug = 'sakshamraj1-34lrc'
+          login_path = os.path.expanduser('~/.lightning/login.json')
+
+          def sync_secret():
+              if os.path.exists(login_path) and os.environ.get('GH_TOKEN'):
+                  res = subprocess.run(
+                      ['gh', 'secret', 'set', 'LIGHTNING_LOGIN_JSON', '--repo', os.environ['REPO']],
+                      stdin=open(login_path, 'rb'),
+                      capture_output=True,
+                      text=True
+                  )
+                  if res.returncode == 0:
+                      print('Synced rotated login.json to GitHub Secrets.', flush=True)
+                  else:
+                      print(f'Secret sync notice: {res.stderr.strip()}', flush=True)
 
           from lightning_sdk import Studio
 
@@ -71,11 +83,7 @@ jobs:
 
               is_healthy = False
               try:
-                  res = requests.get(
-                      domain,
-                      headers={'ngrok-skip-browser-warning': '1'},
-                      timeout=8
-                  )
+                  res = requests.get(domain, headers={'ngrok-skip-browser-warning': '1'}, timeout=8)
                   if res.status_code in [200, 302] and 'ERR_NGROK_3200' not in res.text:
                       is_healthy = True
               except Exception as net_err:
@@ -88,7 +96,8 @@ jobs:
                   try:
                       st = Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)
                       st.start()
-                      print('Start command sent. Waiting 60s for container boot & .studiorc...', flush=True)
+                      sync_secret()
+                      print('Start command sent. Waiting 60s for container boot & on_start.sh...', flush=True)
                       time.sleep(60)
                   except Exception as err:
                       print(f'Studio wake notice: {err}', flush=True)
@@ -99,25 +108,7 @@ jobs:
               time.sleep(180)
           "
 
-      # - name: Save Rotated Refresh Token & Dispatch Circular Successor
-      #   if: always()
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     REPO: ${{ github.repository }}
-      #   run: |
-      #     if [ -f ~/.lightning/login.json ]; then
-      #       gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json
-      #       echo "Rotated LIGHTNING_LOGIN_JSON saved to GitHub Secrets."
-      #     fi
-
-      #     curl -s -X POST \
-      #       -H "Authorization: token $GH_TOKEN" \
-      #       -H "Accept: application/vnd.github.v3+json" \
-      #       "https://api.github.com/repos/$REPO/actions/workflows/restart_studio.yml/dispatches" \
-      #       -d '{"ref":"main"}'
-      #     echo "Circular successor dispatched."
-
-      - name: Save Rotated Refresh Token & Dispatch Circular Successor
+      - name: Final Secret Sync & Dispatch Circular Successor
         if: always()
         env:
           GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
@@ -127,10 +118,129 @@ jobs:
           if [ -f ~/.lightning/login.json ] && [ -n "$GH_TOKEN" ]; then
             gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json || echo "Secret rotation skipped"
           fi
-    
+
           curl -f -s -X POST \
             -H "Authorization: token $WORKFLOW_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/restart_studio.yml/dispatches" \
             -d '{"ref":"main"}'
           echo "Circular successor dispatched."
+
+# name: Keep Studio Fresh & Free
+
+# on:
+#   schedule:
+#     - cron: '*/30 * * * *'
+#   workflow_dispatch:
+
+# permissions:
+#   actions: write
+#   contents: read
+
+# concurrency:
+#   group: studio-keep-alive
+#   cancel-in-progress: false
+
+# jobs:
+#   keep_alive:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 350
+#     steps:
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Dependencies
+#         run: pip install -U "lightning-sdk" requests
+
+#       - name: Restore Self-Refreshing Lightning Login
+#         env:
+#           LIGHTNING_LOGIN_JSON: ${{ secrets.LIGHTNING_LOGIN_JSON }}
+#         run: |
+#           python -c "
+#           import os, json
+
+#           raw = os.environ.get('LIGHTNING_LOGIN_JSON', '').strip()
+#           if not raw:
+#               raise RuntimeError('LIGHTNING_LOGIN_JSON secret is empty!')
+
+#           parsed = json.loads(raw)
+#           parsed['storage'] = 'file'
+#           lightning_dir = os.path.expanduser('~/.lightning')
+#           os.makedirs(lightning_dir, exist_ok=True)
+#           login_path = os.path.join(lightning_dir, 'login.json')
+
+#           with open(login_path, 'w') as f:
+#               json.dump(parsed, f)
+#           os.chmod(login_path, 0o600)
+#           print('Restored file-backed login.json with keys:', list(parsed.keys()))
+#           "
+
+#       - name: Circular Watchdog Loop (Boot Guard)
+#         env:
+#           LIGHTNING_CLOUD_URL: https://platform.lightning.ai
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           python -u -c "
+#           import os, time, requests, socket
+#           socket.setdefaulttimeout(20)
+
+#           domain = 'https://doornail-plant-jazz.ngrok-free.dev'
+#           studio_name = 'scratch-studio-devbox'
+#           teamspace_name = 'default-project'
+#           org_slug = 'sakshamraj1-34lrc'
+
+#           from lightning_sdk import Studio
+
+#           for i in range(70):
+#               print(f'=== Check {i+1}/70 at {time.strftime(\"%H:%M:%S\")} ===', flush=True)
+
+#               is_healthy = False
+#               try:
+#                   res = requests.get(
+#                       domain,
+#                       headers={'ngrok-skip-browser-warning': '1'},
+#                       timeout=8
+#                   )
+#                   if res.status_code in [200, 302] and 'ERR_NGROK_3200' not in res.text:
+#                       is_healthy = True
+#               except Exception as net_err:
+#                   print(f'Ping failed: {net_err}', flush=True)
+
+#               print(f'Domain healthy: {is_healthy}', flush=True)
+
+#               if not is_healthy:
+#                   print('Endpoint offline or Studio sleeping. Waking up...', flush=True)
+#                   try:
+#                       st = Studio(name=studio_name, teamspace=teamspace_name, org=org_slug)
+#                       st.start()
+#                       print('Start command sent. Waiting 60s for container boot & .studiorc...', flush=True)
+#                       time.sleep(60)
+#                   except Exception as err:
+#                       print(f'Studio wake notice: {err}', flush=True)
+#               else:
+#                   print('Site online and healthy.', flush=True)
+
+#               print('Sleeping 180s (3m)...', flush=True)
+#               time.sleep(180)
+#           "
+
+#       - name: Save Rotated Refresh Token & Dispatch Circular Successor
+#         if: always()
+#         env:
+#           GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+#           WORKFLOW_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#         run: |
+#           if [ -f ~/.lightning/login.json ] && [ -n "$GH_TOKEN" ]; then
+#             gh secret set LIGHTNING_LOGIN_JSON --repo "$REPO" < ~/.lightning/login.json || echo "Secret rotation skipped"
+#           fi
+    
+#           curl -f -s -X POST \
+#             -H "Authorization: token $WORKFLOW_TOKEN" \
+#             -H "Accept: application/vnd.github.v3+json" \
+#             "https://api.github.com/repos/$REPO/actions/workflows/restart_studio.yml/dispatches" \
+#             -d '{"ref":"main"}'
+#           echo "Circular successor dispatched."
